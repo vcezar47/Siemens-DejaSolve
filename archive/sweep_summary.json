@@ -1,0 +1,19 @@
+{
+  "n_cases": 400,
+  "seed": 1,
+  "converged": 395,
+  "failed": 5,
+  "failure_rate": 0.0125,
+  "failure_modes": {
+    "line_search_stall": 5
+  },
+  "iterations": {
+    "mean": 8.311392405063291,
+    "median": 8.0,
+    "p90": 10.0,
+    "max": 21,
+    "total": 3283
+  },
+  "wall_s": 0.33499250000022585,
+  "relief_open_share": 0.3139240506329114
+}

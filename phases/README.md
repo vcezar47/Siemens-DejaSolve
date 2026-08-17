@@ -11,8 +11,8 @@ happened and the plan is what was intended.
 |---|---|---|
 | 0 · Validate + scaffold | ✅ closed 16 Aug | [phase-0-validation.md](phase-0-validation.md) |
 | 1 · THE NUMBER | ✅ gate met 16 Aug | [phase-1-the-number.md](phase-1-the-number.md) |
-| 2 · Verifier | not started | — |
-| 3 · Agent + UI | not started | — |
+| 2 · Verifier | ✅ gate met 17 Aug | [phase-2-verifier.md](phase-2-verifier.md) |
+| 3 · Agent + UI | ✅ gate met 17 Aug (UI deferred) | [phase-3-ingest.md](phase-3-ingest.md) |
 | 4 · Cloud/Docker + final measurements | not started | — |
 | 5 · Slides + rehearsal | not started | — |
 

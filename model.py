@@ -56,6 +56,18 @@ K_TORQUE = D_MOT / (20.0 * np.pi)
 #: flow per rev/min of shaft speed, Q[L/min] = w[rev/min] * K_DISP
 K_DISP = D_MOT / 1000.0
 
+
+def motor_constants(p: dict) -> tuple[float, float]:
+    """Torque and displacement constants for this case's motor.
+
+    Displacement is hardware, so it normally comes from the module constant.
+    A case may override it with ``D_mot`` to describe a circuit built around a
+    different motor — which is how the fold variant in ``fold.py`` is built
+    without disturbing the base circuit or anything measured on it.
+    """
+    d = p.get("D_mot", D_MOT)
+    return d / (20.0 * np.pi), d / 1000.0
+
 #: the swept case setup, in a fixed order — this is the retrieval feature vector
 PARAM_NAMES = (
     "Q_nom",       # L/min    pump nominal delivery
@@ -148,6 +160,7 @@ def residual(x, p: dict) -> np.ndarray:
     """Flow imbalance [L/min] at the 5 nodes, torque imbalance [Nm] at 2 shafts."""
     p1, p2a, p3a, wa, p2b, p3b, wb = x
     rho = p["rho"]
+    k_torque, k_disp = motor_constants(p)
     g_va = orifice_gain(p["A_valve_a"], rho)
     g_vb = orifice_gain(p["A_valve_b"], rho)
     g_ret = orifice_gain(A_RET, rho)
@@ -158,8 +171,8 @@ def residual(x, p: dict) -> np.ndarray:
     q_va = g_va * f_dp(p1 - p2a)
     q_vb = g_vb * f_dp(p1 - p2b)
 
-    q_ma = K_DISP * wa + LEAK_MOT * (p2a - p3a)
-    q_mb = K_DISP * wb + LEAK_MOT * (p2b - p3b)
+    q_ma = k_disp * wa + LEAK_MOT * (p2a - p3a)
+    q_mb = k_disp * wb + LEAK_MOT * (p2b - p3b)
     q_ra = g_ret * f_dp(p3a - P_TANK)
     q_rb = g_ret * f_dp(p3b - P_TANK)
 
@@ -167,10 +180,10 @@ def residual(x, p: dict) -> np.ndarray:
         q_pump - q_va - q_vb - q_rel,                       # manifold node
         q_va - q_ma,                                        # motor a inlet
         q_ma - q_ra,                                        # motor a outlet
-        (p2a - p3a) * K_TORQUE - load_torque(wa, p["c_load_a"]),   # shaft a
+        (p2a - p3a) * k_torque - load_torque(wa, p["c_load_a"]),   # shaft a
         q_vb - q_mb,                                        # motor b inlet
         q_mb - q_rb,                                        # motor b outlet
-        (p2b - p3b) * K_TORQUE - load_torque(wb, p["c_load_b"]),   # shaft b
+        (p2b - p3b) * k_torque - load_torque(wb, p["c_load_b"]),   # shaft b
     ])
 
 
@@ -185,6 +198,7 @@ def jacobian(x, p: dict) -> np.ndarray:
     """
     p1, p2a, p3a, wa, p2b, p3b, wb = x
     rho = p["rho"]
+    k_torque, k_disp = motor_constants(p)
     g_va = orifice_gain(p["A_valve_a"], rho)
     g_vb = orifice_gain(p["A_valve_b"], rho)
     g_ret = orifice_gain(A_RET, rho)
@@ -208,27 +222,27 @@ def jacobian(x, p: dict) -> np.ndarray:
     J[1, 0] = d_va
     J[1, 1] = -d_va - LEAK_MOT
     J[1, 2] = LEAK_MOT
-    J[1, 3] = -K_DISP
+    J[1, 3] = -k_disp
     # motor a outlet: q_ma - q_ra
     J[2, 1] = LEAK_MOT
     J[2, 2] = -LEAK_MOT - d_ra
-    J[2, 3] = K_DISP
+    J[2, 3] = k_disp
     # shaft a torque balance
-    J[3, 1] = K_TORQUE
-    J[3, 2] = -K_TORQUE
+    J[3, 1] = k_torque
+    J[3, 2] = -k_torque
     J[3, 3] = -d_load_torque(wa, p["c_load_a"])
     # motor b inlet
     J[4, 0] = d_vb
     J[4, 4] = -d_vb - LEAK_MOT
     J[4, 5] = LEAK_MOT
-    J[4, 6] = -K_DISP
+    J[4, 6] = -k_disp
     # motor b outlet
     J[5, 4] = LEAK_MOT
     J[5, 5] = -LEAK_MOT - d_rb
-    J[5, 6] = K_DISP
+    J[5, 6] = k_disp
     # shaft b torque balance
-    J[6, 4] = K_TORQUE
-    J[6, 5] = -K_TORQUE
+    J[6, 4] = k_torque
+    J[6, 5] = -k_torque
     J[6, 6] = -d_load_torque(wb, p["c_load_b"])
     return J
 
@@ -341,6 +355,50 @@ def normalise(vec) -> np.ndarray:
     lo = np.array([PARAM_BOUNDS[k][0] for k in PARAM_NAMES])
     hi = np.array([PARAM_BOUNDS[k][1] for k in PARAM_NAMES])
     return (np.atleast_2d(np.asarray(vec, dtype=float)) - lo) / (hi - lo)
+
+
+# --- dynamic stability -----------------------------------------------------
+#
+# The steady state solved above is the equilibrium of a dynamic system: oil
+# compressibility gives each node a pressure state, each shaft has inertia.
+# Writing that system as  dx/dt = S * F(x)  with S a positive diagonal scaling
+# lets us ask whether a converged root is an *operating point* at all.
+#
+# This matters because Newton will happily converge onto a root sitting on the
+# Stribeck downslope, where d(load torque)/dw < 0. Such a root satisfies the
+# equations to 1e-8 and is dynamically unstable — no real machine ever sits
+# there. It is the concrete form "silently wrong" takes in this model.
+
+BULK = 15000.0      # bar, effective bulk modulus of the oil
+V_NODE = 0.5        # L, lumped volume at each pressure node
+J_SHAFT = 0.05      # kg m^2, shaft + load inertia
+
+
+def dynamic_scales() -> np.ndarray:
+    """Diagonal S mapping residuals to state derivatives, in units per second.
+
+    Pressure rows: dp/dt [bar/s]      = (BULK / (60 * V)) * Q_net [L/min]
+    Shaft rows:    dw/dt [rev/min/s]  = (60 / (2*pi*J)) * T_net [Nm]
+    """
+    s = np.empty(7)
+    s[[0, 1, 2, 4, 5]] = BULK / (60.0 * V_NODE)
+    s[[3, 6]] = 60.0 / (2.0 * np.pi * J_SHAFT)
+    return s
+
+
+def stability(x, p: dict) -> dict:
+    """Eigenvalues of the linearised dynamics at a converged steady state."""
+    A = dynamic_scales()[:, None] * jacobian(x, p)
+    eig = np.linalg.eigvals(A)
+    max_real = float(np.max(eig.real))
+    return {
+        "stable": bool(max_real < 0.0),
+        "max_real_eig": max_real,
+        "unstable_shafts": [
+            name for name, i in (("a", 3), ("b", 6))
+            if d_load_torque(float(x[i]), p[f"c_load_{name}"]) < 0.0
+        ],
+    }
 
 
 def shaft_regime(w: float) -> str:

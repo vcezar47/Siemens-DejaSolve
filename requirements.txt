@@ -1,2 +1,10 @@
 numpy>=1.26
 matplotlib>=3.8
+
+# UI / service (Phase 3). The demo runs without these — dejasolve.py is a CLI.
+fastapi>=0.110
+uvicorn>=0.27
+
+# Optional: the Claude ingest backend. Imported lazily inside ingest.ingest_llm,
+# so the pipeline runs without it and falls back to the deterministic parser.
+# anthropic>=0.116

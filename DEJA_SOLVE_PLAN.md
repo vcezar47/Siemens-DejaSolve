@@ -201,8 +201,8 @@ are back; spend them on Phase 2, not on polishing Phase 1.
 |---|---|---|---|
 | ~~0. Validate + scaffold~~ | ~~Tue 11 – Thu 13 Aug~~ | **Done.** Mentor answered (§0). Amesim locked as vocabulary | ✅ confirmed |
 | ~~1. THE NUMBER~~ | ~~Sun 16 – Tue 18 Aug~~ | **Done 16 Aug.** `model.py`, `sweep.py`, `bench.py`, `plot_convergence.py`, `run_all.py`. 400-case archive, 200 fresh queries, 1-NN retrieval | ✅ **plot exists, 42% fewer iterations, answers agree to 4e-08 bar.** *The project can no longer fail* |
-| **2. Verifier** | Wed 19 – Thu 20 Aug | Rule set + the deliberately-wrong-transfer case that it catches | A case that converges fast to a *wrong* answer, and is refused |
-| **3. Agent + UI** | Fri 21 – Sun 23 Aug | LLM ingest → Case Card; Streamlit/FastAPI front end; retrieval explanation text | End-to-end run from a messy log file |
+| ~~2. Verifier~~ | ~~Wed 19 – Thu 20 Aug~~ | **Done 17 Aug.** `verifier.py` (5 pre-solve rules + 2 post-solve), `fold.py`. Eigenvalue admissibility check | ✅ **4 silently-wrong answers → 0, at +36% solver work.** [record](phases/phase-2-verifier.md) |
+| ~~3. Agent + UI~~ | ~~Fri 21 – Sun 23 Aug~~ | **Done 17 Aug.** `casecard.py`, `ingest.py` (rules + Claude backends), `make_logs.py`, `dejasolve.py`, and a FastAPI service + single-page UI (`app.py`, `static/index.html`) | ✅ **messy artifact → verified warm start, 8 → 4 iterations, in the browser.** [record](phases/phase-3-ingest.md) |
 | **4. Cloud/Docker + final measurements** | Mon 24 – Tue 25 Aug | compose file, AWS architecture slide, re-run all benchmarks clean, freeze numbers | `docker compose up` works on a clean machine |
 | **5. Slides + rehearsal** | Wed 26 – Thu 27 Aug | Deck, script, 3 full rehearsals with a timer | Under 10:00 twice in a row |
 | **Buffer** | Fri 28 morning | Nothing new. Only rehearsal | — |
@@ -222,9 +222,14 @@ and a trust story beats a demo with a chat box.
 
 ## 6. The demo — 3 acts, ~3 minutes total
 
-**Act 1 — the archive works (40s).** Drop in a messy solver log + a note in plain language. The ingest agent
-produces a Case Card. Search: "find me cases like this one." Top-3 come back with similarity scores and a
-one-line reason each.
+**Act 1 — the archive works (40s).** `python dejasolve.py --all`. Five real artifacts go in — a tidy solver
+log, an older banner log in SI units, a truncated log, an English email, a Romanian note. Each becomes a Case
+Card with canonical units and quoted provenance; retrieval names the nearest archived case and its regime.
+
+**Show the refusals, they are the better half of Act 1.** The truncated log is missing `p_crack`; the system
+names the gap, finds the nearest case on the six parameters that *were* stated, shows what that case used —
+and refuses to apply it: *"a missing parameter is a question for the engineer, not a value to borrow."* A
+mis-read unit (`7.8 m2` → 7.8e+06 mm²) is caught as implausible before it ever reaches retrieval.
 
 **Act 2 — the number (60s).** Panel A of `figs/convergence.png`, mirroring the PhysicsAI workflow:
 
@@ -241,10 +246,20 @@ Say the third row out loud: **"the speed of AI, the guarantee of the solver."** 
 from §6a: *"Across 200 fresh cases: 42% fewer Newton iterations, all four cold-start failures rescued, and
 the answers agree to 4×10⁻⁸ bar."*
 
-**Act 3 — the refusal (60s).** Feed it a case whose nearest neighbour is *superficially* similar but in a
-different regime. Naive version: warm-starts, converges beautifully, gives a **wrong** answer. Déjà Solve:
-refuses, one line of explanation. *"Silent wrongness is the failure mode that actually scares engineers.
-This is the layer nobody builds."*
+**Act 3 — the refusal (60s).** `figs/verifier.png`, case `foldq-0009`. Naive retrieval warm-starts and
+converges in **8 clean iterations** to shaft b at **35.6 rev/min** — residual 1e-8, looks perfect. It is a
+**dynamically unstable root**: the circuit's supply curve crosses the Stribeck load curve three times and it
+landed on the middle crossing, where no machine can run. Déjà Solve refuses in one line — *"converged onto a
+dynamically unstable root; the equations are satisfied but no machine runs here"* — and recovers a real
+operating point at 5.5 rev/min.
+
+Across 200 cases: **4 silently wrong answers → 0**, for **+36% solver work**.
+
+*"Silent wrongness is the failure mode that actually scares engineers. This is the layer nobody builds."*
+
+**Open with the honesty, it is stronger than the demo:** *"I first checked whether my own base circuit could
+produce a silently wrong answer. A 16-seed multi-start over all 400 cases found exactly one root every time —
+it can't, and I'll say so. This is the hardware corner where it can."* See §6b.
 
 ---
 
@@ -298,6 +313,99 @@ physical: the working model adds two motor shafts loaded through **Stribeck fric
 branch has negative slope and narrows the basin of attraction around the operating point. That is an
 ordinary mechatronic nonlinearity, not a contrivance — and it is why Panel A shows the cold run crawling
 across a plateau for 8 iterations before it can converge at all.
+
+---
+
+## 6b. Measured results — Phase 2, 17 Aug
+
+Full record: [`phases/phase-2-verifier.md`](phases/phase-2-verifier.md). Numbers from `fold_results.json`.
+
+**What "wrong" means, precisely.** The steady state is the equilibrium of a dynamic system (oil
+compressibility gives each node a pressure state, each shaft has inertia). A root on the Stribeck downslope
+has `d(load torque)/dw < 0` — positive feedback. It satisfies the equations to 1e-8 and is **dynamically
+unstable**; no machine can sit there. Newton cannot tell. The eigenvalues can.
+
+200 fresh cases on the fold circuit:
+
+| | naive retrieval | verified |
+|---|---|---|
+| valid operating point | 147 | **200** |
+| **unstable root (silently wrong)** | **4** | **0** |
+| no answer | 49 | **0** |
+| total Newton iterations | 1571 | 2130 |
+
+69 of 200 transfers refused by the pre-solve gate. **Price of never being silently wrong: +36% solver work.**
+
+**The gate is physics, not distance** — and this is the strongest argument for Layer 3 existing at all: in
+Phase 1 the correlation between setup distance and what a transfer actually costs is **r = 0.18**. Parameter
+similarity barely predicts transferability. Distance survives only as an envelope guard, and even its
+threshold is not tuned — it is the archive's own 99th-percentile case spacing.
+
+Both cheap regime estimators were validated against solved ground truth before being trusted: **395/395**.
+
+### Four things to concede before anyone asks
+
+1. **The pre-solve gate did not catch the demo case** — it admitted the transfer; the post-solve eigenvalue
+   check caught it. The rules do not predict every bad transfer; the backstop is what makes the guarantee.
+2. **The effort comparison is not like-for-like, deliberately.** The verified policy escalates (warm → cold →
+   multi-start) *because it can tell it failed*. The naive one gets one shot because it never knows. +36% is
+   the honest price.
+3. **Admissible ≠ unique.** These cases are genuinely bistable; both 5.5 and ~460 rev/min are valid operating
+   points. The verifier guarantees you never land on an impossible one. Choosing between real branches needs
+   a transient — out of scope, limits slide.
+4. **The wrong-answer demo runs on a variant circuit** (5 cm³/rev motor instead of 32). The base circuit has
+   a unique root everywhere — verified by multi-start, not assumed. Say this *first*; it is the credibility
+   move, not the weakness.
+
+---
+
+## 6c. Measured results — Phase 3, 17 Aug
+
+Full record: [`phases/phase-3-ingest.md`](phases/phase-3-ingest.md).
+
+**The model layer is justified by a number, not an assertion.** Five artifacts, 35 fields, scored against
+ground truth (correct = within 1%, *or* correctly reported missing). Inventing a plausible value counts as a
+miss, not partial credit:
+
+| artifact style | parser | local model (qwen2.5:7b) | **hybrid** |
+|---|---|---|---|
+| machine logs (3 files, unit conversion + a corrupted value) | **21/21** | 15/21 | **21/21** |
+| prose — an English email and a Romanian note | 2/14 | **12/14** | **12/14** |
+| **total** | 23/35 (66%) | 27/35 (77%) | **33/35 (94%)** |
+| **invented** | 0 | 0 | **0** |
+
+**The headline finding is not "the model wins" — it is that the two fail on disjoint inputs.** The parser is
+perfect on machine logs (`4.09 m3/h → 68.18 L/min`, a corrupted `p_crack = ####` reported missing not zero)
+and scores 0/7 on the Romanian note. The model reads the Romanian note 7/7 and misreads machine logs. So the
+shipped backend runs the parser first and calls a model **only for the fields it could not fill** — which is
+also what makes the demo fast: a well-formed log never reaches the model and returns in 1.6 s.
+
+**Layer 1 needed its own verifier, and that is the best story in this phase.** The first run showed the local
+model inventing 3 values — the project's own failure mode appearing in ingest. It answered *"the standard fan
+curves"* with `c_load = 0.0`, while giving correct values with no citation at all. The fix is deterministic:
+a citation supports a number only if it **contains a digit**; a value outside the physical envelope is
+dropped; a missing citation is fine if the value's digits are in the artifact. That took the local model from
+3 inventions to **0**, and raised its score 21→27 at the same time. *A model can talk its way past an
+instruction; it cannot talk its way past this.*
+
+**Local by default — and the reason is confidentiality, not cost.** Ingest runs on `qwen2.5:7b` via Ollama,
+on the machine. Nothing leaves the network, and the demo needs no internet. See the new §9 Q&A entry.
+
+**Two things to say plainly:** the *Claude* backend is written but has never executed (no key on the build
+machine) — do not quote a number for it. And the local model is **slow on this laptop**: an RTX 3050 has 4 GB
+VRAM against a ~4.7 GB model, so only 12 of 29 layers fit on the GPU and a prose artifact costs 1–3 minutes.
+Machine logs are unaffected. For the live demo, run the prose case beforehand or demo the instant path.
+
+**The UI is a FastAPI service with a single-page client** (`python app.py`), not a Streamlit script — and that
+is a pitch decision, not just a technical one. You are registered under *Digital Twins & Platforms* and slide
+8 is "why it's a platform"; what a platform exposes is an API. `POST /api/analyse` is the same endpoint a
+Study Manager sweep would call, and it maps 1:1 onto the AWS architecture slide. A widget script would have
+quietly contradicted the pitch. It also keeps the Phase 4 image small and needs no CDN, so it runs in a
+conference room with no internet.
+
+**Demo it with the refusals, not just the green path.** The page styles a refusal as a first-class outcome:
+Retrieve turns red, names the missing `p_crack`, shows what the nearest case used — and the downstream stages
+grey out as *skipped* so the room sees exactly where the pipeline stopped.
 
 ---
 
@@ -442,6 +550,14 @@ feature.
 **"Does this scale to 3D fields / real meshes?"** — Not in this demo, and I say so on the limits slide. The
 mapping problem between different meshes is real work. The retrieval and verification layers are
 mesh-agnostic; the transfer operator is the part that would need engineering.
+
+**"Would our simulation data leave our network?"** — *(Expect this one. Run artifacts are customer data, and
+it is the objection most likely to kill adoption regardless of how good the numbers are.)* No. Ingest has
+three interchangeable backends: a deterministic parser (no network at all), a **local model over Ollama**
+(nothing leaves the machine), and a hosted model for the quality ceiling. The default deployment can be
+entirely on-prem. And the layer that matters — retrieval, the verifier, the solver — never touches a network
+under any configuration; the model only ever turns text into a Case Card. Pick the backend to match your
+data-governance rules, and the rest of the system does not change.
 
 **"Why an LLM at all?"** — Only for unstructured→structured on ingest, and for the human-readable
 explanation. **It never touches numerics.** If you delete it, the system still works — it just needs clean

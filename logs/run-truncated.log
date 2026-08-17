@@ -1,0 +1,15 @@
+=== HydroSim 4.2 :: batch runner ===
+run id      : SIM-2026-0455
+
+[parameters]
+Q_nom       = 44.0 L/min
+A_valve_a   = 5.5 mm^2
+A_valve_b   = 5.5 mm^2
+c_load_a    = 1.1e-05 Nm/(rev/min)^2
+c_load_b    = 1.1e-05 Nm/(rev/min)^2
+p_crack     = ####  <- NaN written by the sweep driver, see ticket HS-2291
+rho         = 850.0 kg/m^3
+
+[init]
+solving steady state ...
+  iter  1  residual 3.100e+

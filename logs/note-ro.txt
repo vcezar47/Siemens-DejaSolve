@@ -1,0 +1,14 @@
+Salut,
+
+Am rulat cazul de vineri, cel cu doua motoare. Debitul pompei a fost pe la
+70 l/min, ventilul A deschis la 4,5 mm2 iar ventilul B la 9 mm2. Supapa de
+siguranta e reglata la 150 bar. Uleiul era deja cald cand am pornit,
+densitatea 835 kg/m3.
+
+Sarcina pe arborele A e mica (c = 8e-6), pe B e mai mare, in jur de 2,4e-05.
+
+Nu converge din start, pica la initializare de fiecare data. Am incercat si
+cu pasi mai mici, acelasi lucru. Daca ai timp arunca un ochi.
+
+Multumesc,
+Cristi

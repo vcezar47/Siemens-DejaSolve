@@ -25,7 +25,7 @@ import numpy as np
 import model
 from sweep import sample_cases
 
-#: which state entries are pressures (bar) and which are speeds (rev/min) —
+#: which state entries are pressures (bar) and which are speeds (rev/min) --
 #: agreement is reported per unit rather than as one meaningless max-norm
 PRESSURE_IDX = [0, 1, 2, 4, 5]
 SPEED_IDX = [3, 6]
@@ -33,7 +33,7 @@ SPEED_IDX = [3, 6]
 
 def load_archive(path: Path) -> tuple[list[dict], np.ndarray, np.ndarray]:
     if not path.exists():
-        raise SystemExit(f"no archive at {path} — run `python sweep.py` first")
+        raise SystemExit(f"no archive at {path} -- run `python sweep.py` first")
     records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
     if not records:
         raise SystemExit(f"archive at {path} is empty")
@@ -135,6 +135,32 @@ def run_bench(archive_path: Path, n_queries: int, seed: int, out: Path,
     out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"\n  -> {out}")
     return payload
+
+
+def summary_hash(payload: dict) -> str:
+    """A short digest of the Phase 1 result, for "did anything move?".
+
+    Deliberately over a *subset*: timings and the generation timestamp change on
+    every run, and the archive path changes with the OS separator, so hashing
+    the whole file would report a difference on every machine and prove nothing.
+    What is left is exactly what a slide would quote.
+
+    The recipe lives here rather than in a shell command because a
+    reproducibility claim nobody can re-run is not a check.
+    """
+    import hashlib
+
+    s = payload["summary"]
+    core = {
+        "config": {k: v for k, v in payload["config"].items() if k != "archive"},
+        "cold": {k: v for k, v in s["cold"].items() if not k.endswith("_ms")},
+        "warm": {k: v for k, v in s["warm"].items() if not k.endswith("_ms")},
+        **{k: s[k] for k in ("n_queries", "rescued", "broken",
+                             "iteration_reduction_pct", "agreement",
+                             "neighbour_distance")},
+    }
+    blob = json.dumps(core, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
 
 def run_sensitivity(queries, archive_norm, archive_states) -> list[dict]:

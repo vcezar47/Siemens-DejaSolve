@@ -1,0 +1,17 @@
+From: dan.p@___
+Subject: re: overnight sweep - case 118 keeps dying
+
+Hi,
+
+Case 118 is the one that died overnight again. Setup was the usual for the
+restrictive-A study: pump at about 55 lpm, metering valve A cracked barely
+open (roughly 2 mm2, deliberately restrictive), B left wide at 11 mm2. The
+relief was set to 240 bar. Oil was cold-ish when we started, call it 890.
+
+Loads were the standard fan curves on both shafts, same as always.
+
+It never gets past initialisation - the solver just sits there and then gives
+up. Andrei says he saw the same thing on the low-flow cases last month. Can
+you have a look before Friday?
+
+Thanks

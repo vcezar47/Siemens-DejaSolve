@@ -1,0 +1,15 @@
+ HYDRAULIC NETWORK SOLVER   (build 11.3.0-rc2)
+ =============================================
+ Case ............................:  nightly/case_0118
+ Date ............................:  12-MAR-2026 03:12
+
+ Pump nominal delivery ...........:     4.0908 m3/h
+ Metering valve A, orifice area ..:  7.800e-06 m2
+ Metering valve B, orifice area ..:      6.400 mm2
+ Shaft A quadratic load coeff ....:  9.700e-06
+ Shaft B quadratic load coeff ....:  2.200e-05
+ Relief cracking setting .........:     215.00 bar
+ Working fluid density ...........:      0.874 g/cm3
+
+ *** initialisation did not converge in 60 iterations ***
+ *** residual at exit:  1.4471e+01                    ***

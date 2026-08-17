@@ -79,7 +79,7 @@ def draw(results: dict, out: Path) -> None:
 
     a = s["agreement"]
     fig.suptitle(
-        f"Déjà Solve — warm-starting the initialisation solve from the nearest archived case    "
+        f"Déjà Solve -- warm-starting the initialisation solve from the nearest archived case    "
         f"|    answers agree to {a['max_dp_bar']:.0e} bar / {a['max_dw_rpm']:.0e} rev/min "
         f"across all {a['n_compared']} cases",
         fontsize=11, y=1.0)
@@ -95,7 +95,7 @@ def main() -> None:
     ap.add_argument("--out", type=Path, default=Path("figs/convergence.png"))
     args = ap.parse_args()
     if not args.results.exists():
-        raise SystemExit(f"no {args.results} — run `python bench.py` first")
+        raise SystemExit(f"no {args.results} -- run `python bench.py` first")
     draw(json.loads(args.results.read_text(encoding="utf-8")), args.out)
 
 

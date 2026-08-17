@@ -1,0 +1,22 @@
+=== HydroSim 4.2 :: batch runner ===
+run id      : SIM-2026-0412
+started     : 2026-03-14 22:41:07
+model file  : manifold_2motor.hsm
+operator    : m.ionescu
+
+[parameters]
+Q_nom       = 62.4 L/min
+A_valve_a   = 7.85 mm^2
+A_valve_b   = 3.12 mm^2
+c_load_a    = 1.42e-05 Nm/(rev/min)^2
+c_load_b    = 2.61e-05 Nm/(rev/min)^2
+p_crack     = 187.0 bar
+rho         = 863.0 kg/m^3
+
+[init]
+solving steady state ...
+  iter  1  residual 4.812e+01
+  iter  5  residual 9.330e+00
+  iter  8  residual 8.882e+00
+initialisation FAILED - line search stalled (alpha < 1e-4)
+run aborted after 00:00:03

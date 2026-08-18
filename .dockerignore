@@ -1,0 +1,33 @@
+# Keep the build context to what the service actually needs to run.
+# .git alone is larger than everything else in this repo combined.
+.git/
+.gitattributes
+.gitignore
+
+# agent / editor tooling
+.claude/
+.cursor/
+.vscode/
+.idea/
+
+# local python state
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# docs and the assignment brief — not needed at runtime
+*.md
+phases/
+*.pdf
+
+# container files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini

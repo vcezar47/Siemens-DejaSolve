@@ -21,6 +21,12 @@
   h1 span{color:var(--teal)}
   .tagline{color:var(--dim);font-size:13px}
   .badges{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  /* availability is a status, so it gets status colour, not just a suffix.
+     Option colours render in the popup on Chromium/Firefox; the closed select
+     is coloured directly so the state is visible without opening it. */
+  select option.on{color:var(--ok)}
+  select option.off{color:var(--refuse)}
+  select.on{color:var(--ok)} select.off{color:var(--refuse)}
   .badge{font:12px/1 var(--mono);color:var(--dim);background:var(--panel-2);
          border:1px solid var(--line);border-radius:99px;padding:6px 11px;white-space:nowrap}
   .badge b{color:var(--ink);font-weight:600}
@@ -138,41 +144,84 @@ const fmt = v => (v === null || v === undefined) ? '' :
 
 let SAMPLES = [];
 
+//: label for each backend id. `auto` is always offered and always works —
+//: it degrades to the parser rather than failing.
+const BACKEND_LABEL = {auto:'auto', hybrid:'hybrid (parser + local model)',
+                       rules:'rules only (instant)',
+                       ollama:'Ollama only (local)'};
+
+//: last health payload, so `explain()` can describe the current selection
+//: without another round trip
+let HEALTH = {};
+
+function renderHealth(h){
+  HEALTH = h;
+  const B = h.backends || {};
+  const ready = Object.keys(B).filter(k => B[k].available);
+
+  $('#badges').innerHTML =
+    `<span class="badge">archive <b>${h.archive_size}</b> cases</span>` +
+    `<span class="badge">ingest <b>${ready.join(' + ') || 'none'}</b></span>` +
+    (B.ollama && B.ollama.available
+      ? `<span class="badge" style="color:var(--ok)">local <b>on-prem</b></span>` : '');
+
+  // Whatever /api/health offers is what the page offers — the list is not
+  // written out here, so a backend can never exist on one side only.
+  // Unavailable ones stay visible with the reason in the label; hiding them
+  // is how a demo ends up with an unexplained missing feature.
+  const sel = $('#backend');
+  const keep = sel.value;                     // survive a refresh mid-demo
+  const markup =
+    `<option class="on" value="auto">ingest: auto</option>` +
+    Object.keys(B).map(k =>
+      `<option class="${B[k].available ? 'on' : 'off'}" value="${k}"` +
+      `${B[k].available ? '' : ' data-off="1"'}>ingest: ${BACKEND_LABEL[k]||k}` +
+      `${B[k].available ? '' : ' - unavailable'}</option>`).join('');
+  // Rebuilding on every poll would close an open dropdown under the user's
+  // cursor, so only touch the DOM when the availability picture changed.
+  if(sel.innerHTML !== markup){
+    sel.innerHTML = markup;
+    if([...sel.options].some(o => o.value === keep)) sel.value = keep;
+  }
+  explain();
+}
+
+function explain(){
+  const sel = $('#backend');
+  const B = HEALTH.backends || {};
+  const ready = Object.keys(B).filter(k => B[k].available);
+  const o = sel.selectedOptions[0];
+  const k = sel.value;
+  $('#hint').textContent = (k === 'auto')
+    ? `auto -> ${ready.includes('hybrid') ? 'hybrid' : 'rules'}`
+    : (B[k] ? B[k].detail : '');
+  const off = !!(o && o.dataset.off);
+  $('#hint').style.color = off ? 'var(--refuse)' : 'var(--ok)';
+  sel.classList.toggle('off', off);
+  sel.classList.toggle('on', !off);
+}
+
+//: Health is a live property, not a load-time fact: Ollama can come up or go
+//: away while the page sits open. Re-read it rather than leaving the page
+//: asserting something that stopped being true — a demo that says
+//: "unavailable" about a backend you just fixed is the worst kind of wrong.
+async function refreshHealth(){
+  try{ renderHealth(await (await fetch('/api/health')).json()); }
+  catch(e){ /* transient: keep showing the last known state */ }
+}
+
 async function boot(){
   try{
-    const h = await (await fetch('/api/health')).json();
-    const B = h.backends || {};
-    const ready = Object.keys(B).filter(k => B[k].available);
+    renderHealth(await (await fetch('/api/health')).json());
 
-    $('#badges').innerHTML =
-      `<span class="badge">archive <b>${h.archive_size}</b> cases</span>` +
-      `<span class="badge">ingest <b>${ready.join(' + ')}</b></span>` +
-      (B.ollama && B.ollama.available
-        ? `<span class="badge" style="color:var(--ok)">local <b>on-prem</b></span>` : '');
-
-    // Whatever /api/health offers is what the page offers — the list is not
-    // written out here, so a backend can never exist on one side only.
-    // Unavailable ones stay visible with the reason in the label; hiding them
-    // is how a demo ends up with an unexplained missing feature.
-    const label = {auto:'auto', hybrid:'hybrid (parser + local model)',
-                   rules:'rules only (instant)',
-                   ollama:'Ollama only (local)'};
-    $('#backend').innerHTML =
-      `<option value="auto">ingest: auto</option>` +
-      Object.keys(B).map(k =>
-        `<option value="${k}"${B[k].available ? '' : ' data-off="1"'}>ingest: ${label[k]||k}` +
-        `${B[k].available ? '' : ' - unavailable'}</option>`).join('');
-
-    const explain = () => {
-      const o = $('#backend').selectedOptions[0];
-      const k = $('#backend').value;
-      $('#hint').textContent = (k === 'auto')
-        ? `auto -> ${ready.includes('hybrid') ? 'hybrid' : 'rules'}`
-        : (B[k] ? B[k].detail : '');
-      $('#hint').style.color = (o && o.dataset.off) ? 'var(--refuse)' : '';
-    };
     $('#backend').onchange = explain;
-    explain();
+    // focus fires before the popup opens, so the next open is already correct
+    $('#backend').addEventListener('focus', refreshHealth);
+    // coming back to the tab after fixing something outside the browser
+    window.addEventListener('focus', refreshHealth);
+    // and a slow backstop for the case where neither of those happens
+    setInterval(refreshHealth, 15000);
+
     SAMPLES = await (await fetch('/api/samples')).json();
     $('#samples').innerHTML = SAMPLES.map((s,i) =>
       `<button class="chip" data-i="${i}">${esc(s.name)}</button>`).join('');

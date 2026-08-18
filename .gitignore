@@ -3,3 +3,19 @@ __pycache__/
 .venv/
 venv/
 .ipynb_checkpoints/
+
+# agent / editor tooling — not project content
+.claude/
+.cursor/
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# scratch / temp
+*.tmp
+*.bak
+*~

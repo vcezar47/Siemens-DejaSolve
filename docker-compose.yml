@@ -1,0 +1,54 @@
+# Déjà Solve — the runtime, Layer 4.
+#
+#   docker compose up                       # the demo at http://localhost:8000
+#   docker compose --profile reproduce up   # regenerate every number, then exit
+#
+# Two services, both from the same image, because that is what is honestly
+# here: an API that serves verified warm starts, and a solver-runner that
+# produces the archive it serves from. The architecture slide shows where this
+# decomposes next — index service, object store, queue — and those are drawn
+# as the destination, not faked as empty containers here. A compose file with a
+# queue nothing publishes to is worse than an honest one.
+
+services:
+  # --- the service the demo talks to ---------------------------------------
+  ui:
+    build: .
+    image: dejasolve:latest
+    container_name: dejasolve-ui
+    ports:
+      - "8000:8000"
+    environment:
+      # Ingest's local-model backend. The archive and every solve stay in this
+      # container; only this one optional call leaves it, and it goes to the
+      # host, never off the machine. Unreachable is a supported state: ingest
+      # falls back to the deterministic parser and /api/health says so.
+      # Overridable without editing this file, which matters when the host's
+      # default Ollama is serving from the wrong model directory:
+      #   OLLAMA_URL=http://host.docker.internal:11435 docker compose up -d
+      OLLAMA_URL: "${OLLAMA_URL:-http://host.docker.internal:11434}"
+      OLLAMA_MODEL: "${OLLAMA_MODEL:-qwen2.5:7b}"
+    extra_hosts:
+      # Docker Desktop provides this name; on native Linux it must be mapped.
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  # --- the solver-runner: regenerates the archive, results and figures ------
+  # Profile-gated so `docker compose up` meets the gate (the UI comes up) and
+  # does not silently spend a minute re-solving 600 cases first.
+  runner:
+    build: .
+    image: dejasolve:latest
+    container_name: dejasolve-runner
+    profiles: ["reproduce"]
+    # The repo is mounted so regenerated artifacts land in the working tree
+    # rather than dying with the container — the point of the reproducer is
+    # that the numbers on the slides come back out onto disk.
+    #
+    # On Windows this leaves LF endings in files git normalises to CRLF, so
+    # `git status` afterwards lists logs/ as modified with an empty diff. It is
+    # noise, not a change: `git diff logs/` returns nothing. Verified: the
+    # Phase 1 summary hash is identical from the host and from this container.
+    volumes:
+      - .:/app
+    command: ["python", "run_all.py"]

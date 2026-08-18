@@ -114,6 +114,51 @@ python ingest.py --compare        # scores every available backend
 > and no internet is needed. The Claude backend is written but **untested** here.
 > On a 4 GB GPU a prose artifact takes 1–3 minutes; machine logs are unaffected.
 
+### Before the demo: check the model is actually reachable
+
+The prose artifacts (`note-ro.txt`, `note-email.txt`) are the half of the demo
+that needs the model — the deterministic parser scores 0/7 on the Romanian note.
+Without it the pipeline still runs and refuses honestly, but the 94% hybrid
+result cannot be shown.
+
+```bash
+curl http://127.0.0.1:11434/api/tags     # must list qwen2.5:7b
+```
+
+If it lists other models but not `qwen2.5:7b`, **do not re-pull it** — check
+where Ollama is reading from before downloading 4.7 GB again:
+
+```bash
+ollama pull qwen2.5:7b                   # only if the blobs are genuinely absent
+```
+
+**The trap, and it cost an hour to pin down:** if the models live somewhere
+other than the default store, `OLLAMA_MODELS` must reach the *server process*.
+The **tray app does not pass it through** — setting the variable at Windows User
+scope, or exporting it in the shell that launches `ollama app.exe`, both leave
+the server reading the default directory. The model sits on disk, complete, and
+invisible. Restarting the tray app does not help, and neither does signing out.
+
+What works is running the server yourself, so it inherits the variable directly:
+
+```powershell
+$env:OLLAMA_MODELS = "E:\ollama\models"; & "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe" serve
+```
+
+**That terminal window *is* the server — closing it stops Ollama.** Start it
+before the demo and leave it alone. Kill any tray-app instance first, or the port
+is already taken.
+
+Newer Ollama builds expose a model-location field in the tray app's settings; if
+yours has one, set it there instead and this stops being a per-session ritual.
+
+Two reasons this is worth the paragraph: it fails *silently* — `auto` degrades to
+the parser and the prose artifacts simply refuse, which looks like a broken
+feature rather than a missing directory — and the error message says
+`run 'ollama pull qwen2.5:7b'`, which would waste 4.7 GB re-downloading a model
+that is already there. Check `/api/health` first; it reports which backends are
+reachable and why.
+
 ## The model
 
 ```

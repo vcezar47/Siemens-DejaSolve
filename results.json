@@ -1,7 +1,7 @@
 {
-  "generated_utc": "2026-08-18T08:02:18+00:00",
+  "generated_utc": "2026-08-18T08:32:00+00:00",
   "config": {
-    "archive": "archive\\cases.jsonl",
+    "archive": "archive/cases.jsonl",
     "archive_size": 395,
     "n_queries": 200,
     "query_seed": 99,
@@ -22,7 +22,7 @@
       "mean_iterations": 8.321428571428571,
       "median_iterations": 8.0,
       "total_iterations": 1631,
-      "total_wall_ms": 521.0740999928021
+      "total_wall_ms": 243.05567599913047
     },
     "warm": {
       "failures": 0,
@@ -30,7 +30,7 @@
       "mean_iterations": 4.862244897959184,
       "median_iterations": 4.0,
       "total_iterations": 953,
-      "total_wall_ms": 267.6737999972829
+      "total_wall_ms": 119.85396299769491
     },
     "nominal": {
       "failures": 0,
@@ -39,7 +39,7 @@
       "mean_iterations": 7.1,
       "median_iterations": 7.0,
       "total_iterations": 1420,
-      "total_wall_ms": 364.064899998084
+      "total_wall_ms": 170.61259700494702
     },
     "warm_vs_nominal": {
       "n_compared": 200,
@@ -88,21 +88,21 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 5.909939204684633e-12,
-        "wall_ms": 1.9178999991709134
+        "wall_ms": 1.588213000104588
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.014566457044566e-13,
-        "wall_ms": 0.9184999998979038
+        "wall_ms": 0.7123850000425591
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 6.394884621840902e-14,
-        "wall_ms": 0.45679999948333716
+        "wall_ms": 0.4171529999439372
       },
       "agreement": {
         "max_dp_bar": 5.400124791776761e-13,
@@ -164,8 +164,8 @@
         },
         "warm": {
           "p1": 134.625940158797,
-          "p2a": 56.26941248070787,
-          "p3a": 18.561266072581073,
+          "p2a": 56.26941248070788,
+          "p3a": 18.561266072581077,
           "w_a": 838.9511066309905,
           "p2b": 16.50765230588456,
           "p3b": 4.276825828750613,
@@ -191,21 +191,21 @@
         "status": "line_search_stall",
         "iterations": 8,
         "residual_inf": 61.2179866030026,
-        "wall_ms": 4.226099999868893
+        "wall_ms": 2.707804999772634
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.1820056872456917e-10,
-        "wall_ms": 1.754899999468762
+        "wall_ms": 1.0873280007217545
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.3917755836700962e-12,
-        "wall_ms": 1.1410999995860038
+        "wall_ms": 0.7287999997060979
       },
       "history": {
         "cold": [
@@ -291,21 +291,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 8.122924555209465e-11,
-        "wall_ms": 1.0983000001942855
+        "wall_ms": 0.9573719999025343
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.5987211554602254e-14,
-        "wall_ms": 0.9018999999170774
+        "wall_ms": 0.636359999589331
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 5.927702773078636e-11,
-        "wall_ms": 0.4890000000159489
+        "wall_ms": 0.33785200048441766
       },
       "agreement": {
         "max_dp_bar": 4.565947619994404e-11,
@@ -332,21 +332,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 1.348773537301895e-09,
-        "wall_ms": 1.5898999999990338
+        "wall_ms": 1.3821929996993276
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.638405132733169e-10,
-        "wall_ms": 1.2047999998685555
+        "wall_ms": 0.7485529995392426
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 9,
         "residual_inf": 9.947598300641403e-14,
-        "wall_ms": 1.3914000001022941
+        "wall_ms": 1.0754550003184704
       },
       "agreement": {
         "max_dp_bar": 1.4684218285765382e-09,
@@ -373,21 +373,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 1.1067999994338606
+        "wall_ms": 0.7963179996295366
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-14,
-        "wall_ms": 0.8092999996733852
+        "wall_ms": 0.767323999752989
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.4158453015843406e-13,
-        "wall_ms": 0.47620000077586155
+        "wall_ms": 0.4294760001357645
       },
       "agreement": {
         "max_dp_bar": 1.5631940186722204e-13,
@@ -414,21 +414,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.0477841644606087e-11,
-        "wall_ms": 0.9276999999201507
+        "wall_ms": 0.6782259997635265
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 0.9313999998994404
+        "wall_ms": 0.7892700004958897
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.255973186038318e-12,
-        "wall_ms": 0.4528999998001382
+        "wall_ms": 0.3410379995330004
       },
       "agreement": {
         "max_dp_bar": 1.800515292416094e-11,
@@ -455,24 +455,24 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.599918668191094e-09,
-        "wall_ms": 0.9774000000106753
+        "wall_ms": 0.6871120003779652
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.907985046680551e-14,
-        "wall_ms": 0.9554999996908009
+        "wall_ms": 0.637674999779847
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 3.183231456205249e-12,
-        "wall_ms": 0.4527000000962289
+        "residual_inf": 3.1796787425264483e-12,
+        "wall_ms": 0.38310500076477183
       },
       "agreement": {
-        "max_dp_bar": 5.3038888836454134e-09,
+        "max_dp_bar": 5.303881778218056e-09,
         "max_dw_rpm": 4.612729753716849e-09,
         "max_dp_bar_nominal": 5.306887373990321e-09,
         "max_dw_rpm_nominal": 4.610228643286973e-09
@@ -496,21 +496,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.0886000000027707
+        "wall_ms": 0.823901999865484
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8146000000124332
+        "wall_ms": 0.7946610003273236
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.2451906172827876e-10,
-        "wall_ms": 0.47559999984514434
+        "wall_ms": 0.3578240002752864
       },
       "agreement": {
         "max_dp_bar": 1.1182521575392457e-10,
@@ -537,21 +537,21 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 1.2434497875801753e-13,
-        "wall_ms": 1.841400000557769
+        "wall_ms": 1.3111459993524477
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.2434497875801753e-13,
-        "wall_ms": 0.838599999951839
+        "wall_ms": 0.8132399998430628
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.8599345114344032e-12,
-        "wall_ms": 1.1006999993696809
+        "wall_ms": 0.7895179996921797
       },
       "agreement": {
         "max_dp_bar": 2.8421709430404007e-13,
@@ -578,21 +578,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.526032964553451e-10,
-        "wall_ms": 1.1076000000684871
+        "wall_ms": 0.7447799998772098
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8158000000548782
+        "wall_ms": 0.5841250003868481
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 3.2269849015165164e-09,
-        "wall_ms": 0.5555000007007038
+        "wall_ms": 0.40862900004867697
       },
       "agreement": {
         "max_dp_bar": 2.01762873075495e-09,
@@ -619,21 +619,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 1.007194327939942e-11,
-        "wall_ms": 1.7178999996758648
+        "wall_ms": 1.4522940000460949
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.566924533515703e-12,
-        "wall_ms": 0.9788999996089842
+        "wall_ms": 0.6995260000621784
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 6.394884621840902e-14,
-        "wall_ms": 1.3317000002643908
+        "wall_ms": 1.0420140006317524
       },
       "agreement": {
         "max_dp_bar": 7.389644451905042e-13,
@@ -660,21 +660,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 1.1901590823981678e-13,
-        "wall_ms": 1.3301000008141273
+        "wall_ms": 0.9314180006185779
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.1191048088221578e-13,
-        "wall_ms": 0.7816999996066443
+        "wall_ms": 0.6785820005461574
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 6.844114608384189e-09,
-        "wall_ms": 0.4840000001422595
+        "wall_ms": 0.4975680003553862
       },
       "agreement": {
         "max_dp_bar": 7.250378075696062e-10,
@@ -701,21 +701,21 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 1.5631940186722204e-13,
-        "wall_ms": 1.883099999758997
+        "wall_ms": 1.4267939995988854
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.900186922895955e-10,
-        "wall_ms": 1.0443999999552034
+        "wall_ms": 0.7586020001326688
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.6342482922482304e-13,
-        "wall_ms": 1.2495000000853906
+        "wall_ms": 0.9144989999185782
       },
       "agreement": {
         "max_dp_bar": 1.2434497875801753e-13,
@@ -742,21 +742,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 6.004086117172847e-13,
-        "wall_ms": 1.4483999993899488
+        "wall_ms": 1.187544000458729
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 5.851019224678566e-09,
-        "wall_ms": 1.1556999997992534
+        "wall_ms": 0.9876230005829711
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 9.461750494210719e-09,
-        "wall_ms": 1.3226999999460531
+        "wall_ms": 0.8496860000377637
       },
       "agreement": {
         "max_dp_bar": 6.84867096367725e-09,
@@ -783,21 +783,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 1.1460000005172333
+        "wall_ms": 0.8299820001411717
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 0.7711000007475377
+        "wall_ms": 0.7169320006141788
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.4234657896849967e-10,
-        "wall_ms": 0.49870000020746375
+        "wall_ms": 0.3431369996178546
       },
       "agreement": {
         "max_dp_bar": 1.9555912444957357e-10,
@@ -824,21 +824,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.1999999996987754
+        "wall_ms": 0.9371719997943728
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 0.8294999997815466
+        "wall_ms": 0.5930119996264693
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.6373999995048507
+        "wall_ms": 0.42601899986038916
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -865,21 +865,21 @@
         "status": "line_search_stall",
         "iterations": 7,
         "residual_inf": 58.29063104436893,
-        "wall_ms": 3.6680000002888846
+        "wall_ms": 2.7663319997373037
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 0.8432999993601697
+        "wall_ms": 0.59839200002898
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8474999995087273
+        "wall_ms": 0.5897680002817651
       }
     },
     {
@@ -900,21 +900,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 6.899271376425986e-09,
-        "wall_ms": 1.2243000001035398
+        "wall_ms": 1.0314229994037305
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 6.039613253960852e-14,
-        "wall_ms": 0.8323000001837499
+        "wall_ms": 0.8362099997611949
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 6.572520305780927e-14,
-        "wall_ms": 1.041100000293227
+        "wall_ms": 0.9649090006860206
       },
       "agreement": {
         "max_dp_bar": 1.0467715583217796e-09,
@@ -941,21 +941,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.6407142311436473e-10,
-        "wall_ms": 1.0687000003599678
+        "wall_ms": 0.7312090001505567
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.4868995751603507e-14,
-        "wall_ms": 1.1476999998194515
+        "wall_ms": 0.5672170000252663
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.3073986337985843e-12,
-        "wall_ms": 0.4920999999740161
+        "wall_ms": 0.32488900069438387
       },
       "agreement": {
         "max_dp_bar": 2.4445512281090487e-10,
@@ -982,21 +982,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 9.580599424907632e-09,
-        "wall_ms": 1.0113999996974599
+        "wall_ms": 0.9360820004076231
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.4868995751603507e-14,
-        "wall_ms": 0.7902999996076687
+        "wall_ms": 0.5892160006624181
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 5.5347726402033004e-11,
-        "wall_ms": 0.3532999999151798
+        "wall_ms": 0.2595800006019999
       },
       "agreement": {
         "max_dp_bar": 1.6550700365769444e-08,
@@ -1023,21 +1023,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.3898000006520306
+        "wall_ms": 0.8639429997856496
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-13,
-        "wall_ms": 0.8199999992939411
+        "wall_ms": 0.5897159999221913
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 0.4594000001816312
+        "wall_ms": 0.34574200071801897
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -1064,27 +1064,27 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.795492251716496e-09,
-        "wall_ms": 0.9858000003077905
+        "wall_ms": 0.8942550002757343
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 0.8159000008163275
+        "residual_inf": 7.105427357601002e-15,
+        "wall_ms": 0.5818019999423996
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 0.4589000000123633
+        "wall_ms": 0.40604100013297284
       },
       "agreement": {
         "max_dp_bar": 1.2813387684218469e-08,
         "max_dw_rpm": 6.706613930873573e-09,
         "max_dp_bar_nominal": 1.2813373473363754e-08,
-        "max_dw_rpm_nominal": 6.706613930873573e-09
+        "max_dw_rpm_nominal": 6.7067276177112944e-09
       }
     },
     {
@@ -1105,21 +1105,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 2.3447910280083306e-13,
-        "wall_ms": 1.8284999996467377
+        "wall_ms": 1.6060849993664306
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.714611172104924e-10,
-        "wall_ms": 1.074700000572193
+        "wall_ms": 0.9454840001126286
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 2.3447910280083306e-13,
-        "wall_ms": 0.6120000007285853
+        "wall_ms": 0.43585000003076857
       },
       "agreement": {
         "max_dp_bar": 1.1102230246251565e-15,
@@ -1146,21 +1146,21 @@
         "status": "line_search_stall",
         "iterations": 8,
         "residual_inf": 61.2179866030026,
-        "wall_ms": 4.226099999868893
+        "wall_ms": 2.707804999772634
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.1820056872456917e-10,
-        "wall_ms": 1.754899999468762
+        "wall_ms": 1.0873280007217545
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.3917755836700962e-12,
-        "wall_ms": 1.1410999995860038
+        "wall_ms": 0.7287999997060979
       }
     },
     {
@@ -1181,21 +1181,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.648699999350356
+        "wall_ms": 0.8658699998704833
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 1.4786000001549837
+        "wall_ms": 0.6084160004320438
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 2.444579649818479e-09,
-        "wall_ms": 0.7794000002832036
+        "wall_ms": 0.5217190000621486
       },
       "agreement": {
         "max_dp_bar": 6.903178473294247e-09,
@@ -1222,21 +1222,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.352665866098505e-09,
-        "wall_ms": 2.0614999993995298
+        "wall_ms": 0.8915130001696525
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.7763568394002505e-15,
-        "wall_ms": 1.1415999997552717
+        "wall_ms": 0.5837460003021988
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 5.380258016884909e-09,
-        "wall_ms": 1.7176999999719555
+        "wall_ms": 0.2572229996076203
       },
       "agreement": {
         "max_dp_bar": 3.597941145017103e-08,
@@ -1263,21 +1263,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.5710999996372266
+        "wall_ms": 0.8386530007555848
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 6.394884621840902e-14,
-        "wall_ms": 1.3994999999340507
+        "wall_ms": 0.5665309990945389
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.500099999953818
+        "wall_ms": 0.34345600033702794
       },
       "agreement": {
         "max_dp_bar": 5.684341886080802e-14,
@@ -1304,21 +1304,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.3884999998481362
+        "wall_ms": 1.3850840005034115
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.7763568394002505e-15,
-        "wall_ms": 0.8272000004581059
+        "wall_ms": 0.5930529996476253
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.794919768371983e-11,
-        "wall_ms": 0.4733000005217036
+        "wall_ms": 0.336029000209237
       },
       "agreement": {
         "max_dp_bar": 4.403588604873221e-12,
@@ -1345,21 +1345,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.1546319456101628e-14,
-        "wall_ms": 1.1793999992733006
+        "wall_ms": 0.8503569997628802
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.1546319456101628e-14,
-        "wall_ms": 0.8379999999306165
+        "wall_ms": 0.5685790001734858
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.3322676295501878e-14,
-        "wall_ms": 0.6228000002010958
+        "wall_ms": 0.33802400048443815
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -1386,21 +1386,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.5502800699305226e-10,
-        "wall_ms": 1.991000000089116
+        "wall_ms": 0.8234789993366576
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 1.4836999998806277
+        "wall_ms": 0.6041790002200287
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.5772000004071742
+        "wall_ms": 0.4904789993815939
       },
       "agreement": {
         "max_dp_bar": 2.0591812699422007e-09,
@@ -1427,21 +1427,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.167399999758345
+        "wall_ms": 0.9061660002771532
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 0.7970999995450256
+        "wall_ms": 0.5775890003860695
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8565999996790197
+        "wall_ms": 0.3283600008217036
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -1468,21 +1468,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.117399999202462
+        "wall_ms": 0.963114999649406
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8017999998628511
+        "wall_ms": 0.5823600004077889
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.4591999995682272
+        "wall_ms": 0.3367320005054353
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -1509,21 +1509,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.247180302423658e-12,
-        "wall_ms": 1.2529999994512764
+        "wall_ms": 1.2477739992391434
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8044999995036051
+        "wall_ms": 0.9666920004747226
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 4.263256414560601e-14,
-        "wall_ms": 0.4504999997152481
+        "wall_ms": 0.5036719994677696
       },
       "agreement": {
         "max_dp_bar": 6.608047442568932e-12,
@@ -1550,21 +1550,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 1.9184653865522705e-13,
-        "wall_ms": 1.4755000001969165
+        "wall_ms": 1.4548799999829498
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.6077095210675907e-10,
-        "wall_ms": 1.0386000003563822
+        "wall_ms": 0.8044029991651769
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.9184653865522705e-13,
-        "wall_ms": 1.1079999994763057
+        "wall_ms": 0.9318470001744572
       },
       "agreement": {
         "max_dp_bar": 3.552713678800501e-15,
@@ -1591,21 +1591,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.0845999995581224
+        "wall_ms": 0.956401000621554
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 1.0922999999820604
+        "wall_ms": 0.6790310008000233
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.4175327578413999e-12,
-        "wall_ms": 0.4680999991251156
+        "wall_ms": 0.35430999923846684
       },
       "agreement": {
         "max_dp_bar": 1.3393730569077889e-12,
@@ -1632,21 +1632,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.0161650127192843e-09,
-        "wall_ms": 1.0930999997071922
+        "wall_ms": 0.7239780006784713
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.907985046680551e-14,
-        "wall_ms": 0.8643000001029577
+        "wall_ms": 0.7184570004028501
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 2.134363796812977e-10,
-        "wall_ms": 0.36360000012791716
+        "wall_ms": 0.27552600022318074
       },
       "agreement": {
         "max_dp_bar": 2.026176559866144e-09,
@@ -1673,21 +1673,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.682583210069424e-10,
-        "wall_ms": 1.2671000004047528
+        "wall_ms": 0.8161060004567844
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.9963000002244371
+        "wall_ms": 0.6519109992950689
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 0.9539000002405373
+        "wall_ms": 0.42912500066449866
       },
       "agreement": {
         "max_dp_bar": 2.632049245221424e-09,
@@ -1714,21 +1714,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.631495187368273e-11,
-        "wall_ms": 1.0773999993034522
+        "wall_ms": 0.664127999698394
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.3092638912203256e-14,
-        "wall_ms": 0.9356999998999527
+        "wall_ms": 0.7280800000444287
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 4.11262135457946e-11,
-        "wall_ms": 0.7730999996056198
+        "wall_ms": 0.403308999921137
       },
       "agreement": {
         "max_dp_bar": 2.34123831432953e-11,
@@ -1755,21 +1755,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.3176000002204091
+        "wall_ms": 0.8790550000412622
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.973799150320701e-14,
-        "wall_ms": 0.856499999827065
+        "wall_ms": 0.6185709999044775
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.7763568394002505e-14,
-        "wall_ms": 0.47850000009930227
+        "wall_ms": 0.40485600038664415
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -1796,21 +1796,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.1123999993287725
+        "wall_ms": 0.8039570002438268
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 0.8961000003182562
+        "wall_ms": 0.5680960002791835
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 4.352987303946065e-09,
-        "wall_ms": 0.5011000002923538
+        "wall_ms": 0.4338349999670754
       },
       "agreement": {
         "max_dp_bar": 4.992170232753779e-09,
@@ -1837,21 +1837,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.09153608163615e-10,
-        "wall_ms": 0.986199999715609
+        "wall_ms": 0.8107349995043478
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.9141000000454369
+        "wall_ms": 0.7045539996397565
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 9.237055564881302e-14,
-        "wall_ms": 0.6204000001162058
+        "wall_ms": 0.4943429994455073
       },
       "agreement": {
         "max_dp_bar": 1.0028458063970902e-09,
@@ -1878,21 +1878,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.094100000045728
+        "wall_ms": 0.808685000265541
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 1.0490000004210742
+        "wall_ms": 0.9521429992673802
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 4.192202140984591e-13,
-        "wall_ms": 0.48690000039641745
+        "wall_ms": 0.620421999883547
       },
       "agreement": {
         "max_dp_bar": 4.547473508864641e-13,
@@ -1919,21 +1919,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.8977175386680756e-10,
-        "wall_ms": 0.9613000001991168
+        "wall_ms": 0.9471710000070743
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 1.2314000005062553
+        "wall_ms": 0.7348919998548809
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.679723027336877e-11,
-        "wall_ms": 0.592299999880197
+        "wall_ms": 0.35762100014835596
       },
       "agreement": {
         "max_dp_bar": 2.963602696581802e-10,
@@ -1960,21 +1960,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 6.039613253960852e-14,
-        "wall_ms": 1.5364000000772648
+        "wall_ms": 1.320674999988114
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0821565865626326e-11,
-        "wall_ms": 0.8609000005890266
+        "wall_ms": 0.7005919997027377
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-13,
-        "wall_ms": 0.9887000005619484
+        "wall_ms": 0.9022519998325151
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -2001,21 +2001,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.0971000001518405
+        "wall_ms": 1.3234250000095926
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 0.8082000003923895
+        "wall_ms": 0.615720000496367
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.780442956573097e-12,
-        "wall_ms": 0.46910000037314603
+        "wall_ms": 0.4552259997581132
       },
       "agreement": {
         "max_dp_bar": 7.489120434911456e-12,
@@ -2042,21 +2042,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.0886999998547253
+        "wall_ms": 0.8538080001017079
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 0.8037999996304279
+        "wall_ms": 0.5869360002179747
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 0.4591999995682272
+        "wall_ms": 0.4500960003497312
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -2083,21 +2083,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.0877000004256843
+        "wall_ms": 0.8504099996571313
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.2079226507921703e-13,
-        "wall_ms": 1.0293000004821806
+        "wall_ms": 0.6146549994809902
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 0.46600000041507883
+        "wall_ms": 0.46213699988584267
       },
       "agreement": {
         "max_dp_bar": 5.684341886080802e-14,
@@ -2124,21 +2124,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.902389605376811e-11,
-        "wall_ms": 1.151899999968009
+        "wall_ms": 0.6926309997652424
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.2470025012589758e-12,
-        "wall_ms": 0.9540999999444466
+        "wall_ms": 0.6582030000572558
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 0.5157999994480633
+        "wall_ms": 0.4184379995422205
       },
       "agreement": {
         "max_dp_bar": 3.9960923459148034e-11,
@@ -2165,21 +2165,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 5.823608262289781e-11,
-        "wall_ms": 1.6567000002396526
+        "wall_ms": 1.9119899998258916
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.504663143554353e-12,
-        "wall_ms": 0.9789999994609389
+        "wall_ms": 0.804616000095848
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.1368683772161603e-13,
-        "wall_ms": 1.1819999999715947
+        "wall_ms": 1.0716659999161493
       },
       "agreement": {
         "max_dp_bar": 4.291678123991005e-12,
@@ -2206,21 +2206,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.2256862191861728e-12,
-        "wall_ms": 1.2282000006962335
+        "wall_ms": 0.8803829996395507
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4477308241112041e-11,
-        "wall_ms": 0.8416000000579515
+        "wall_ms": 0.7119089996194816
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-14,
-        "wall_ms": 0.45509999927162426
+        "wall_ms": 0.5107099996166653
       },
       "agreement": {
         "max_dp_bar": 1.1688428003253648e-12,
@@ -2247,21 +2247,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 4.369837824924616e-13,
-        "wall_ms": 1.2234999994689133
+        "wall_ms": 1.002747000711679
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.147615418834903e-12,
-        "wall_ms": 0.8898999994926271
+        "wall_ms": 0.706957999682345
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 4.192202140984591e-13,
-        "wall_ms": 0.5454000001918757
+        "wall_ms": 0.4635699997379561
       },
       "agreement": {
         "max_dp_bar": 2.5934809855243657e-13,
@@ -2288,21 +2288,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 8.881784197001252e-14,
-        "wall_ms": 1.6252000004897127
+        "wall_ms": 1.4134240000203135
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0821565865626326e-11,
-        "wall_ms": 0.9677000007286551
+        "wall_ms": 0.7085900006131851
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 2.8066438062523957e-13,
-        "wall_ms": 0.7208000006357906
+        "wall_ms": 0.6170110000311979
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -2329,21 +2329,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.3490000001183944
+        "wall_ms": 0.8507399998052279
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.973799150320701e-14,
-        "wall_ms": 0.8702999994056881
+        "wall_ms": 0.6685790003757575
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 9.692733726751612e-09,
-        "wall_ms": 0.37320000046747737
+        "wall_ms": 0.34190199949080124
       },
       "agreement": {
         "max_dp_bar": 1.848002284532413e-08,
@@ -2370,21 +2370,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.863931397063425e-11,
-        "wall_ms": 0.9608000000298489
+        "wall_ms": 0.8001020005394821
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.7763568394002505e-14,
-        "wall_ms": 0.8550000002287561
+        "wall_ms": 0.6270220001169946
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 0.9170000002995948
+        "wall_ms": 0.39255299998330884
       },
       "agreement": {
         "max_dp_bar": 3.359446054673754e-11,
@@ -2411,21 +2411,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.5351000001828652
+        "wall_ms": 0.7811169998603873
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8053999999901862
+        "wall_ms": 0.5636830001094495
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 3.481659405224491e-13,
-        "wall_ms": 0.5089999995107064
+        "wall_ms": 0.3295599999546539
       },
       "agreement": {
         "max_dp_bar": 1.0516032489249483e-12,
@@ -2452,21 +2452,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.410995930153149e-10,
-        "wall_ms": 0.990099999398808
+        "wall_ms": 0.8421000002272194
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 0.829600000542996
+        "wall_ms": 0.6558450004376937
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 9.592326932761353e-13,
-        "wall_ms": 0.4924000004393747
+        "wall_ms": 0.3351029999976163
       },
       "agreement": {
         "max_dp_bar": 1.106670310946356e-09,
@@ -2493,21 +2493,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.1437873698459953e-10,
-        "wall_ms": 1.0943999996015918
+        "wall_ms": 0.8474129999740398
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.3092638912203256e-14,
-        "wall_ms": 0.8332000006703311
+        "wall_ms": 0.5955899996479275
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.394973522423243e-12,
-        "wall_ms": 1.2493000003814814
+        "wall_ms": 1.0312069998690276
       },
       "agreement": {
         "max_dp_bar": 2.3788970793248154e-11,
@@ -2534,21 +2534,21 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 5.909939204684633e-12,
-        "wall_ms": 1.9178999991709134
+        "wall_ms": 1.588213000104588
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.014566457044566e-13,
-        "wall_ms": 0.9184999998979038
+        "wall_ms": 0.7123850000425591
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 6.394884621840902e-14,
-        "wall_ms": 0.45679999948333716
+        "wall_ms": 0.4171529999439372
       },
       "agreement": {
         "max_dp_bar": 5.400124791776761e-13,
@@ -2575,21 +2575,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 1.4033219031261979e-13,
-        "wall_ms": 1.611400000001595
+        "wall_ms": 1.555509999889182
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.329070518200751e-13,
-        "wall_ms": 0.8923999994294718
+        "wall_ms": 0.6773539998903289
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 10,
         "residual_inf": 3.175237850427948e-11,
-        "wall_ms": 1.5389000000141095
+        "wall_ms": 1.2253649992999271
       },
       "agreement": {
         "max_dp_bar": 2.6716406864579767e-12,
@@ -2616,21 +2616,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.0726999998951214
+        "wall_ms": 0.8151849997375393
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 0.7651000005353126
+        "wall_ms": 0.6604310001421254
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.7273293906328036e-11,
-        "wall_ms": 0.45000000045547495
+        "wall_ms": 0.44396599969331874
       },
       "agreement": {
         "max_dp_bar": 3.134914550173562e-11,
@@ -2657,21 +2657,21 @@
         "status": "converged",
         "iterations": 13,
         "residual_inf": 4.796163466380676e-14,
-        "wall_ms": 1.9326000001456123
+        "wall_ms": 1.5704730003562872
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 10,
         "residual_inf": 4.796163466380676e-14,
-        "wall_ms": 1.217299999552779
+        "wall_ms": 0.8852649998516426
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 4.796163466380676e-14,
-        "wall_ms": 0.7733000002190238
+        "wall_ms": 0.5669539996233652
       },
       "agreement": {
         "max_dp_bar": 7.105427357601002e-15,
@@ -2698,21 +2698,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 8.56931592352339e-09,
-        "wall_ms": 0.9646999997130479
+        "wall_ms": 0.8871589998307172
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 0.8286999991469202
+        "wall_ms": 0.6098719995861757
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 3.666400516522117e-11,
-        "wall_ms": 0.3791999997702078
+        "wall_ms": 0.2686420002646628
       },
       "agreement": {
         "max_dp_bar": 1.2790863479494874e-08,
@@ -2739,21 +2739,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.1341999997966923
+        "wall_ms": 0.9585239995431039
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8844000003591646
+        "wall_ms": 0.5993240001771483
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.45589999990625074
+        "wall_ms": 0.3339280001455336
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -2780,21 +2780,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 5.684341886080802e-14,
-        "wall_ms": 1.4612000004490255
+        "wall_ms": 1.2914400003865012
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.5579538487363607e-13,
-        "wall_ms": 0.8593000002292683
+        "wall_ms": 0.6449169995903503
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 3.4994229736184934e-13,
-        "wall_ms": 0.5584999998973217
+        "wall_ms": 0.48976499965647236
       },
       "agreement": {
         "max_dp_bar": 7.283063041541027e-14,
@@ -2821,21 +2821,21 @@
         "status": "converged",
         "iterations": 12,
         "residual_inf": 1.0458300891968975e-13,
-        "wall_ms": 1.8304999994143145
+        "wall_ms": 1.3228280004113913
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0886136436738525e-10,
-        "wall_ms": 0.839799999994284
+        "wall_ms": 0.7733069996902486
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 3.648703561509592e-11,
-        "wall_ms": 0.6519999997181003
+        "wall_ms": 0.6267840008149506
       },
       "agreement": {
         "max_dp_bar": 9.663381206337363e-12,
@@ -2862,21 +2862,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 1.0593999995762715
+        "wall_ms": 0.8733810000194353
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.7554999992862577
+        "wall_ms": 0.6202539998412249
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 3.3999469906120794e-12,
-        "wall_ms": 0.4438999994818005
+        "wall_ms": 0.33802000052673975
       },
       "agreement": {
         "max_dp_bar": 3.856470698337944e-12,
@@ -2903,21 +2903,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.440913414782699e-09,
-        "wall_ms": 0.9568999994371552
+        "wall_ms": 0.6860889998279163
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 0.76699999954144
+        "wall_ms": 0.7137089996831492
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 0.4438999994818005
+        "wall_ms": 0.367790999916906
       },
       "agreement": {
         "max_dp_bar": 5.232642763530748e-09,
@@ -2944,21 +2944,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.0762000001705019
+        "wall_ms": 0.7610870006828918
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-14,
-        "wall_ms": 0.7625999996889732
+        "wall_ms": 0.7267180008057039
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.47229999927367317
+        "wall_ms": 0.36594199991668575
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -2985,21 +2985,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.56593721007448e-09,
-        "wall_ms": 1.438899999811838
+        "wall_ms": 0.7016710005700588
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.334310688136611e-13,
-        "wall_ms": 0.9728000004542992
+        "wall_ms": 0.6975559999773395
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 0.599000000875094
+        "wall_ms": 0.45148499975766754
       },
       "agreement": {
         "max_dp_bar": 1.2470565025068936e-08,
@@ -3026,21 +3026,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 6.195316260004802e-09,
-        "wall_ms": 1.9406999999773689
+        "wall_ms": 1.3367609999477281
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.9468870959826745e-12,
-        "wall_ms": 0.9746999994604266
+        "wall_ms": 0.6988590002947603
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.440892098500626e-14,
-        "wall_ms": 0.9823999998843647
+        "wall_ms": 0.8121190003294032
       },
       "agreement": {
         "max_dp_bar": 5.113349743623985e-10,
@@ -3067,27 +3067,27 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 2.311040248059726e-12,
-        "wall_ms": 1.739300000735966
+        "wall_ms": 1.5914229998088558
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 6.253504380993036e-10,
-        "wall_ms": 0.9408000005350914
+        "wall_ms": 0.7543229994553258
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 9.079273333156834e-09,
-        "wall_ms": 0.7714000003034016
+        "wall_ms": 0.5571269994106842
       },
       "agreement": {
         "max_dp_bar": 1.1360441476426786e-09,
         "max_dw_rpm": 4.642629392037634e-09,
         "max_dp_bar_nominal": 7.796074896759819e-11,
-        "max_dw_rpm_nominal": 3.1513991416431963e-10
+        "max_dw_rpm_nominal": 3.1536728783976287e-10
       }
     },
     {
@@ -3108,21 +3108,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 1.083699999981036
+        "wall_ms": 0.8373129994652118
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.7763568394002505e-14,
-        "wall_ms": 0.8164000000761007
+        "wall_ms": 0.8515409999745316
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 8.785860927673639e-12,
-        "wall_ms": 0.45560000035038684
+        "wall_ms": 0.35564500012696953
       },
       "agreement": {
         "max_dp_bar": 6.295408638834488e-12,
@@ -3149,21 +3149,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 4.909139761366532e-09,
-        "wall_ms": 1.8624000003910623
+        "wall_ms": 1.2314609994064085
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.5278446830488974e-11,
-        "wall_ms": 0.9964000000763917
+        "wall_ms": 0.70194099953369
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 1.1368683772161603e-13,
-        "wall_ms": 0.5905999996684841
+        "wall_ms": 0.41167600011249306
       },
       "agreement": {
         "max_dp_bar": 5.692214699593023e-09,
@@ -3190,21 +3190,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.0995000002367306
+        "wall_ms": 0.9900209997795173
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.7882999998400919
+        "wall_ms": 0.6215610001163441
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 3.143441063002683e-11,
-        "wall_ms": 0.4881000004388625
+        "wall_ms": 0.3475499997875886
       },
       "agreement": {
         "max_dp_bar": 3.631583922469872e-11,
@@ -3231,21 +3231,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0611955758577096e-10,
-        "wall_ms": 0.9459000002607354
+        "wall_ms": 0.8483460005663801
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8188000001609907
+        "wall_ms": 0.589266000133648
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.6912999997439329
+        "wall_ms": 0.5121079993841704
       },
       "agreement": {
         "max_dp_bar": 1.283382289329893e-10,
@@ -3272,21 +3272,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 2.8954616482224083e-12,
-        "wall_ms": 1.4329999994515674
+        "wall_ms": 1.2557009995362023
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.069900220812997e-13,
-        "wall_ms": 0.92789999962406
+        "wall_ms": 0.6742550003764336
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 8.900297387981482e-09,
-        "wall_ms": 0.4939999998896383
+        "wall_ms": 0.41921299998648465
       },
       "agreement": {
         "max_dp_bar": 6.473044322774513e-10,
@@ -3313,21 +3313,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.276561079066596e-10,
-        "wall_ms": 0.9374000001116656
+        "wall_ms": 1.0419210002510226
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 0.7999999997991836
+        "wall_ms": 1.3054789997113403
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 0.4472999999052263
+        "wall_ms": 0.670637999974133
       },
       "agreement": {
         "max_dp_bar": 1.6074608311100747e-10,
@@ -3354,21 +3354,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.648974786889084e-10,
-        "wall_ms": 0.9298000004491769
+        "wall_ms": 1.3783370004603057
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8054999998421408
+        "wall_ms": 1.3376389997574734
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 6.394884621840902e-14,
-        "wall_ms": 0.4543999993984471
+        "wall_ms": 0.808560000223224
       },
       "agreement": {
         "max_dp_bar": 3.103394874415244e-09,
@@ -3395,21 +3395,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.626610454281035e-11,
-        "wall_ms": 1.784600000064529
+        "wall_ms": 1.3665960004800581
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.7763568394002505e-14,
-        "wall_ms": 0.9779000001799432
+        "wall_ms": 1.1563460002435022
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 0.4616999995050719
+        "wall_ms": 0.8501330003127805
       },
       "agreement": {
         "max_dp_bar": 7.58930696065363e-11,
@@ -3436,21 +3436,21 @@
         "status": "converged",
         "iterations": 12,
         "residual_inf": 2.0933832445280132e-10,
-        "wall_ms": 3.260000000409491
+        "wall_ms": 4.530072000306973
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.9964000000763917
+        "wall_ms": 1.1997439996775938
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 6.696865284538944e-13,
-        "wall_ms": 0.6272000000535627
+        "wall_ms": 0.8442549997198512
       },
       "agreement": {
         "max_dp_bar": 4.773852424477809e-10,
@@ -3477,21 +3477,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.716138508025324e-12,
-        "wall_ms": 1.2249000001247623
+        "wall_ms": 2.044874999228341
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.105071755271638e-12,
-        "wall_ms": 1.0024000002886169
+        "wall_ms": 1.4515719994960818
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 1.900701818158268e-13,
-        "wall_ms": 0.5904999998165295
+        "wall_ms": 0.8478610006932286
       },
       "agreement": {
         "max_dp_bar": 4.760636329592671e-13,
@@ -3518,21 +3518,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 4.2015280143914424e-12,
-        "wall_ms": 1.4206000005287933
+        "wall_ms": 2.1963629997117096
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 9,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.0996000000886852
+        "wall_ms": 1.5590029997838428
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 2.970269363800071e-09,
-        "wall_ms": 0.782499999331776
+        "wall_ms": 1.418152999576705
       },
       "agreement": {
         "max_dp_bar": 4.235118922224501e-10,
@@ -3559,26 +3559,26 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.993605446339643e-11,
-        "wall_ms": 1.351500000055239
+        "wall_ms": 1.37906899999507
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 0.8295999996335013
+        "wall_ms": 1.1656309998215875
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.4913000002488843
+        "wall_ms": 0.8115270002235775
       },
       "agreement": {
         "max_dp_bar": 4.193623226456111e-11,
         "max_dw_rpm": 9.549694368615746e-11,
-        "max_dp_bar_nominal": 4.192202140984591e-11,
+        "max_dp_bar_nominal": 4.191491598248831e-11,
         "max_dw_rpm_nominal": 9.549694368615746e-11
       }
     },
@@ -3600,21 +3600,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.0422999994261772
+        "wall_ms": 1.1856699993586517
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.263256414560601e-14,
-        "wall_ms": 0.8489000001645763
+        "wall_ms": 0.615852999544586
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.6033999998180661
+        "wall_ms": 0.4301250000935397
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -3641,21 +3641,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 3.090860900556436e-13,
-        "wall_ms": 2.1851000001333887
+        "wall_ms": 1.4337020002130885
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.752198386384407e-11,
-        "wall_ms": 1.0517999999137828
+        "wall_ms": 0.8114529991871677
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.250526875968717e-09,
-        "wall_ms": 0.5007999998269952
+        "wall_ms": 0.4191799998807255
       },
       "agreement": {
         "max_dp_bar": 1.5324204127864505e-09,
@@ -3682,21 +3682,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.69373897924197e-09,
-        "wall_ms": 1.0455000001456938
+        "wall_ms": 0.7690850006838446
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.8909999996831175
+        "wall_ms": 0.5735510003432864
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 8.242295734817162e-13,
-        "wall_ms": 0.5640999997922336
+        "wall_ms": 0.3735999998752959
       },
       "agreement": {
         "max_dp_bar": 1.0868461686186492e-08,
@@ -3723,21 +3723,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.4805999999225605
+        "wall_ms": 0.8093369997368427
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 0.9671999996498926
+        "wall_ms": 0.5624089999400894
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.46909999946365133
+        "wall_ms": 0.33005899967974983
       },
       "agreement": {
         "max_dp_bar": 7.105427357601002e-15,
@@ -3764,21 +3764,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.378899999508576
+        "wall_ms": 0.875118999829283
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 0.7696000002397341
+        "wall_ms": 0.5734269998356467
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 1.4175327578413999e-11,
-        "wall_ms": 0.9867999997368315
+        "wall_ms": 0.518908000231022
       },
       "agreement": {
         "max_dp_bar": 5.96003246755572e-11,
@@ -3805,21 +3805,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.2020000003758469
+        "wall_ms": 0.8043849993555341
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.263256414560601e-14,
-        "wall_ms": 0.8146000000124332
+        "wall_ms": 0.5851120004081167
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 0.5137999996804865
+        "wall_ms": 0.33549599993421
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -3846,24 +3846,24 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 1.8471999992470955
+        "wall_ms": 0.8905530003175954
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.9575999995140592
+        "wall_ms": 0.6370400005835108
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 1.1586000000534113
+        "wall_ms": 0.3282830002717674
       },
       "agreement": {
-        "max_dp_bar": 3.552713678800501e-15,
+        "max_dp_bar": 8.881784197001252e-16,
         "max_dw_rpm": 1.1368683772161603e-13,
         "max_dp_bar_nominal": 3.552713678800501e-15,
         "max_dw_rpm_nominal": 1.1368683772161603e-13
@@ -3887,21 +3887,21 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 1.2967404927621828e-13,
-        "wall_ms": 4.507200000261946
+        "wall_ms": 1.4774410001336946
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.1546319456101628e-13,
-        "wall_ms": 1.9333000000187894
+        "wall_ms": 0.7244179996632738
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 7.44453387824251e-11,
-        "wall_ms": 1.3429999999061693
+        "wall_ms": 0.6424459998015664
       },
       "agreement": {
         "max_dp_bar": 5.0543569329875027e-11,
@@ -3928,21 +3928,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.1144999998577987
+        "wall_ms": 1.0537789994486957
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 0.8234000006268616
+        "wall_ms": 0.6286500001806417
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 1.2573053709274973e-11,
-        "wall_ms": 0.37929999962216243
+        "wall_ms": 0.2625499992063851
       },
       "agreement": {
         "max_dp_bar": 9.613643214834156e-12,
@@ -3969,21 +3969,21 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 1.1723955140041653e-13,
-        "wall_ms": 1.9302000000607222
+        "wall_ms": 1.439227000446408
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-12,
-        "wall_ms": 1.021299999592884
+        "wall_ms": 0.7377669999186764
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 5.634195332504532e-10,
-        "wall_ms": 1.295899999604444
+        "wall_ms": 1.1478500000521308
       },
       "agreement": {
         "max_dp_bar": 1.6663448398901437e-10,
@@ -4010,21 +4010,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4437162576541596e-10,
-        "wall_ms": 0.9478000001763576
+        "wall_ms": 0.6628420005654334
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.263256414560601e-14,
-        "wall_ms": 0.8631000000605127
+        "wall_ms": 0.631564000286744
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 6.31636964953941e-11,
-        "wall_ms": 0.45279999994818354
+        "wall_ms": 1.2504129999797442
       },
       "agreement": {
         "max_dp_bar": 1.5592149793519638e-10,
@@ -4051,21 +4051,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.0931999995591468
+        "wall_ms": 1.2121380004828097
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.973799150320701e-14,
-        "wall_ms": 0.7724999995843973
+        "wall_ms": 0.6226260002222261
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.2718714970105793e-11,
-        "wall_ms": 1.0332000001653796
+        "wall_ms": 0.3441779999775463
       },
       "agreement": {
         "max_dp_bar": 1.872990651463624e-11,
@@ -4092,21 +4092,21 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 5.333067321089402e-12,
-        "wall_ms": 2.1028999999543885
+        "wall_ms": 1.2936539997099317
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.563071810346429e-09,
-        "wall_ms": 0.9955000004993053
+        "wall_ms": 0.6705590003548423
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.5257267388667515e-09,
-        "wall_ms": 1.0233000002699555
+        "wall_ms": 0.8918419998735772
       },
       "agreement": {
         "max_dp_bar": 1.1471001926111057e-09,
@@ -4133,21 +4133,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 8.615330671091215e-14,
-        "wall_ms": 1.4377999996213475
+        "wall_ms": 1.5085900004123687
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.3494985391134833e-10,
-        "wall_ms": 1.0595000003377208
+        "wall_ms": 1.0356069997214945
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 1.80120807158346e-10,
-        "wall_ms": 0.85040000067238
+        "wall_ms": 0.7674299995414913
       },
       "agreement": {
         "max_dp_bar": 1.0688916418644112e-10,
@@ -4174,21 +4174,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 1.1297999999442254
+        "wall_ms": 0.9849959997154656
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 0.7900999999037595
+        "wall_ms": 0.6023590003678692
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.678835345359403e-11,
-        "wall_ms": 0.4908999999315711
+        "wall_ms": 0.3520399995977641
       },
       "agreement": {
         "max_dp_bar": 1.4004797321831575e-10,
@@ -4215,21 +4215,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 8.162366782471508e-09,
-        "wall_ms": 0.9678999995230697
+        "wall_ms": 0.7232919997477438
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 0.812700000096811
+        "wall_ms": 0.7217479997052578
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 1.0816023632287397e-09,
-        "wall_ms": 0.35519999983080197
+        "wall_ms": 0.37913599953753874
       },
       "agreement": {
         "max_dp_bar": 1.2870515320173581e-08,
@@ -4256,26 +4256,26 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 8.810033591544197e-09,
-        "wall_ms": 0.9635000005800975
+        "wall_ms": 0.8370159994228743
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 2.4868995751603507e-14,
-        "wall_ms": 2.1403999999165535
+        "residual_inf": 3.197442310920451e-14,
+        "wall_ms": 0.7143279999581864
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.8030021919912542e-11,
-        "wall_ms": 1.2577999996210565
+        "wall_ms": 0.4131240002607228
       },
       "agreement": {
         "max_dp_bar": 1.7337711710752046e-08,
         "max_dw_rpm": 1.780063030309975e-08,
-        "max_dp_bar_nominal": 1.737564048198692e-08,
+        "max_dp_bar_nominal": 1.7375626271132205e-08,
         "max_dw_rpm_nominal": 1.774697011569515e-08
       }
     },
@@ -4297,21 +4297,21 @@
         "status": "converged",
         "iterations": 12,
         "residual_inf": 1.0402345651527867e-11,
-        "wall_ms": 5.591000000094937
+        "wall_ms": 1.5274370007318794
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.9539925233402755e-14,
-        "wall_ms": 2.2828999999546795
+        "wall_ms": 1.1077860008299467
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 5.88862292261183e-13,
-        "wall_ms": 3.8566000002902
+        "wall_ms": 1.081510999938473
       },
       "agreement": {
         "max_dp_bar": 1.0800249583553523e-12,
@@ -4338,21 +4338,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 7.105427357601002e-14,
-        "wall_ms": 4.437700000380573
+        "wall_ms": 3.685419999783335
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.5995207642590685e-10,
-        "wall_ms": 3.0397000000448315
+        "wall_ms": 0.7881300007284153
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 1.9380053117856733e-12,
-        "wall_ms": 1.7766999999366817
+        "wall_ms": 0.5805020000479999
       },
       "agreement": {
         "max_dp_bar": 9.667822098435863e-13,
@@ -4379,21 +4379,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 6.348965797542405e-09,
-        "wall_ms": 2.6838000003408524
+        "wall_ms": 0.9240839999620221
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 2.167599999665981
+        "wall_ms": 0.5819689995405497
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.8178000000261818
+        "wall_ms": 0.4150929999013897
       },
       "agreement": {
         "max_dp_bar": 9.062119943337166e-09,
@@ -4420,21 +4420,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 7.993605777301127e-13,
-        "wall_ms": 5.293100000017148
+        "wall_ms": 1.3385809997998876
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.6786572132332367e-11,
-        "wall_ms": 3.581700000722776
+        "wall_ms": 0.8583280005041161
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4793588576367256e-10,
-        "wall_ms": 3.321199999845703
+        "wall_ms": 1.0668699997040676
       },
       "agreement": {
         "max_dp_bar": 4.023514854623045e-11,
@@ -4461,21 +4461,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 3.01469999976689
+        "wall_ms": 1.2265879995538853
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.748299999439041
+        "wall_ms": 0.5725599994548247
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 4.306190959368905e-09,
-        "wall_ms": 1.5139999995881226
+        "wall_ms": 0.32801899942569435
       },
       "agreement": {
         "max_dp_bar": 3.4351366196005984e-09,
@@ -4502,21 +4502,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.904787935331115e-13,
-        "wall_ms": 3.530299999511044
+        "wall_ms": 1.0217440003543743
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.329070518200751e-15,
-        "wall_ms": 2.4716999996599043
+        "wall_ms": 0.9145459998762817
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.0011547146859812e-11,
-        "wall_ms": 1.2650999997276813
+        "wall_ms": 0.4087840006832266
       },
       "agreement": {
         "max_dp_bar": 3.0198066269804258e-12,
@@ -4543,21 +4543,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 3.7781999999424443
+        "wall_ms": 2.0781990006071283
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.2420999994210433
+        "wall_ms": 1.465397000174562
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 5.3708077984993e-09,
-        "wall_ms": 0.9952000000339467
+        "wall_ms": 0.4929649994664942
       },
       "agreement": {
         "max_dp_bar": 1.141003735938284e-08,
@@ -4584,21 +4584,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 4.036100000121223
+        "wall_ms": 2.095804000418866
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 6.828315690654563e-12,
-        "wall_ms": 2.6203999996141647
+        "wall_ms": 1.4430849996642792
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.1346728829030326e-09,
-        "wall_ms": 3.2695999998395564
+        "wall_ms": 1.6443559998151613
       },
       "agreement": {
         "max_dp_bar": 1.6210321973630926e-10,
@@ -4625,21 +4625,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 9.798348798994994e-09,
-        "wall_ms": 3.2572999998592422
+        "wall_ms": 1.4770930001759552
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 2.119799999491079
+        "wall_ms": 1.2743439992846106
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.2023999997836654
+        "wall_ms": 0.6573250002475106
       },
       "agreement": {
         "max_dp_bar": 1.3884815075471124e-08,
@@ -4666,21 +4666,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.890300000217394
+        "wall_ms": 1.6268130002572434
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-14,
-        "wall_ms": 2.3983000000953325
+        "wall_ms": 1.214328999594727
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 3.3131257737295527e-09,
-        "wall_ms": 1.183100000162085
+        "wall_ms": 0.5077220002931426
       },
       "agreement": {
         "max_dp_bar": 6.0896923059772234e-09,
@@ -4707,21 +4707,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 3.1296999995902297
+        "wall_ms": 1.7071629999918514
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 2.5424999994356767
+        "wall_ms": 1.1967919999733567
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.7804282492761558e-09,
-        "wall_ms": 1.2999000000490923
+        "wall_ms": 0.709960999301984
       },
       "agreement": {
         "max_dp_bar": 4.367294081930595e-09,
@@ -4748,26 +4748,26 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 9.581135884673131e-09,
-        "wall_ms": 2.713200000471261
+        "wall_ms": 1.5034519992696005
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.708300000449526
+        "residual_inf": 7.105427357601002e-15,
+        "wall_ms": 1.090908000151103
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.5149999999266583
+        "wall_ms": 0.8765309994487325
       },
       "agreement": {
         "max_dp_bar": 1.4278356275099213e-08,
         "max_dw_rpm": 1.741636879160069e-08,
-        "max_dp_bar_nominal": 1.4278327853389783e-08,
+        "max_dp_bar_nominal": 1.4278342064244498e-08,
         "max_dw_rpm_nominal": 1.7416596165276133e-08
       }
     },
@@ -4789,21 +4789,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 3.149699999994482
+        "wall_ms": 1.6368710003007436
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.9160000003685127
+        "wall_ms": 1.1251309997533099
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.0199840971836238e-11,
-        "wall_ms": 1.2254000002940302
+        "wall_ms": 0.7268600002134917
       },
       "agreement": {
         "max_dp_bar": 1.686828454694478e-11,
@@ -4830,21 +4830,21 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 6.394884621840902e-14,
-        "wall_ms": 5.937099999755446
+        "wall_ms": 2.639911999722244
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.694822225952521e-12,
-        "wall_ms": 3.0888000001141336
+        "wall_ms": 1.4511150002363138
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 1.6012080550353858e-11,
-        "wall_ms": 2.5134999996225815
+        "wall_ms": 1.084202000129153
       },
       "agreement": {
         "max_dp_bar": 1.0983214338011749e-11,
@@ -4871,21 +4871,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 8.881926305548404e-09,
-        "wall_ms": 2.68320000031963
+        "wall_ms": 1.684918999671936
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.2368999998434447
+        "wall_ms": 1.2246799997228663
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 9.947598300641403e-14,
-        "wall_ms": 1.586200000019744
+        "wall_ms": 0.7803870003044722
       },
       "agreement": {
         "max_dp_bar": 1.4583648066945898e-08,
@@ -4912,21 +4912,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.566658245470535e-09,
-        "wall_ms": 2.6414999992994126
+        "wall_ms": 1.4021410006535007
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 9.947598300641403e-14,
-        "wall_ms": 2.7384999993955716
+        "wall_ms": 1.262050999685016
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 1.2158999998064246
+        "wall_ms": 0.6440709994421923
       },
       "agreement": {
         "max_dp_bar": 6.793143825234438e-09,
@@ -4953,26 +4953,26 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 3.4732999993138947
+        "wall_ms": 1.6520219996891683
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.2391000002244255
+        "wall_ms": 1.1035249999622465
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.3710000002902234
+        "residual_inf": 2.1316282072803006e-14,
+        "wall_ms": 0.7779300003676326
       },
       "agreement": {
-        "max_dp_bar": 1.5987211554602254e-14,
-        "max_dw_rpm": 1.1368683772161603e-13,
-        "max_dp_bar_nominal": 2.6645352591003757e-15,
+        "max_dp_bar": 2.1316282072803006e-14,
+        "max_dw_rpm": 0.0,
+        "max_dp_bar_nominal": 1.4210854715202004e-14,
         "max_dw_rpm_nominal": 0.0
       }
     },
@@ -4994,21 +4994,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 3.1105000007300987
+        "wall_ms": 1.5573350001432118
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.387099999396014
+        "wall_ms": 1.091902000553091
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.4416000003620866
+        "wall_ms": 0.7020010007181554
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -5035,21 +5035,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.1032953984322376e-11,
-        "wall_ms": 3.199200000381097
+        "wall_ms": 1.3885449998269905
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.7629454280031496e-11,
-        "wall_ms": 2.6484999998501735
+        "wall_ms": 1.3234240004749154
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 5.2512660886350204e-11,
-        "wall_ms": 1.42020000021148
+        "wall_ms": 0.6452819998230552
       },
       "agreement": {
         "max_dp_bar": 2.744826588241267e-11,
@@ -5076,21 +5076,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 4.973799150320701e-14,
-        "wall_ms": 4.085800000211748
+        "wall_ms": 2.274936000503658
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.744915819785092e-13,
-        "wall_ms": 2.6688999996622442
+        "wall_ms": 1.5386830000352347
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 3.5056402225563943e-12,
-        "wall_ms": 2.457999999933236
+        "wall_ms": 0.9689090002211742
       },
       "agreement": {
         "max_dp_bar": 1.2998491172311333e-12,
@@ -5117,21 +5117,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 6.4486869177926565e-09,
-        "wall_ms": 3.2105000000228756
+        "wall_ms": 0.7154009999794653
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.0230999998602783
+        "wall_ms": 0.7467549994544243
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.525979425627156e-10,
-        "wall_ms": 1.1534999994182726
+        "wall_ms": 0.35888299953512615
       },
       "agreement": {
         "max_dp_bar": 1.0489486612641485e-08,
@@ -5158,21 +5158,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 2.769599999737693
+        "wall_ms": 0.7741829995211447
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 2.171900000575988
+        "wall_ms": 0.6279890003497712
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 6.110667527536862e-13,
-        "wall_ms": 1.3251000000309432
+        "wall_ms": 0.4052969998156186
       },
       "agreement": {
         "max_dp_bar": 1.1226575225009583e-12,
@@ -5199,21 +5199,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 3.5311000001456705
+        "wall_ms": 0.825101999907929
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-14,
-        "wall_ms": 2.8875999996671453
+        "wall_ms": 1.851850000093691
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 1.7198686919073225e-11,
-        "wall_ms": 1.0136000000784406
+        "wall_ms": 0.6840519999968819
       },
       "agreement": {
         "max_dp_bar": 2.1756818568974268e-11,
@@ -5240,21 +5240,21 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 1.0480505352461478e-13,
-        "wall_ms": 4.505500000050233
+        "wall_ms": 2.7861199996550567
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.5714541607158026e-11,
-        "wall_ms": 2.4092000003292924
+        "wall_ms": 1.421482000296237
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 1.0480505352461478e-13,
-        "wall_ms": 2.1287999998094165
+        "wall_ms": 1.375324000036926
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -5281,21 +5281,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 9.237055564881302e-14,
-        "wall_ms": 4.673099999308761
+        "wall_ms": 2.5605900000300608
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.8257395595355774e-11,
-        "wall_ms": 2.349800000047253
+        "wall_ms": 1.4782530006414163
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 1.7760335424554796e-09,
-        "wall_ms": 2.6511999994909274
+        "wall_ms": 1.468767000005755
       },
       "agreement": {
         "max_dp_bar": 1.5363177396920946e-10,
@@ -5322,21 +5322,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 1.5583445645006577e-10,
-        "wall_ms": 1.5316999997594394
+        "wall_ms": 2.326310000171361
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.549516567451064e-14,
-        "wall_ms": 0.8372000002054847
+        "wall_ms": 1.1763470001824317
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 4.8121506779352785e-11,
-        "wall_ms": 1.2950999998793122
+        "wall_ms": 1.2544860001071356
       },
       "agreement": {
         "max_dp_bar": 5.128519831032463e-11,
@@ -5363,21 +5363,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.2258999995538034
+        "wall_ms": 1.6556239997953526
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 0.8161999994626967
+        "wall_ms": 1.2034849996780395
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.44609999986278126
+        "wall_ms": 0.6190700005390681
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -5404,21 +5404,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.3345768934414082e-10,
-        "wall_ms": 1.0030999992522993
+        "wall_ms": 1.2452499995561084
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 0.7709999999860884
+        "wall_ms": 1.1159139994560974
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 1.6110999995362363
+        "wall_ms": 0.6198270002641948
       },
       "agreement": {
         "max_dp_bar": 1.8449242134011001e-10,
@@ -5445,21 +5445,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.7003287666739197e-11,
-        "wall_ms": 3.5753999991356977
+        "wall_ms": 1.6758029996708501
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.632800000355928
+        "wall_ms": 1.2531869997474132
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 6.889901982276569e-10,
-        "wall_ms": 1.7522999996799626
+        "wall_ms": 0.5790769992017886
       },
       "agreement": {
         "max_dp_bar": 2.7280755432457227e-10,
@@ -5486,21 +5486,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.578467382998497e-09,
-        "wall_ms": 2.6882000001933193
+        "wall_ms": 1.7253030000574654
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 9.947598300641403e-14,
-        "wall_ms": 3.46839999929216
+        "wall_ms": 0.8055580001382623
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 4.0174796822611825e-10,
-        "wall_ms": 1.222099999722559
+        "wall_ms": 0.4405210002005333
       },
       "agreement": {
         "max_dp_bar": 5.250683443591697e-09,
@@ -5527,21 +5527,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 5.36389999979292
+        "wall_ms": 0.8266229997389019
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.9499999998515705
+        "wall_ms": 0.6680700007564155
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 5.364597654988756e-12,
-        "wall_ms": 1.1278000001766486
+        "wall_ms": 0.33403299948986387
       },
       "agreement": {
         "max_dp_bar": 1.6001422409317456e-11,
@@ -5568,21 +5568,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 4.998100000193517
+        "wall_ms": 0.9794870002224343
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 6.394884621840902e-14,
-        "wall_ms": 3.985100000136299
+        "wall_ms": 0.7071219997669687
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.071942617476452e-11,
-        "wall_ms": 1.257400000213238
+        "wall_ms": 0.47509700016235
       },
       "agreement": {
         "max_dp_bar": 5.650235834764317e-11,
@@ -5609,24 +5609,24 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 1.7550405573274475e-12,
-        "wall_ms": 6.29190000017843
+        "wall_ms": 1.4333730005091638
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.3997691894473974e-12,
-        "wall_ms": 4.872299999988172
+        "wall_ms": 0.7061470005282899
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 2.776083363187354e-09,
-        "wall_ms": 3.6290000007284107
+        "residual_inf": 2.7760851395441932e-09,
+        "wall_ms": 0.763246000133222
       },
       "agreement": {
-        "max_dp_bar": 1.261731163992863e-09,
+        "max_dp_bar": 1.2617320521712827e-09,
         "max_dw_rpm": 1.2470309229684062e-09,
         "max_dp_bar_nominal": 2.1884716261411086e-12,
         "max_dw_rpm_nominal": 0.0
@@ -5650,21 +5650,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 3.197442310920451e-14,
-        "wall_ms": 4.805999999916821
+        "wall_ms": 1.4185639993229415
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.197442310920451e-14,
-        "wall_ms": 2.811700000165729
+        "wall_ms": 0.8353319999514497
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 4.810374321095878e-12,
-        "wall_ms": 5.331900000783207
+        "wall_ms": 1.2089719994037296
       },
       "agreement": {
         "max_dp_bar": 2.5983659668327164e-12,
@@ -5691,21 +5691,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 4.964900000231864
+        "wall_ms": 1.0153090006497223
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.7763568394002505e-14,
-        "wall_ms": 2.588300000752497
+        "wall_ms": 0.7923950006443192
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.7481000004408997
+        "wall_ms": 0.4667309995056712
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -5732,21 +5732,21 @@
         "status": "converged",
         "iterations": 11,
         "residual_inf": 1.624478329631529e-12,
-        "wall_ms": 6.440899999688554
+        "wall_ms": 1.2097429998902953
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 9,
         "residual_inf": 4.920641671901649e-11,
-        "wall_ms": 4.11789999998291
+        "wall_ms": 6.120603000454139
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 8.21000223361068e-09,
-        "wall_ms": 2.783899999485584
+        "wall_ms": 0.9998550003729179
       },
       "agreement": {
         "max_dp_bar": 2.2751294181944104e-09,
@@ -5773,21 +5773,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.47512629573066e-09,
-        "wall_ms": 3.290200000265031
+        "wall_ms": 0.8511250007359195
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.7763568394002505e-14,
-        "wall_ms": 2.5234000004275003
+        "wall_ms": 0.8794730001682183
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.5592999998261803
+        "wall_ms": 0.48087399954965804
       },
       "agreement": {
         "max_dp_bar": 1.0454726862008101e-08,
@@ -5814,21 +5814,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 8.881784197001252e-15,
-        "wall_ms": 2.8822999993280973
+        "wall_ms": 0.8942169997681049
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.1403999999165535
+        "wall_ms": 0.6646789997830638
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 1.5987211554602254e-14,
-        "wall_ms": 1.451199999792152
+        "wall_ms": 0.4104059999008314
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -5855,21 +5855,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.661408953803402e-10,
-        "wall_ms": 2.886199999920791
+        "wall_ms": 0.7715600004303269
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 2.6606000001265784
+        "wall_ms": 0.9231209996869438
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.1651124509626243e-11,
-        "wall_ms": 1.2588999998115469
+        "wall_ms": 0.36081200050830375
       },
       "agreement": {
         "max_dp_bar": 6.215188363967172e-10,
@@ -5896,21 +5896,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.5926996367361426e-09,
-        "wall_ms": 2.311500000359956
+        "wall_ms": 0.9854800000539399
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 2.096000000165077
+        "wall_ms": 0.6419339997592033
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.1072999996031285
+        "wall_ms": 0.4143289997955435
       },
       "agreement": {
         "max_dp_bar": 7.2053012445394415e-09,
@@ -5937,21 +5937,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 8.025619280260798e-09,
-        "wall_ms": 2.3339999997915584
+        "wall_ms": 0.9407970001120702
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.8822000001819106
+        "wall_ms": 0.8551709997846046
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 1.6921006817938178e-09,
-        "wall_ms": 0.8430999996562605
+        "wall_ms": 0.26427100056025665
       },
       "agreement": {
         "max_dp_bar": 1.011414951790357e-08,
@@ -5978,21 +5978,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.0590817112188233e-10,
-        "wall_ms": 3.1613999999535736
+        "wall_ms": 0.9666320001997519
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 2.505899999960093
+        "wall_ms": 0.6843099999969127
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 1.3881000004403177
+        "wall_ms": 0.40646499928698177
       },
       "agreement": {
         "max_dp_bar": 2.0304469217080623e-10,
@@ -6019,21 +6019,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 9.549722790325177e-09,
-        "wall_ms": 3.0059000000619562
+        "wall_ms": 0.8604340000601951
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.1094000003358815
+        "wall_ms": 0.6683600004180335
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.2737999995806604
+        "wall_ms": 0.3419439999561291
       },
       "agreement": {
         "max_dp_bar": 1.4054464259061206e-08,
@@ -6060,26 +6060,26 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 1.1368683772161603e-13,
-        "wall_ms": 4.933999999593652
+        "wall_ms": 1.3872319996153237
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.73425767874869e-12,
-        "wall_ms": 2.9576999995697406
+        "wall_ms": 0.6945280001673382
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 6.666986962500232e-09,
-        "wall_ms": 2.789400000438036
+        "wall_ms": 0.8938289993238868
       },
       "agreement": {
-        "max_dp_bar": 3.084453581436719e-09,
+        "max_dp_bar": 3.0844553577935585e-09,
         "max_dw_rpm": 1.2112423064536415e-08,
-        "max_dp_bar_nominal": 7.86926079854311e-12,
+        "max_dp_bar_nominal": 7.86748444170371e-12,
         "max_dw_rpm_nominal": 3.2173375075217336e-11
       }
     },
@@ -6101,21 +6101,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 8.093081760307541e-12,
-        "wall_ms": 3.8359999998647254
+        "wall_ms": 1.2059210002917098
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.689582056016661e-13,
-        "wall_ms": 2.440599999317783
+        "wall_ms": 0.7663409996894188
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.552713678800501e-14,
-        "wall_ms": 3.576999999495456
+        "wall_ms": 1.695852000011655
       },
       "agreement": {
         "max_dp_bar": 6.536993168992922e-13,
@@ -6142,21 +6142,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 3.54330000027403
+        "wall_ms": 0.9872139999060892
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.6697754290362354e-13,
-        "wall_ms": 1.9965999999840278
+        "wall_ms": 0.6340449999697739
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.41299999995681
+        "wall_ms": 0.4439899994395091
       },
       "agreement": {
         "max_dp_bar": 7.105427357601002e-15,
@@ -6183,21 +6183,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 1.4210854715202004e-13,
-        "wall_ms": 5.355600000257255
+        "wall_ms": 1.4210539993655402
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.2289902429074573e-10,
-        "wall_ms": 3.327000000354019
+        "wall_ms": 0.833585000691528
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 10,
         "residual_inf": 1.4210854715202004e-13,
-        "wall_ms": 5.468700000164972
+        "wall_ms": 1.4512249999825144
       },
       "agreement": {
         "max_dp_bar": 1.7763568394002505e-15,
@@ -6224,21 +6224,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 1.723066134218243e-13,
-        "wall_ms": 7.726900000307069
+        "wall_ms": 1.0716429997046362
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.973799150320701e-14,
-        "wall_ms": 5.396700000346755
+        "wall_ms": 0.7447640000464162
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 3.284564620287256e-09,
-        "wall_ms": 2.061199999843666
+        "wall_ms": 0.5347100004655658
       },
       "agreement": {
         "max_dp_bar": 4.3365844248910435e-10,
@@ -6265,21 +6265,21 @@
         "status": "line_search_stall",
         "iterations": 8,
         "residual_inf": 54.0553427247886,
-        "wall_ms": 10.319499999241089
+        "wall_ms": 2.6859579993470106
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.6285639503621496e-11,
-        "wall_ms": 2.9847000005247537
+        "wall_ms": 0.9426310007256689
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 3.126388037344441e-13,
-        "wall_ms": 2.4271000002045184
+        "wall_ms": 0.6156480003483011
       }
     },
     {
@@ -6300,21 +6300,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 2.2026824808563106e-13,
-        "wall_ms": 5.573200000071665
+        "wall_ms": 1.1961760001213406
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.1858958259836072e-11,
-        "wall_ms": 2.903900000092108
+        "wall_ms": 1.015409000501677
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 9,
         "residual_inf": 2.3447910280083306e-13,
-        "wall_ms": 3.3592999998290907
+        "wall_ms": 1.2301480001042364
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -6341,21 +6341,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 5.684341886080802e-14,
-        "wall_ms": 2.948600000308943
+        "wall_ms": 0.9765860004335991
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.684341886080802e-14,
-        "wall_ms": 2.129600000444043
+        "wall_ms": 0.6664219999947818
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 4.833058397935019e-10,
-        "wall_ms": 3.3491000003778026
+        "wall_ms": 0.6705770001644851
       },
       "agreement": {
         "max_dp_bar": 5.030642569181509e-11,
@@ -6382,21 +6382,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 3.3788999999160296
+        "wall_ms": 0.9952610007530893
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 2.510199999960605
+        "wall_ms": 0.6083150001359172
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.9059000005654525
+        "wall_ms": 0.5282740003167419
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -6423,21 +6423,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 6.750155989720952e-14,
-        "wall_ms": 3.7113999997018254
+        "wall_ms": 1.170237000224006
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 8.378719940083101e-11,
-        "wall_ms": 2.8083999995942577
+        "wall_ms": 0.8195000000341679
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 1.3659473552252166e-10,
-        "wall_ms": 3.3936999998331885
+        "wall_ms": 0.8667410002090037
       },
       "agreement": {
         "max_dp_bar": 1.2247092229245027e-10,
@@ -6464,21 +6464,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 2.898000000641332
+        "wall_ms": 0.8526530000381172
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.907985046680551e-14,
-        "wall_ms": 2.1282000006976887
+        "wall_ms": 0.7860890000301879
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.2640839486266486e-09,
-        "wall_ms": 1.3858000002073823
+        "wall_ms": 0.45673699969484005
       },
       "agreement": {
         "max_dp_bar": 9.313652071796241e-10,
@@ -6505,21 +6505,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 3.13929999992979
+        "wall_ms": 0.8685059992785682
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 3.2968000004984788
+        "wall_ms": 0.763614000788948
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 4.73608707807216e-10,
-        "wall_ms": 1.9102000005659647
+        "wall_ms": 0.3611069996622973
       },
       "agreement": {
         "max_dp_bar": 5.466489483296755e-10,
@@ -6546,21 +6546,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 6.8098415795248e-11,
-        "wall_ms": 3.388299999642186
+        "wall_ms": 0.7613749994561658
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.7763568394002505e-14,
-        "wall_ms": 2.7317000003677094
+        "wall_ms": 0.598808999711764
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.5875000008236384
+        "wall_ms": 0.5644009997922694
       },
       "agreement": {
         "max_dp_bar": 6.410516562027624e-11,
@@ -6587,21 +6587,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 8.881784197001252e-15,
-        "wall_ms": 3.434700000070734
+        "wall_ms": 0.9582359998603351
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 8.881784197001252e-15,
-        "wall_ms": 3.5045000004174653
+        "wall_ms": 0.715533999937179
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.564400000461319
+        "wall_ms": 0.4240589996697963
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -6628,21 +6628,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 8.988365607365267e-13,
-        "wall_ms": 3.686300000481424
+        "wall_ms": 0.9453570000914624
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 9.951151014320203e-12,
-        "wall_ms": 2.462000000377884
+        "wall_ms": 0.6150360004539834
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.3161999995645601
+        "wall_ms": 1.5566890006084577
       },
       "agreement": {
         "max_dp_bar": 8.455458555545192e-13,
@@ -6669,21 +6669,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 3.3370999999533524
+        "wall_ms": 1.3855709994459176
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 2.3041000004013767
+        "wall_ms": 0.5896739994568634
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.6342482922482304e-13,
-        "wall_ms": 1.3335000003280584
+        "wall_ms": 0.4400259995236411
       },
       "agreement": {
         "max_dp_bar": 1.8474111129762605e-13,
@@ -6710,21 +6710,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.997779802171863e-11,
-        "wall_ms": 2.5485999994998565
+        "wall_ms": 0.6724619997839909
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.2564999999303836
+        "wall_ms": 0.7627289996889886
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.744915819785092e-13,
-        "wall_ms": 1.2446999999156105
+        "wall_ms": 0.4587559997162316
       },
       "agreement": {
         "max_dp_bar": 2.3888446776254568e-11,
@@ -6751,21 +6751,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.7528000000529573
+        "wall_ms": 2.436788000522938
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 2.2521999999298714
+        "wall_ms": 1.9195379991288064
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 1.1891000003743102
+        "wall_ms": 0.5210720000832225
       },
       "agreement": {
         "max_dp_bar": 3.375077994860476e-14,
@@ -6792,21 +6792,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.184759123087133e-10,
-        "wall_ms": 2.4863999997251085
+        "wall_ms": 0.6899390000398853
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 2.193500000430504
+        "wall_ms": 0.818571999843698
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.7053025658242404e-13,
-        "wall_ms": 1.2219000000186497
+        "wall_ms": 0.38794800002506236
       },
       "agreement": {
         "max_dp_bar": 9.730882766234572e-10,
@@ -6833,21 +6833,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.0130741518187278e-10,
-        "wall_ms": 2.433200000268698
+        "wall_ms": 0.7636119999006041
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 2.17140000040672
+        "wall_ms": 0.7783710007061018
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 5.759126509019552e-11,
-        "wall_ms": 1.2971999994988437
+        "wall_ms": 0.36888199974782765
       },
       "agreement": {
         "max_dp_bar": 2.078195393551141e-10,
@@ -6874,21 +6874,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 5.684341886080802e-14,
-        "wall_ms": 4.6520000005330076
+        "wall_ms": 1.1990660004812526
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.7283953702171857e-10,
-        "wall_ms": 3.08729999960633
+        "wall_ms": 0.7795259998601978
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 5.345768272491114e-10,
-        "wall_ms": 1.5306999994209036
+        "wall_ms": 0.41175500064127846
       },
       "agreement": {
         "max_dp_bar": 2.984279490192421e-11,
@@ -6915,21 +6915,21 @@
         "status": "converged",
         "iterations": 13,
         "residual_inf": 4.884981308350689e-14,
-        "wall_ms": 5.118600000059814
+        "wall_ms": 1.4920719995643594
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.6697754290362354e-13,
-        "wall_ms": 2.747100000306091
+        "wall_ms": 3.204047000508581
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 4.529709940470639e-14,
-        "wall_ms": 3.889800000251853
+        "wall_ms": 0.827139000648458
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -6956,21 +6956,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 4.433499999322521
+        "wall_ms": 0.8162029998857179
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.3922999998831074
+        "wall_ms": 0.6410679998225532
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.7350389447965426e-10,
-        "wall_ms": 2.181699999709963
+        "wall_ms": 0.653029999739374
       },
       "agreement": {
         "max_dp_bar": 1.7978436517296359e-09,
@@ -6997,21 +6997,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 3.186999999343243
+        "wall_ms": 0.8654789999127388
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.4868995751603507e-14,
-        "wall_ms": 2.2349999999278225
+        "wall_ms": 0.611295999988215
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 3.993250174971763e-12,
-        "wall_ms": 1.2974999999642023
+        "wall_ms": 0.352957999893988
       },
       "agreement": {
         "max_dp_bar": 4.305888978706207e-12,
@@ -7038,21 +7038,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.8768000001946348
+        "wall_ms": 1.1869310001202393
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.0709999998871353
+        "wall_ms": 0.604472999839345
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 9.357208341498335e-10,
-        "wall_ms": 1.2344000006123679
+        "wall_ms": 0.3427050005484489
       },
       "agreement": {
         "max_dp_bar": 1.3986642954932904e-09,
@@ -7079,21 +7079,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.7908343958624755e-11,
-        "wall_ms": 2.4720999999772175
+        "wall_ms": 0.7688380001127371
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.197442310920451e-14,
-        "wall_ms": 2.225999999609485
+        "wall_ms": 0.6072240003049956
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.7402080604588264e-11,
-        "wall_ms": 1.2050999994244194
+        "wall_ms": 0.34909100031654816
       },
       "agreement": {
         "max_dp_bar": 3.353051170051913e-11,
@@ -7120,21 +7120,21 @@
         "status": "line_search_stall",
         "iterations": 7,
         "residual_inf": 23.147449339855207,
-        "wall_ms": 8.195899999918765
+        "wall_ms": 2.267540000502777
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.290700000230572
+        "wall_ms": 0.8054429999901913
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 1.8878000000768225
+        "wall_ms": 0.4999290003979695
       }
     },
     {
@@ -7155,21 +7155,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 3.585499999644526
+        "wall_ms": 0.9395609995408449
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.8928000001542387
+        "wall_ms": 0.6024819995218422
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 5.172164918576527e-09,
-        "wall_ms": 2.7466999999887776
+        "wall_ms": 0.3328479997435352
       },
       "agreement": {
         "max_dp_bar": 3.1661997468290792e-09,
@@ -7196,21 +7196,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 8.518057370565657e-09,
-        "wall_ms": 2.577700000074401
+        "wall_ms": 2.1339330005503143
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 2.222299999630195
+        "wall_ms": 1.010507000501093
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 8.206768598029157e-13,
-        "wall_ms": 1.4738999998371582
+        "wall_ms": 1.3526889997592662
       },
       "agreement": {
         "max_dp_bar": 1.5139804077080043e-08,
@@ -7237,21 +7237,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 4.04660000003787
+        "wall_ms": 1.5222310003082384
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.377699999669858
+        "wall_ms": 1.394226000229537
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.5285999998013722
+        "wall_ms": 0.6388579995473265
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -7278,21 +7278,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 3.3881999997902312
+        "wall_ms": 1.2358370004221797
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 2.8299999994487735
+        "wall_ms": 1.3335250005184207
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 2.1225066149099803e-09,
-        "wall_ms": 2.4619999994683894
+        "wall_ms": 0.5117149994475767
       },
       "agreement": {
         "max_dp_bar": 8.407030627211043e-10,
@@ -7319,21 +7319,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.755737220169976e-09,
-        "wall_ms": 3.269699999691511
+        "wall_ms": 0.835482000184129
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.3997000007511815
+        "wall_ms": 0.6877830001030816
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 9.853593496700341e-10,
-        "wall_ms": 1.0470999995959573
+        "wall_ms": 0.32636200012348127
       },
       "agreement": {
         "max_dp_bar": 7.948187885631341e-09,
@@ -7360,21 +7360,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 1.3589129821411916e-13,
-        "wall_ms": 4.092600000149105
+        "wall_ms": 1.3726349998250953
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.739934749726672e-09,
-        "wall_ms": 2.6051000004372327
+        "wall_ms": 0.7501480004066252
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 3.869793374633446e-12,
-        "wall_ms": 3.628500000559143
+        "wall_ms": 0.8097190002445132
       },
       "agreement": {
         "max_dp_bar": 4.263256414560601e-13,
@@ -7401,27 +7401,27 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 3.136100000119768
+        "wall_ms": 0.8857040002112626
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.1226999997452367
+        "wall_ms": 0.6212379994394723
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
         "residual_inf": 4.2078571738102255e-09,
-        "wall_ms": 1.7345999995086459
+        "wall_ms": 0.7389600004898966
       },
       "agreement": {
-        "max_dp_bar": 2.617020822270888e-09,
-        "max_dw_rpm": 2.262368070660159e-09,
+        "max_dp_bar": 2.6170217104493076e-09,
+        "max_dw_rpm": 2.262311227241298e-09,
         "max_dp_bar_nominal": 2.842170943040401e-14,
-        "max_dw_rpm_nominal": 0.0
+        "max_dw_rpm_nominal": 5.684341886080802e-14
       }
     },
     {
@@ -7442,21 +7442,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.7763568394002505e-14,
-        "wall_ms": 3.3075000001190347
+        "wall_ms": 0.9368540004288661
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 3.131299999949988
+        "wall_ms": 0.7156000001486973
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 6.359357485052897e-13,
-        "wall_ms": 1.9691000006787363
+        "wall_ms": 0.33931500001926906
       },
       "agreement": {
         "max_dp_bar": 9.947598300641403e-13,
@@ -7483,21 +7483,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 9.601563988326234e-11,
-        "wall_ms": 2.6384999991933
+        "wall_ms": 0.721999999768741
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.5987211554602254e-13,
-        "wall_ms": 2.499299999726645
+        "wall_ms": 0.850563999847509
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.6169000000445521
+        "wall_ms": 0.377647999812325
       },
       "agreement": {
         "max_dp_bar": 1.028652718559897e-10,
@@ -7524,21 +7524,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 4.980815759836332e-11,
-        "wall_ms": 5.470799999784504
+        "wall_ms": 1.776871000402025
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.7763568394002505e-15,
-        "wall_ms": 2.223200000116776
+        "wall_ms": 0.6579270002475823
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 4.008020582091376e-10,
-        "wall_ms": 1.2532000000646804
+        "wall_ms": 0.4249069997968036
       },
       "agreement": {
         "max_dp_bar": 7.295852810784709e-10,
@@ -7565,21 +7565,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.871200000299723
+        "wall_ms": 0.8991250006147311
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 2.1203000005698414
+        "wall_ms": 0.6190180001794943
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.1316282072803006e-14,
-        "wall_ms": 1.2403000000631437
+        "wall_ms": 0.4064089998792042
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -7606,21 +7606,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 3.377100000761857
+        "wall_ms": 1.02524399972026
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 3.983399999924586
+        "wall_ms": 0.6962950001252466
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.0678356804637588e-09,
-        "wall_ms": 3.72719999995752
+        "wall_ms": 1.1910709999938263
       },
       "agreement": {
         "max_dp_bar": 1.2256435866220272e-09,
@@ -7647,24 +7647,24 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.0076318081646605e-09,
-        "wall_ms": 2.6034000002255198
+        "wall_ms": 0.7711979997111484
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.0658141036401503e-14,
-        "wall_ms": 2.101300000504125
+        "wall_ms": 0.6684800000584801
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 4.263256414560601e-13,
-        "wall_ms": 1.269000000320375
+        "wall_ms": 0.5474560002767248
       },
       "agreement": {
-        "max_dp_bar": 7.664965551157366e-09,
+        "max_dp_bar": 7.664958445730008e-09,
         "max_dw_rpm": 3.1566173674946185e-08,
         "max_dp_bar_nominal": 7.665228451969597e-09,
         "max_dw_rpm_nominal": 3.156742423016112e-08
@@ -7688,21 +7688,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 3.601200000048266
+        "wall_ms": 1.1671199999909732
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 9,
         "residual_inf": 8.109068971862143e-13,
-        "wall_ms": 3.629499999988184
+        "wall_ms": 0.9319669998149038
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.858400000150141
+        "wall_ms": 0.8578829992984538
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -7729,21 +7729,21 @@
         "status": "converged",
         "iterations": 10,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 4.538200000752113
+        "wall_ms": 2.7752289997806656
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 5.839773109528323e-13,
-        "wall_ms": 3.012599999237864
+        "wall_ms": 0.7195709995357902
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.31789999998
+        "wall_ms": 0.7160939994719229
       },
       "agreement": {
         "max_dp_bar": 2.1316282072803006e-14,
@@ -7770,21 +7770,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.603499638098583e-10,
-        "wall_ms": 2.592799999547424
+        "wall_ms": 0.7642249993295991
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.0919999997204286
+        "wall_ms": 1.1440309999670717
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 2.6924951157525356e-10,
-        "wall_ms": 1.2891000005765818
+        "wall_ms": 0.36874800025543664
       },
       "agreement": {
         "max_dp_bar": 9.885781082630274e-11,
@@ -7811,21 +7811,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.9615000003104797
+        "wall_ms": 1.2733300000036252
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 2.2470999992947327
+        "wall_ms": 0.5925620007474208
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 5.142481995790149e-10,
-        "wall_ms": 2.2567000005437876
+        "wall_ms": 0.37469699964276515
       },
       "agreement": {
         "max_dp_bar": 5.630429456005004e-10,
@@ -7852,21 +7852,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 2.637889906509372e-12,
-        "wall_ms": 3.490600000077393
+        "wall_ms": 1.3097359997118474
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.174847134663651e-09,
-        "wall_ms": 2.897099999245256
+        "wall_ms": 0.7014510001681629
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.277378368693462e-13,
-        "wall_ms": 2.497199999197619
+        "wall_ms": 0.7549800002379925
       },
       "agreement": {
         "max_dp_bar": 3.126388037344441e-13,
@@ -7893,21 +7893,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 3.2191999998758547
+        "wall_ms": 0.7934420000310638
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 3.6924000005456037
+        "wall_ms": 0.7397219997073989
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.5250999995259917
+        "wall_ms": 0.656731999697513
       },
       "agreement": {
         "max_dp_bar": 1.7763568394002505e-14,
@@ -7934,21 +7934,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 5.185540885577211e-11,
-        "wall_ms": 2.6754000000437372
+        "wall_ms": 0.743226999475155
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.197442310920451e-14,
-        "wall_ms": 2.429399999527959
+        "wall_ms": 0.7248540005093673
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.3742999999521999
+        "wall_ms": 0.3557249992809375
       },
       "agreement": {
         "max_dp_bar": 5.618971954390872e-11,
@@ -7975,21 +7975,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 3.8366999997379025
+        "wall_ms": 1.0070689995700377
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.842170943040401e-14,
-        "wall_ms": 3.4047999997710576
+        "wall_ms": 0.9582839993527159
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 1.5665000000808504
+        "wall_ms": 0.3639149999798974
       },
       "agreement": {
         "max_dp_bar": 7.105427357601002e-15,
@@ -8016,21 +8016,21 @@
         "status": "converged",
         "iterations": 12,
         "residual_inf": 9.259260025373806e-14,
-        "wall_ms": 4.321000000345521
+        "wall_ms": 1.3568730000770302
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 10,
         "residual_inf": 4.604689740617118e-09,
-        "wall_ms": 3.453399999671092
+        "wall_ms": 1.2678789998972206
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.7755575615628914e-14,
-        "wall_ms": 2.7951000001849025
+        "wall_ms": 1.1598990004131338
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -8057,21 +8057,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 6.742922664670914e-09,
-        "wall_ms": 3.300899999885587
+        "wall_ms": 0.9893050000755466
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 2.2773000000597676
+        "wall_ms": 0.7097389998307335
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 5.506706202140776e-13,
-        "wall_ms": 1.3381999997363891
+        "wall_ms": 0.48792899997351924
       },
       "agreement": {
         "max_dp_bar": 1.1353918694112508e-08,
@@ -8098,21 +8098,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 2.7283952874768147e-10,
-        "wall_ms": 3.643500000180211
+        "wall_ms": 1.1694499999066466
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 9.308109838457312e-13,
-        "wall_ms": 2.6342000001022825
+        "wall_ms": 0.7310529999813298
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 3.219522426434196e-10,
-        "wall_ms": 4.3408999999883235
+        "wall_ms": 0.7345780004470726
       },
       "agreement": {
         "max_dp_bar": 1.978115449219331e-10,
@@ -8139,21 +8139,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 2.1670665262263356e-11,
-        "wall_ms": 3.727000000253611
+        "wall_ms": 0.9807619999264716
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 2.190692072190359e-12,
-        "wall_ms": 3.5943000002589542
+        "wall_ms": 1.0507950000828714
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
         "residual_inf": 1.2250094272303613e-09,
-        "wall_ms": 2.552700000705954
+        "wall_ms": 0.676470000144036
       },
       "agreement": {
         "max_dp_bar": 1.8258106138091534e-10,
@@ -8180,21 +8180,21 @@
         "status": "converged",
         "iterations": 12,
         "residual_inf": 4.369837824924616e-13,
-        "wall_ms": 7.974799999828974
+        "wall_ms": 1.6739250004320638
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.163158458439284e-11,
-        "wall_ms": 2.9484999995474936
+        "wall_ms": 0.8120960001178901
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 4.298783551348606e-13,
-        "wall_ms": 4.334499999458785
+        "wall_ms": 1.023439999698894
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -8221,21 +8221,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.319300390103308e-11,
-        "wall_ms": 2.9286999997566454
+        "wall_ms": 0.6762849998267484
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.4868995751603507e-14,
-        "wall_ms": 3.5303000004205387
+        "wall_ms": 0.6929099999979371
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.2790999999197084
+        "wall_ms": 0.38881700038473355
       },
       "agreement": {
         "max_dp_bar": 3.2663649562891806e-11,
@@ -8262,21 +8262,21 @@
         "status": "converged",
         "iterations": 9,
         "residual_inf": 7.437606086568849e-12,
-        "wall_ms": 4.672400000345078
+        "wall_ms": 1.4944909999030642
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.3979928326079971e-11,
-        "wall_ms": 2.8996000000915956
+        "wall_ms": 0.8783779994701035
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.2789769243681803e-13,
-        "wall_ms": 3.291200000603567
+        "wall_ms": 0.8690059994478361
       },
       "agreement": {
         "max_dp_bar": 1.9771961845549413e-12,
@@ -8303,21 +8303,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 5.329070518200751e-15,
-        "wall_ms": 3.0169000001478707
+        "wall_ms": 0.8386439994865214
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.1329000001060194
+        "wall_ms": 0.7016580002527917
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 4.263256414560601e-14,
-        "wall_ms": 1.216999999996915
+        "wall_ms": 0.3933810003218241
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
@@ -8344,21 +8344,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 3.552713678800501e-15,
-        "wall_ms": 2.870199999961187
+        "wall_ms": 0.8686090004630387
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 2.3554999997941195
+        "wall_ms": 0.679284999932861
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.5069000000949018
+        "wall_ms": 0.3970119996665744
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
@@ -8385,21 +8385,21 @@
         "status": "converged",
         "iterations": 7,
         "residual_inf": 2.9050539751551696e-11,
-        "wall_ms": 2.7921999999307445
+        "wall_ms": 0.6832239996583667
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 1.7763568394002505e-14,
-        "wall_ms": 3.326200000628887
+        "wall_ms": 0.7342599992625765
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
         "residual_inf": 5.510578660050669e-10,
-        "wall_ms": 2.010399999562651
+        "wall_ms": 0.2690070004973677
       },
       "agreement": {
         "max_dp_bar": 1.844497887759644e-10,
@@ -8426,21 +8426,21 @@
         "status": "converged",
         "iterations": 8,
         "residual_inf": 1.4210854715202004e-14,
-        "wall_ms": 3.9068000005499925
+        "wall_ms": 0.8219520004786318
       },
       "nominal": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
         "residual_inf": 3.552713678800501e-14,
-        "wall_ms": 3.2983000000967877
+        "wall_ms": 0.5837500002598972
       },
       "warm": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
         "residual_inf": 7.105427357601002e-15,
-        "wall_ms": 1.7170000000987784
+        "wall_ms": 0.326057000165747
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,

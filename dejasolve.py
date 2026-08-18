@@ -189,14 +189,27 @@ def analyse(text: str, name: str, archive: Archive,
                          verdict.reason, {"rule": verdict.rule}))
 
     cold = model.solve(card.params)
+    # The flat cold start is the weakest baseline there is, so the demo quotes
+    # the same comparison bench.py does: a nominal guess built from this card's
+    # own parameters, no archive involved. If the archive only beats the flat
+    # start, it has not earned the stage it is standing on.
+    nom = model.solve(card.params, x0=model.nominal_start(card.params))
     if verdict.admit:
         warm = model.solve(card.params, x0=archive.states[j])
         chosen, label = warm, "warm"
     else:
-        warm, chosen, label = None, cold, "cold"
+        # A refused transfer should not cost the engineer anything. The archive
+        # stays refused; the fallback is simply the best guess that does not
+        # involve it. Cold remains the last resort if the nominal guess fails.
+        warm = None
+        chosen, label = ((nom, "nominal") if nom["converged"]
+                         else (cold, "cold"))
 
     solve = {"cold_iterations": cold["iterations"],
-             "cold_status": cold["status"], "start": label}
+             "cold_status": cold["status"],
+             "nominal_iterations": nom["iterations"],
+             "nominal_status": nom["status"],
+             "start": label}
     if warm is not None:
         solve.update(warm_iterations=warm["iterations"],
                      warm_status=warm["status"])
@@ -204,6 +217,10 @@ def analyse(text: str, name: str, archive: Archive,
             dx = np.abs(np.array(cold["x"]) - np.array(warm["x"]))
             solve["agreement"] = float(dx.max())
             solve["saved"] = cold["iterations"] - warm["iterations"]
+        if nom["converged"] and warm["converged"]:
+            dn = np.abs(np.array(nom["x"]) - np.array(warm["x"]))
+            solve["agreement_vs_nominal"] = float(dn.max())
+            solve["saved_vs_nominal"] = nom["iterations"] - warm["iterations"]
     trace["solve"] = solve
 
     if not chosen["converged"]:
@@ -215,8 +232,13 @@ def analyse(text: str, name: str, archive: Archive,
         return trace
 
     if warm is not None and "saved" in solve:
-        headline = (f"{solve['cold_iterations']} -> {solve['warm_iterations']} "
-                    f"iterations, same answer to {solve['agreement']:.1e}")
+        base = (f"{solve['cold_iterations']} cold / {solve['nominal_iterations']} nominal"
+                if nom["converged"] else f"{solve['cold_iterations']} cold")
+        headline = (f"{base} -> {solve['warm_iterations']} warm iterations, "
+                    f"same answer to {solve['agreement']:.1e}")
+    elif label == "nominal":
+        headline = (f"nominal guess, {nom['iterations']} iterations "
+                    f"(archive refused, none used)")
     else:
         headline = f"cold start, {cold['iterations']} iterations"
     stages.append(_stage("solve", "ok", headline, solve))

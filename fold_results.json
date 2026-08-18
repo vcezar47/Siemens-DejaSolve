@@ -13,7 +13,12 @@
     "guarded_unresolved": 0,
     "guarded_refused": 69,
     "naive_iterations": 1571,
-    "guarded_iterations": 2130
+    "guarded_iterations": 1579,
+    "guarded_cold_iterations": 2130,
+    "answer_compared": 200,
+    "answer_differs_from_cold_fallback": 12,
+    "max_dp_bar_vs_cold_fallback": 33.15954048484572,
+    "max_dw_rpm_vs_cold_fallback": 788.8446521735116
   },
   "coverage_radius": 0.6404150181109362,
   "n_queries": 200,
@@ -41,16 +46,24 @@
     },
     "guarded": {
       "admissible": true,
-      "resolved_by": "cold",
+      "resolved_by": "nominal",
       "gate": "ok",
       "trail": [
         "ADMIT  [ok] same regime, 0.48 away in setup space",
         "warm: REFUSE [unstable] converged onto a dynamically unstable root (shaft b sits on the friction downslope); the equations are satisfied but no machine runs here",
-        "cold: ADMIT  [ok] stable operating point"
+        "nominal: ADMIT  [ok] stable operating point"
       ],
       "iterations_total": 15,
+      "w_a": 574.0889100243556,
+      "w_b": 462.465230742796
+    },
+    "guarded_cold_fallback": {
+      "resolved_by": "cold",
+      "iterations_total": 15,
+      "admissible": true,
       "w_a": 5.757495236590931,
-      "w_b": 5.5454567754984625
+      "w_b": 5.5454567754984625,
+      "same_answer": false
     },
     "unstable_shaft": "b",
     "roots": [
@@ -153,16 +166,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "envelope",
         "trail": [
           "REFUSE [envelope] p_crack = 259.3 is outside the archive (120.4 to 259.3)",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 721.9682905480338,
+        "w_b": 713.1715808473385
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 19,
+        "admissible": true,
         "w_a": 721.968290548033,
-        "w_b": 713.1715808473386
+        "w_b": 713.1715808473386,
+        "same_answer": true
       }
     },
     {
@@ -198,6 +218,14 @@
         "iterations_total": 7,
         "w_a": 798.7939839948964,
         "w_b": 1063.3522322391098
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 7,
+        "admissible": true,
+        "w_a": 798.7939839948964,
+        "w_b": 1063.3522322391098,
+        "same_answer": true
       }
     },
     {
@@ -224,16 +252,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.9 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 19,
-        "w_a": 733.7670757937913,
+        "iterations_total": 10,
+        "w_a": 733.76707579381,
         "w_b": 965.8356477681615
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 19,
+        "admissible": true,
+        "w_a": 733.7670757937913,
+        "w_b": 965.8356477681615,
+        "same_answer": true
       }
     },
     {
@@ -269,6 +304,14 @@
         "iterations_total": 5,
         "w_a": 7.04126279568744,
         "w_b": 7.03837526586584
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 7.04126279568744,
+        "w_b": 7.03837526586584,
+        "same_answer": true
       }
     },
     {
@@ -295,16 +338,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.7 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 17,
+        "iterations_total": 9,
         "w_a": 667.747807819719,
-        "w_b": 643.0484128100675
+        "w_b": 643.0484128100668
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 17,
+        "admissible": true,
+        "w_a": 667.747807819719,
+        "w_b": 643.0484128100675,
+        "same_answer": true
       }
     },
     {
@@ -331,15 +381,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.1 Nm available), but the source case has it stuck",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 535.5349446572914,
+        "w_b": 577.1304971816841
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 11,
+        "admissible": true,
         "w_a": 9.719911728568333,
-        "w_b": 10.309855790944363
+        "w_b": 10.309855790944363,
+        "same_answer": false
       }
     },
     {
@@ -375,6 +433,14 @@
         "iterations_total": 5,
         "w_a": 7.472225629962795,
         "w_b": 7.047436948734151
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 7.472225629962795,
+        "w_b": 7.047436948734151,
+        "same_answer": true
       }
     },
     {
@@ -410,6 +476,14 @@
         "iterations_total": 6,
         "w_a": 7.925319432320375,
         "w_b": 7.947730488736364
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 7.925319432320375,
+        "w_b": 7.947730488736364,
+        "same_answer": true
       }
     },
     {
@@ -445,6 +519,14 @@
         "iterations_total": 6,
         "w_a": 698.0419593553797,
         "w_b": 1043.5696637385176
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 698.0419593553797,
+        "w_b": 1043.5696637385176,
+        "same_answer": true
       }
     },
     {
@@ -471,16 +553,24 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "ok",
         "trail": [
           "ADMIT  [ok] same regime, 0.48 away in setup space",
           "warm: REFUSE [unstable] converged onto a dynamically unstable root (shaft b sits on the friction downslope); the equations are satisfied but no machine runs here",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
         "iterations_total": 15,
+        "w_a": 574.0889100243556,
+        "w_b": 462.465230742796
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
+        "iterations_total": 15,
+        "admissible": true,
         "w_a": 5.757495236590931,
-        "w_b": 5.5454567754984625
+        "w_b": 5.5454567754984625,
+        "same_answer": false
       },
       "unstable_shaft": "b",
       "roots": [
@@ -591,6 +681,14 @@
         "iterations_total": 5,
         "w_a": 660.867594843669,
         "w_b": 750.6065382920641
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 660.867594843669,
+        "w_b": 750.6065382920641,
+        "same_answer": true
       }
     },
     {
@@ -626,6 +724,14 @@
         "iterations_total": 5,
         "w_a": 4.439842963172917,
         "w_b": 5.254091496715546
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 4.439842963172917,
+        "w_b": 5.254091496715546,
+        "same_answer": true
       }
     },
     {
@@ -661,6 +767,14 @@
         "iterations_total": 4,
         "w_a": 5.27519510322546,
         "w_b": 5.309299760038718
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 5.27519510322546,
+        "w_b": 5.309299760038718,
+        "same_answer": true
       }
     },
     {
@@ -687,16 +801,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (17.0 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 7,
+        "w_a": 759.7077134589339,
+        "w_b": 800.5267024113007
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 17,
+        "admissible": true,
         "w_a": 759.7077134588329,
-        "w_b": 800.5267024111256
+        "w_b": 800.5267024111256,
+        "same_answer": true
       }
     },
     {
@@ -732,6 +853,14 @@
         "iterations_total": 9,
         "w_a": 967.255533470094,
         "w_b": 747.4078992352113
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 967.255533470094,
+        "w_b": 747.4078992352113,
+        "same_answer": true
       }
     },
     {
@@ -758,16 +887,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.3 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 688.7852532321008,
+        "w_b": 607.5543084582289
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 18,
+        "admissible": true,
         "w_a": 688.7852532321009,
-        "w_b": 607.5543084582239
+        "w_b": 607.5543084582239,
+        "same_answer": true
       }
     },
     {
@@ -803,6 +939,14 @@
         "iterations_total": 5,
         "w_a": 1150.8876719529553,
         "w_b": 828.3082019808558
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 1150.8876719529553,
+        "w_b": 828.3082019808558,
+        "same_answer": true
       }
     },
     {
@@ -838,6 +982,14 @@
         "iterations_total": 10,
         "w_a": 547.0575236035623,
         "w_b": 648.0735939657451
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 547.0575236035623,
+        "w_b": 648.0735939657451,
+        "same_answer": true
       }
     },
     {
@@ -873,6 +1025,14 @@
         "iterations_total": 5,
         "w_a": 8.335747103995908,
         "w_b": 8.33763203806811
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 8.335747103995908,
+        "w_b": 8.33763203806811,
+        "same_answer": true
       }
     },
     {
@@ -899,16 +1059,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.6 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 19,
+        "iterations_total": 15,
         "w_a": 562.0151635359481,
         "w_b": 574.643189631075
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 19,
+        "admissible": true,
+        "w_a": 562.0151635359481,
+        "w_b": 574.643189631075,
+        "same_answer": true
       }
     },
     {
@@ -944,6 +1111,14 @@
         "iterations_total": 5,
         "w_a": 1048.5371626385688,
         "w_b": 740.7863327606428
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 1048.5371626385688,
+        "w_b": 740.7863327606428,
+        "same_answer": true
       }
     },
     {
@@ -979,6 +1154,14 @@
         "iterations_total": 8,
         "w_a": 779.3574429088114,
         "w_b": 661.8950192278621
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 8,
+        "admissible": true,
+        "w_a": 779.3574429088114,
+        "w_b": 661.8950192278621,
+        "same_answer": true
       }
     },
     {
@@ -1005,16 +1188,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.7 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 30,
-        "w_a": 543.8289134958322,
+        "iterations_total": 12,
+        "w_a": 543.8289134958299,
         "w_b": 557.756482978246
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 30,
+        "admissible": true,
+        "w_a": 543.8289134958322,
+        "w_b": 557.756482978246,
+        "same_answer": true
       }
     },
     {
@@ -1050,6 +1240,14 @@
         "iterations_total": 9,
         "w_a": 562.824943723208,
         "w_b": 624.0194379015961
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 562.824943723208,
+        "w_b": 624.0194379015961,
+        "same_answer": true
       }
     },
     {
@@ -1085,6 +1283,14 @@
         "iterations_total": 6,
         "w_a": 850.9153773220327,
         "w_b": 837.0839779435735
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 850.9153773220327,
+        "w_b": 837.0839779435735,
+        "same_answer": true
       }
     },
     {
@@ -1120,6 +1326,14 @@
         "iterations_total": 10,
         "w_a": 468.6723409926576,
         "w_b": 623.4167178806654
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 468.6723409926576,
+        "w_b": 623.4167178806654,
+        "same_answer": true
       }
     },
     {
@@ -1155,6 +1369,14 @@
         "iterations_total": 6,
         "w_a": 660.2467406448383,
         "w_b": 650.911844536647
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 660.2467406448383,
+        "w_b": 650.911844536647,
+        "same_answer": true
       }
     },
     {
@@ -1190,6 +1412,14 @@
         "iterations_total": 5,
         "w_a": 5.219971729598044,
         "w_b": 5.215887831664202
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 5.219971729598044,
+        "w_b": 5.215887831664202,
+        "same_answer": true
       }
     },
     {
@@ -1225,6 +1455,14 @@
         "iterations_total": 6,
         "w_a": 796.4358175173181,
         "w_b": 835.111046847169
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 796.4358175173181,
+        "w_b": 835.111046847169,
+        "same_answer": true
       }
     },
     {
@@ -1260,6 +1498,14 @@
         "iterations_total": 9,
         "w_a": 822.8156264529447,
         "w_b": 645.7089663947048
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 822.8156264529447,
+        "w_b": 645.7089663947048,
+        "same_answer": true
       }
     },
     {
@@ -1286,16 +1532,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (16.5 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 1074.9483198622797,
+        "w_b": 790.1667359188584
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 22,
+        "admissible": true,
         "w_a": 1074.9483198616763,
-        "w_b": 790.1667359188593
+        "w_b": 790.1667359188593,
+        "same_answer": true
       }
     },
     {
@@ -1331,6 +1584,14 @@
         "iterations_total": 7,
         "w_a": 7.692495420227062,
         "w_b": 7.499079873468841
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 7,
+        "admissible": true,
+        "w_a": 7.692495420227062,
+        "w_b": 7.499079873468841,
+        "same_answer": true
       }
     },
     {
@@ -1366,6 +1627,14 @@
         "iterations_total": 4,
         "w_a": 821.6724594398263,
         "w_b": 783.3218773193432
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 821.6724594398263,
+        "w_b": 783.3218773193432,
+        "same_answer": true
       }
     },
     {
@@ -1392,16 +1661,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (16.4 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 19,
+        "iterations_total": 8,
         "w_a": 884.6002187512461,
-        "w_b": 863.2534885696351
+        "w_b": 863.2534885625474
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 19,
+        "admissible": true,
+        "w_a": 884.6002187512461,
+        "w_b": 863.2534885696351,
+        "same_answer": true
       }
     },
     {
@@ -1437,6 +1713,14 @@
         "iterations_total": 12,
         "w_a": 725.9387955178715,
         "w_b": 719.2748671527371
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 12,
+        "admissible": true,
+        "w_a": 725.9387955178715,
+        "w_b": 719.2748671527371,
+        "same_answer": true
       }
     },
     {
@@ -1472,6 +1756,14 @@
         "iterations_total": 6,
         "w_a": 772.7653581621236,
         "w_b": 893.3622006249975
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 772.7653581621236,
+        "w_b": 893.3622006249975,
+        "same_answer": true
       }
     },
     {
@@ -1507,6 +1799,14 @@
         "iterations_total": 6,
         "w_a": 6.606678303833866,
         "w_b": 5.26953489053888
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 6.606678303833866,
+        "w_b": 5.26953489053888,
+        "same_answer": true
       }
     },
     {
@@ -1533,16 +1833,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (16.2 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 878.5085069974095,
+        "w_b": 778.8443536541121
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 14,
+        "admissible": true,
         "w_a": 878.5085069993867,
-        "w_b": 778.8443536541814
+        "w_b": 778.8443536541814,
+        "same_answer": true
       }
     },
     {
@@ -1578,6 +1885,14 @@
         "iterations_total": 6,
         "w_a": 8.306611110210383,
         "w_b": 8.279285877602646
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 8.306611110210383,
+        "w_b": 8.279285877602646,
+        "same_answer": true
       }
     },
     {
@@ -1613,6 +1928,14 @@
         "iterations_total": 10,
         "w_a": 1095.6456981768886,
         "w_b": 903.6883967522222
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 1095.6456981768886,
+        "w_b": 903.6883967522222,
+        "same_answer": true
       }
     },
     {
@@ -1648,6 +1971,14 @@
         "iterations_total": 5,
         "w_a": 866.6623888946935,
         "w_b": 662.4992081585082
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 866.6623888946935,
+        "w_b": 662.4992081585082,
+        "same_answer": true
       }
     },
     {
@@ -1683,6 +2014,14 @@
         "iterations_total": 10,
         "w_a": 513.5711907015233,
         "w_b": 583.153148982172
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 513.5711907015233,
+        "w_b": 583.153148982172,
+        "same_answer": true
       }
     },
     {
@@ -1709,16 +2048,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (17.6 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 7,
+        "w_a": 633.3527847974351,
+        "w_b": 591.7448604880035
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 21,
+        "admissible": true,
         "w_a": 633.352784798132,
-        "w_b": 591.7448604898785
+        "w_b": 591.7448604898785,
+        "same_answer": true
       }
     },
     {
@@ -1754,6 +2100,14 @@
         "iterations_total": 6,
         "w_a": 720.8011335922632,
         "w_b": 853.7554328158338
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 720.8011335922632,
+        "w_b": 853.7554328158338,
+        "same_answer": true
       }
     },
     {
@@ -1789,6 +2143,14 @@
         "iterations_total": 6,
         "w_a": 862.7839668367702,
         "w_b": 897.3372528984163
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 862.7839668367702,
+        "w_b": 897.3372528984163,
+        "same_answer": true
       }
     },
     {
@@ -1815,16 +2177,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (16.6 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 962.1527904697635,
+        "w_b": 789.4126920645936
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 15,
+        "admissible": true,
         "w_a": 962.152790469762,
-        "w_b": 789.4126920653539
+        "w_b": 789.4126920653539,
+        "same_answer": true
       }
     },
     {
@@ -1851,16 +2220,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.1 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 624.6604272497016,
+        "w_b": 592.8405777688939
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 19,
+        "admissible": true,
         "w_a": 624.6604272537179,
-        "w_b": 592.8405777733328
+        "w_b": 592.8405777733328,
+        "same_answer": true
       }
     },
     {
@@ -1887,15 +2263,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (17.3 Nm available), but the source case has it stuck",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 587.2043953054689,
+        "w_b": 836.9322007366757
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 12,
+        "admissible": true,
         "w_a": 587.2043953055569,
-        "w_b": 836.9322007366756
+        "w_b": 836.9322007366756,
+        "same_answer": true
       }
     },
     {
@@ -1922,16 +2306,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.4 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 877.6432063279514,
+        "w_b": 551.8417945256047
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 17,
+        "admissible": true,
         "w_a": 877.6432063278695,
-        "w_b": 551.8417945256048
+        "w_b": 551.8417945256048,
+        "same_answer": true
       }
     },
     {
@@ -1967,6 +2358,14 @@
         "iterations_total": 6,
         "w_a": 8.88369398634369,
         "w_b": 8.730406127533204
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 8.88369398634369,
+        "w_b": 8.730406127533204,
+        "same_answer": true
       }
     },
     {
@@ -2002,6 +2401,14 @@
         "iterations_total": 7,
         "w_a": 878.9905628574639,
         "w_b": 742.0437754519361
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 7,
+        "admissible": true,
+        "w_a": 878.9905628574639,
+        "w_b": 742.0437754519361,
+        "same_answer": true
       }
     },
     {
@@ -2028,16 +2435,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (20.0 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 7,
+        "w_a": 862.1211876178547,
+        "w_b": 803.128008709535
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 27,
+        "admissible": true,
         "w_a": 862.1211876174333,
-        "w_b": 803.1280087094273
+        "w_b": 803.1280087094273,
+        "same_answer": true
       }
     },
     {
@@ -2073,6 +2487,14 @@
         "iterations_total": 12,
         "w_a": 669.1207122409228,
         "w_b": 740.6300649342708
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 12,
+        "admissible": true,
+        "w_a": 669.1207122409228,
+        "w_b": 740.6300649342708,
+        "same_answer": true
       }
     },
     {
@@ -2108,6 +2530,14 @@
         "iterations_total": 6,
         "w_a": 636.7798724590616,
         "w_b": 748.011458325196
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 636.7798724590616,
+        "w_b": 748.011458325196,
+        "same_answer": true
       }
     },
     {
@@ -2143,6 +2573,14 @@
         "iterations_total": 7,
         "w_a": 703.5730802189383,
         "w_b": 997.1054915269377
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 7,
+        "admissible": true,
+        "w_a": 703.5730802189383,
+        "w_b": 997.1054915269377,
+        "same_answer": true
       }
     },
     {
@@ -2178,6 +2616,14 @@
         "iterations_total": 5,
         "w_a": 924.6361042234355,
         "w_b": 835.5740289455782
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 924.6361042234355,
+        "w_b": 835.5740289455782,
+        "same_answer": true
       }
     },
     {
@@ -2213,6 +2659,14 @@
         "iterations_total": 4,
         "w_a": 4.894577289668818,
         "w_b": 4.794949507206887
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 4.894577289668818,
+        "w_b": 4.794949507206887,
+        "same_answer": true
       }
     },
     {
@@ -2248,6 +2702,14 @@
         "iterations_total": 12,
         "w_a": 604.3057433018147,
         "w_b": 438.63491591380114
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 12,
+        "admissible": true,
+        "w_a": 604.3057433018147,
+        "w_b": 438.63491591380114,
+        "same_answer": true
       }
     },
     {
@@ -2274,16 +2736,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (17.0 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 697.9087342158269,
+        "w_b": 568.1210266712746
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 18,
+        "admissible": true,
         "w_a": 697.9087342232657,
-        "w_b": 568.1210266712976
+        "w_b": 568.1210266712976,
+        "same_answer": true
       }
     },
     {
@@ -2310,16 +2779,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.9 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 766.0707234024716,
+        "w_b": 593.7869280438423
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 17,
+        "admissible": true,
         "w_a": 766.0707234028075,
-        "w_b": 593.786928052231
+        "w_b": 593.786928052231,
+        "same_answer": true
       }
     },
     {
@@ -2355,6 +2831,14 @@
         "iterations_total": 11,
         "w_a": 557.6820315651337,
         "w_b": 641.9237851642854
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 557.6820315651337,
+        "w_b": 641.9237851642854,
+        "same_answer": true
       }
     },
     {
@@ -2390,6 +2874,14 @@
         "iterations_total": 5,
         "w_a": 4.4700615579685685,
         "w_b": 4.462223554166342
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 4.4700615579685685,
+        "w_b": 4.462223554166342,
+        "same_answer": true
       }
     },
     {
@@ -2425,6 +2917,14 @@
         "iterations_total": 11,
         "w_a": 492.0304218818219,
         "w_b": 518.4678840685331
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 492.0304218818219,
+        "w_b": 518.4678840685331,
+        "same_answer": true
       }
     },
     {
@@ -2451,16 +2951,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "coverage",
         "trail": [
           "REFUSE [coverage] nearest case is 0.65 away, beyond the archive's own 0.64 spacing",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 12,
+        "w_a": 1243.3514150131043,
+        "w_b": 1097.3044453791042
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 15,
+        "admissible": true,
         "w_a": 1243.3514150131057,
-        "w_b": 1097.30444537887
+        "w_b": 1097.30444537887,
+        "same_answer": true
       }
     },
     {
@@ -2496,6 +3003,14 @@
         "iterations_total": 11,
         "w_a": 1108.674482805495,
         "w_b": 756.7236964354452
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 1108.674482805495,
+        "w_b": 756.7236964354452,
+        "same_answer": true
       }
     },
     {
@@ -2531,6 +3046,14 @@
         "iterations_total": 8,
         "w_a": 483.3436772411854,
         "w_b": 577.4167161190537
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 8,
+        "admissible": true,
+        "w_a": 483.3436772411854,
+        "w_b": 577.4167161190537,
+        "same_answer": true
       }
     },
     {
@@ -2566,6 +3089,14 @@
         "iterations_total": 14,
         "w_a": 708.1235516864568,
         "w_b": 663.8553344746019
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 14,
+        "admissible": true,
+        "w_a": 708.1235516864568,
+        "w_b": 663.8553344746019,
+        "same_answer": true
       }
     },
     {
@@ -2601,6 +3132,14 @@
         "iterations_total": 4,
         "w_a": 924.7275297253342,
         "w_b": 670.9542609808274
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 924.7275297253342,
+        "w_b": 670.9542609808274,
+        "same_answer": true
       }
     },
     {
@@ -2636,6 +3175,14 @@
         "iterations_total": 10,
         "w_a": 5.150028290293049,
         "w_b": 5.257889909647113
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 5.150028290293049,
+        "w_b": 5.257889909647113,
+        "same_answer": true
       }
     },
     {
@@ -2662,16 +3209,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "envelope",
         "trail": [
           "REFUSE [envelope] c_load_a = 7.072e-06 is outside the archive (7.287e-06 to 2.997e-05)",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 10,
+        "w_a": 1229.5567564029689,
+        "w_b": 1062.414193024714
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 20,
+        "admissible": true,
         "w_a": 1229.5567564019605,
-        "w_b": 1062.4141930220105
+        "w_b": 1062.4141930220105,
+        "same_answer": true
       }
     },
     {
@@ -2698,16 +3252,24 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "ok",
         "trail": [
           "ADMIT  [ok] same regime, 0.41 away in setup space",
           "warm: REFUSE [unstable] converged onto a dynamically unstable root (shaft b sits on the friction downslope); the equations are satisfied but no machine runs here",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 16,
+        "w_a": 361.40566294887054,
+        "w_b": 549.8809765342693
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 15,
+        "admissible": true,
         "w_a": 4.8268610438198785,
-        "w_b": 6.053045791452784
+        "w_b": 6.053045791452784,
+        "same_answer": false
       }
     },
     {
@@ -2734,16 +3296,24 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "ok",
         "trail": [
           "ADMIT  [ok] same regime, 0.55 away in setup space",
           "warm: line_search_stall",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 17,
-        "w_a": 1225.8810443189388,
+        "iterations_total": 14,
+        "w_a": 1225.8810443189377,
         "w_b": 815.7499981957009
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
+        "iterations_total": 17,
+        "admissible": true,
+        "w_a": 1225.8810443189388,
+        "w_b": 815.7499981957009,
+        "same_answer": true
       }
     },
     {
@@ -2779,6 +3349,14 @@
         "iterations_total": 7,
         "w_a": 837.1638172395465,
         "w_b": 1081.3878003369493
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 7,
+        "admissible": true,
+        "w_a": 837.1638172395465,
+        "w_b": 1081.3878003369493,
+        "same_answer": true
       }
     },
     {
@@ -2805,16 +3383,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.9 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 930.8490615366562,
+        "w_b": 597.5473564284165
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 14,
+        "admissible": true,
         "w_a": 930.8490615366096,
-        "w_b": 597.5473564283283
+        "w_b": 597.5473564283283,
+        "same_answer": true
       }
     },
     {
@@ -2841,16 +3426,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (16.4 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 10,
+        "w_a": 785.4945863275547,
+        "w_b": 602.3768146702724
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 17,
+        "admissible": true,
         "w_a": 785.4945863275548,
-        "w_b": 602.3768146702726
+        "w_b": 602.3768146702726,
+        "same_answer": true
       }
     },
     {
@@ -2886,6 +3478,14 @@
         "iterations_total": 5,
         "w_a": 757.885864971153,
         "w_b": 680.7885012598754
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 757.885864971153,
+        "w_b": 680.7885012598754,
+        "same_answer": true
       }
     },
     {
@@ -2912,16 +3512,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.6 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 560.152711993482,
+        "w_b": 932.820890206876
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 17,
+        "admissible": true,
         "w_a": 560.1527119931964,
-        "w_b": 932.8208902068768
+        "w_b": 932.8208902068768,
+        "same_answer": true
       }
     },
     {
@@ -2948,15 +3555,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a cannot break away here (13.8 Nm available vs 14 Nm needed), but the source case has it turning",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 387.92119286475724,
+        "w_b": 499.3651248741378
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 7,
+        "admissible": true,
         "w_a": 4.99963643857278,
-        "w_b": 8.053179319657126
+        "w_b": 8.053179319657126,
+        "same_answer": false
       }
     },
     {
@@ -2992,6 +3607,14 @@
         "iterations_total": 6,
         "w_a": 7.023672499256969,
         "w_b": 6.905222451855487
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 7.023672499256969,
+        "w_b": 6.905222451855487,
+        "same_answer": true
       }
     },
     {
@@ -3027,6 +3650,14 @@
         "iterations_total": 9,
         "w_a": 5.021433704329979,
         "w_b": 4.773407467012759
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 5.021433704329979,
+        "w_b": 4.773407467012759,
+        "same_answer": true
       }
     },
     {
@@ -3053,15 +3684,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "envelope",
         "trail": [
           "REFUSE [envelope] p_crack = 120.2 is outside the archive (120.4 to 259.3)",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 541.2935065089449,
+        "w_b": 631.3447741034472
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 8,
+        "admissible": true,
         "w_a": 4.385014881388969,
-        "w_b": 4.376766892391063
+        "w_b": 4.376766892391063,
+        "same_answer": false
       }
     },
     {
@@ -3097,6 +3736,14 @@
         "iterations_total": 5,
         "w_a": 5.640570269735284,
         "w_b": 5.391683908367661
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 5.640570269735284,
+        "w_b": 5.391683908367661,
+        "same_answer": true
       }
     },
     {
@@ -3132,6 +3779,14 @@
         "iterations_total": 12,
         "w_a": 723.4138057698134,
         "w_b": 795.9908346993168
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 12,
+        "admissible": true,
+        "w_a": 723.4138057698134,
+        "w_b": 795.9908346993168,
+        "same_answer": true
       }
     },
     {
@@ -3167,6 +3822,14 @@
         "iterations_total": 10,
         "w_a": 428.5285817489018,
         "w_b": 1098.311883570383
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 428.5285817489018,
+        "w_b": 1098.311883570383,
+        "same_answer": true
       }
     },
     {
@@ -3193,16 +3856,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (18.0 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 15,
+        "iterations_total": 8,
         "w_a": 681.050331916506,
         "w_b": 733.6531530112256
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 15,
+        "admissible": true,
+        "w_a": 681.050331916506,
+        "w_b": 733.6531530112256,
+        "same_answer": true
       }
     },
     {
@@ -3229,16 +3899,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.4 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 20,
-        "w_a": 590.7477329506149,
+        "iterations_total": 8,
+        "w_a": 590.7477329506133,
         "w_b": 754.4040240181406
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 20,
+        "admissible": true,
+        "w_a": 590.7477329506149,
+        "w_b": 754.4040240181406,
+        "same_answer": true
       }
     },
     {
@@ -3274,6 +3951,14 @@
         "iterations_total": 4,
         "w_a": 5.529213054464003,
         "w_b": 5.572143313704906
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 5.529213054464003,
+        "w_b": 5.572143313704906,
+        "same_answer": true
       }
     },
     {
@@ -3300,15 +3985,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.2 Nm available), but the source case has it stuck",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
         "iterations_total": 9,
+        "w_a": 609.1036866776461,
+        "w_b": 531.9862623164239
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
+        "iterations_total": 9,
+        "admissible": true,
         "w_a": 7.081693159391652,
-        "w_b": 9.815204099576578
+        "w_b": 9.815204099576578,
+        "same_answer": false
       }
     },
     {
@@ -3344,6 +4037,14 @@
         "iterations_total": 11,
         "w_a": 841.1291575015509,
         "w_b": 702.7136474326015
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 841.1291575015509,
+        "w_b": 702.7136474326015,
+        "same_answer": true
       }
     },
     {
@@ -3379,6 +4080,14 @@
         "iterations_total": 4,
         "w_a": 761.345427551335,
         "w_b": 1091.905549990655
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 761.345427551335,
+        "w_b": 1091.905549990655,
+        "same_answer": true
       }
     },
     {
@@ -3414,6 +4123,14 @@
         "iterations_total": 9,
         "w_a": 987.6860670994353,
         "w_b": 1114.296051551414
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 987.6860670994353,
+        "w_b": 1114.296051551414,
+        "same_answer": true
       }
     },
     {
@@ -3440,16 +4157,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "envelope",
         "trail": [
           "REFUSE [envelope] c_load_a = 7.203e-06 is outside the archive (7.287e-06 to 2.997e-05)",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 10,
+        "w_a": 1021.6712868568011,
+        "w_b": 849.2270566592671
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 26,
+        "admissible": true,
         "w_a": 1021.6712868568018,
-        "w_b": 849.2270566592665
+        "w_b": 849.2270566592665,
+        "same_answer": true
       }
     },
     {
@@ -3485,6 +4209,14 @@
         "iterations_total": 6,
         "w_a": 5.0268516185179974,
         "w_b": 8.642250576615035
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 5.0268516185179974,
+        "w_b": 8.642250576615035,
+        "same_answer": true
       }
     },
     {
@@ -3511,16 +4243,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.7 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 16,
+        "iterations_total": 9,
         "w_a": 732.4612799356967,
         "w_b": 756.4768536298421
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 16,
+        "admissible": true,
+        "w_a": 732.4612799356967,
+        "w_b": 756.4768536298421,
+        "same_answer": true
       }
     },
     {
@@ -3556,6 +4295,14 @@
         "iterations_total": 6,
         "w_a": 711.5230680396802,
         "w_b": 712.0100171198216
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 711.5230680396802,
+        "w_b": 712.0100171198216,
+        "same_answer": true
       }
     },
     {
@@ -3591,6 +4338,14 @@
         "iterations_total": 6,
         "w_a": 733.5357867446209,
         "w_b": 682.6601863793294
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 733.5357867446209,
+        "w_b": 682.6601863793294,
+        "same_answer": true
       }
     },
     {
@@ -3617,16 +4372,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "coverage",
         "trail": [
           "REFUSE [coverage] nearest case is 0.64 away, beyond the archive's own 0.64 spacing",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 735.4817350953869,
+        "w_b": 1072.827791589661
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 14,
+        "admissible": true,
         "w_a": 735.4817350953804,
-        "w_b": 1072.8277915896608
+        "w_b": 1072.8277915896608,
+        "same_answer": true
       }
     },
     {
@@ -3662,6 +4424,14 @@
         "iterations_total": 11,
         "w_a": 373.3075707083469,
         "w_b": 479.52010911358315
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 373.3075707083469,
+        "w_b": 479.52010911358315,
+        "same_answer": true
       }
     },
     {
@@ -3688,16 +4458,24 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "ok",
         "trail": [
           "ADMIT  [ok] same regime, 0.43 away in setup space",
           "warm: REFUSE [unstable] converged onto a dynamically unstable root (shaft b sits on the friction downslope); the equations are satisfied but no machine runs here",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
         "iterations_total": 18,
+        "w_a": 550.2052952574173,
+        "w_b": 488.4448249971686
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
+        "iterations_total": 18,
+        "admissible": true,
         "w_a": 4.729467096971977,
-        "w_b": 4.808332528157227
+        "w_b": 4.808332528157227,
+        "same_answer": false
       }
     },
     {
@@ -3733,6 +4511,14 @@
         "iterations_total": 12,
         "w_a": 671.7556809117875,
         "w_b": 1194.841996947958
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 12,
+        "admissible": true,
+        "w_a": 671.7556809117875,
+        "w_b": 1194.841996947958,
+        "same_answer": true
       }
     },
     {
@@ -3768,6 +4554,14 @@
         "iterations_total": 5,
         "w_a": 6.679437757291785,
         "w_b": 6.344744252479373
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 6.679437757291785,
+        "w_b": 6.344744252479373,
+        "same_answer": true
       }
     },
     {
@@ -3803,6 +4597,14 @@
         "iterations_total": 4,
         "w_a": 1241.7395648815063,
         "w_b": 907.7228013567757
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 1241.7395648815063,
+        "w_b": 907.7228013567757,
+        "same_answer": true
       }
     },
     {
@@ -3829,16 +4631,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.5 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 596.4249218584889,
+        "w_b": 672.5471431859268
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 16,
+        "admissible": true,
         "w_a": 596.4249218584422,
-        "w_b": 672.5471431859128
+        "w_b": 672.5471431859128,
+        "same_answer": true
       }
     },
     {
@@ -3865,16 +4674,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (21.6 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 747.2506659716669,
+        "w_b": 1063.1874315121293
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 14,
+        "admissible": true,
         "w_a": 747.2506659716689,
-        "w_b": 1063.187431512129
+        "w_b": 1063.187431512129,
+        "same_answer": true
       }
     },
     {
@@ -3910,6 +4726,14 @@
         "iterations_total": 5,
         "w_a": 6.490720226749058,
         "w_b": 6.611062122196419
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 6.490720226749058,
+        "w_b": 6.611062122196419,
+        "same_answer": true
       }
     },
     {
@@ -3945,6 +4769,14 @@
         "iterations_total": 5,
         "w_a": 7.265557351231009,
         "w_b": 7.198474068646828
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 7.265557351231009,
+        "w_b": 7.198474068646828,
+        "same_answer": true
       }
     },
     {
@@ -3980,6 +4812,14 @@
         "iterations_total": 10,
         "w_a": 1207.9627781365414,
         "w_b": 709.5690362934488
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 1207.9627781365414,
+        "w_b": 709.5690362934488,
+        "same_answer": true
       }
     },
     {
@@ -4015,6 +4855,14 @@
         "iterations_total": 9,
         "w_a": 5.953046727971396,
         "w_b": 6.092334552094813
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 5.953046727971396,
+        "w_b": 6.092334552094813,
+        "same_answer": true
       }
     },
     {
@@ -4050,6 +4898,14 @@
         "iterations_total": 9,
         "w_a": 605.5946278716575,
         "w_b": 871.8354598262353
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 605.5946278716575,
+        "w_b": 871.8354598262353,
+        "same_answer": true
       }
     },
     {
@@ -4085,6 +4941,14 @@
         "iterations_total": 9,
         "w_a": 842.2434790604403,
         "w_b": 1152.6916585112383
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 842.2434790604403,
+        "w_b": 1152.6916585112383,
+        "same_answer": true
       }
     },
     {
@@ -4120,6 +4984,14 @@
         "iterations_total": 4,
         "w_a": 5.229997078170478,
         "w_b": 5.22115060962062
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 5.229997078170478,
+        "w_b": 5.22115060962062,
+        "same_answer": true
       }
     },
     {
@@ -4155,6 +5027,14 @@
         "iterations_total": 10,
         "w_a": 729.9125917333374,
         "w_b": 561.3615824275671
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 729.9125917333374,
+        "w_b": 561.3615824275671,
+        "same_answer": true
       }
     },
     {
@@ -4190,6 +5070,14 @@
         "iterations_total": 5,
         "w_a": 745.1208764979222,
         "w_b": 719.0995575109683
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 745.1208764979222,
+        "w_b": 719.0995575109683,
+        "same_answer": true
       }
     },
     {
@@ -4216,16 +5104,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.5 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 699.8585645117294,
+        "w_b": 605.3059015932187
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 14,
+        "admissible": true,
         "w_a": 699.858564511601,
-        "w_b": 605.3059015932039
+        "w_b": 605.3059015932039,
+        "same_answer": true
       }
     },
     {
@@ -4252,16 +5147,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (16.1 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 595.358109052382,
+        "w_b": 1044.0560069703483
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 18,
+        "admissible": true,
         "w_a": 595.3581090566264,
-        "w_b": 1044.0560069747623
+        "w_b": 1044.0560069747623,
+        "same_answer": true
       }
     },
     {
@@ -4297,6 +5199,14 @@
         "iterations_total": 8,
         "w_a": 1133.6232388454607,
         "w_b": 693.8933981265227
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 8,
+        "admissible": true,
+        "w_a": 1133.6232388454607,
+        "w_b": 693.8933981265227,
+        "same_answer": true
       }
     },
     {
@@ -4332,6 +5242,14 @@
         "iterations_total": 6,
         "w_a": 778.4762973187487,
         "w_b": 1149.5709855168789
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 778.4762973187487,
+        "w_b": 1149.5709855168789,
+        "same_answer": true
       }
     },
     {
@@ -4358,16 +5276,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.8 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 17,
+        "iterations_total": 8,
         "w_a": 531.1271289043933,
-        "w_b": 615.5640153862696
+        "w_b": 615.5640153862707
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 17,
+        "admissible": true,
+        "w_a": 531.1271289043933,
+        "w_b": 615.5640153862696,
+        "same_answer": true
       }
     },
     {
@@ -4394,16 +5319,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.1 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 769.7185719515855,
+        "w_b": 849.5818470018493
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 21,
+        "admissible": true,
         "w_a": 769.7185719515854,
-        "w_b": 849.5818470018494
+        "w_b": 849.5818470018494,
+        "same_answer": true
       }
     },
     {
@@ -4430,15 +5362,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "envelope",
         "trail": [
           "REFUSE [envelope] c_load_b = 7.175e-06 is outside the archive (7.206e-06 to 2.994e-05)",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 692.8726666833695,
+        "w_b": 1290.5687479945127
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 11,
+        "admissible": true,
         "w_a": 692.8726666833701,
-        "w_b": 1290.5687479944618
+        "w_b": 1290.5687479944618,
+        "same_answer": true
       }
     },
     {
@@ -4465,15 +5405,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a cannot break away here (11.5 Nm available vs 14 Nm needed), but the source case has it turning",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
         "iterations_total": 8,
+        "w_a": 434.3465811694038,
+        "w_b": 474.54086607642563
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
+        "iterations_total": 8,
+        "admissible": true,
         "w_a": 4.936392814892463,
-        "w_b": 4.852484771374984
+        "w_b": 4.852484771374984,
+        "same_answer": false
       }
     },
     {
@@ -4500,15 +5448,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft b cannot break away here (12.7 Nm available vs 14 Nm needed), but the source case has it turning",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 728.7603802547172,
+        "w_b": 522.9573213873344
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 7,
+        "admissible": true,
         "w_a": 6.259491131993031,
-        "w_b": 6.299007748242654
+        "w_b": 6.299007748242654,
+        "same_answer": false
       }
     },
     {
@@ -4544,6 +5500,14 @@
         "iterations_total": 11,
         "w_a": 798.287428190988,
         "w_b": 852.6474688036936
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 798.287428190988,
+        "w_b": 852.6474688036936,
+        "same_answer": true
       }
     },
     {
@@ -4570,16 +5534,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.3 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 747.2547864053555,
+        "w_b": 609.8729103695841
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 22,
+        "admissible": true,
         "w_a": 747.2547864044554,
-        "w_b": 609.8729103695862
+        "w_b": 609.8729103695862,
+        "same_answer": true
       }
     },
     {
@@ -4606,16 +5577,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "envelope",
         "trail": [
           "REFUSE [envelope] Q_nom = 30.04 is outside the archive (30.18 to 89.46)",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 785.9660739101522,
+        "w_b": 902.8729533822811
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 23,
+        "admissible": true,
         "w_a": 785.9660739133044,
-        "w_b": 902.8729533822807
+        "w_b": 902.8729533822807,
+        "same_answer": true
       }
     },
     {
@@ -4642,16 +5620,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (16.7 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 630.9659236978182,
+        "w_b": 628.2842607060282
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 16,
+        "admissible": true,
         "w_a": 630.9659236978227,
-        "w_b": 628.2842607034701
+        "w_b": 628.2842607034701,
+        "same_answer": true
       }
     },
     {
@@ -4678,16 +5663,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft b breaks away here (15.2 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 20,
-        "w_a": 605.9434775885279,
+        "iterations_total": 9,
+        "w_a": 605.9434775885304,
         "w_b": 653.2936798301794
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 20,
+        "admissible": true,
+        "w_a": 605.9434775885279,
+        "w_b": 653.2936798301794,
+        "same_answer": true
       }
     },
     {
@@ -4723,6 +5715,14 @@
         "iterations_total": 6,
         "w_a": 872.8948741944755,
         "w_b": 835.6336291239489
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 872.8948741944755,
+        "w_b": 835.6336291239489,
+        "same_answer": true
       }
     },
     {
@@ -4749,16 +5749,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.1 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 885.5480780519244,
+        "w_b": 518.9304280511375
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 17,
+        "admissible": true,
         "w_a": 885.548078058965,
-        "w_b": 518.9304280568313
+        "w_b": 518.9304280568313,
+        "same_answer": true
       }
     },
     {
@@ -4794,6 +5801,14 @@
         "iterations_total": 10,
         "w_a": 688.7277500083268,
         "w_b": 677.3124961410025
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 688.7277500083268,
+        "w_b": 677.3124961410025,
+        "same_answer": true
       }
     },
     {
@@ -4829,6 +5844,14 @@
         "iterations_total": 6,
         "w_a": 901.290411013948,
         "w_b": 810.7240371281871
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 901.290411013948,
+        "w_b": 810.7240371281871,
+        "same_answer": true
       }
     },
     {
@@ -4864,6 +5887,14 @@
         "iterations_total": 10,
         "w_a": 670.8416397562186,
         "w_b": 793.2246702508198
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 670.8416397562186,
+        "w_b": 793.2246702508198,
+        "same_answer": true
       }
     },
     {
@@ -4890,16 +5921,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "envelope",
         "trail": [
           "REFUSE [envelope] c_load_b = 7.093e-06 is outside the archive (7.206e-06 to 2.994e-05)",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 644.8295110210371,
+        "w_b": 1022.2831665720666
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 19,
+        "admissible": true,
         "w_a": 644.8295110240343,
-        "w_b": 1022.283166572548
+        "w_b": 1022.283166572548,
+        "same_answer": true
       }
     },
     {
@@ -4935,6 +5973,14 @@
         "iterations_total": 5,
         "w_a": 4.778699528473699,
         "w_b": 4.395602651488551
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 4.778699528473699,
+        "w_b": 4.395602651488551,
+        "same_answer": true
       }
     },
     {
@@ -4961,16 +6007,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (17.2 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 972.8687616234316,
+        "w_b": 726.9770174826077
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 21,
+        "admissible": true,
         "w_a": 972.8687616316298,
-        "w_b": 726.9770174829665
+        "w_b": 726.9770174829665,
+        "same_answer": true
       }
     },
     {
@@ -4997,16 +6050,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (20.0 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 7,
+        "w_a": 905.3406947808877,
+        "w_b": 648.7423706769417
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 15,
+        "admissible": true,
         "w_a": 905.3406947806907,
-        "w_b": 648.7423706796106
+        "w_b": 648.7423706796106,
+        "same_answer": true
       }
     },
     {
@@ -5042,6 +6102,14 @@
         "iterations_total": 11,
         "w_a": 675.2296189447828,
         "w_b": 480.6257212317148
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 675.2296189447828,
+        "w_b": 480.6257212317148,
+        "same_answer": true
       }
     },
     {
@@ -5077,6 +6145,14 @@
         "iterations_total": 8,
         "w_a": 844.7811247011324,
         "w_b": 528.6723022238252
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 8,
+        "admissible": true,
+        "w_a": 844.7811247011324,
+        "w_b": 528.6723022238252,
+        "same_answer": true
       }
     },
     {
@@ -5112,6 +6188,14 @@
         "iterations_total": 5,
         "w_a": 868.3420396030631,
         "w_b": 854.1962448428393
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 868.3420396030631,
+        "w_b": 854.1962448428393,
+        "same_answer": true
       }
     },
     {
@@ -5138,16 +6222,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.4 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 591.3010815417588,
+        "w_b": 660.6964037933086
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 19,
+        "admissible": true,
         "w_a": 591.3010815411535,
-        "w_b": 660.6964037933102
+        "w_b": 660.6964037933102,
+        "same_answer": true
       }
     },
     {
@@ -5174,16 +6265,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (17.2 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 703.911581309837,
+        "w_b": 982.4492525330883
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 18,
+        "admissible": true,
         "w_a": 703.9115813098308,
-        "w_b": 982.4492525330884
+        "w_b": 982.4492525330884,
+        "same_answer": true
       }
     },
     {
@@ -5219,6 +6317,14 @@
         "iterations_total": 9,
         "w_a": 541.9422566135263,
         "w_b": 572.8330536501779
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 541.9422566135263,
+        "w_b": 572.8330536501779,
+        "same_answer": true
       }
     },
     {
@@ -5254,6 +6360,14 @@
         "iterations_total": 6,
         "w_a": 7.300437446985295,
         "w_b": 7.382635312769002
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 7.300437446985295,
+        "w_b": 7.382635312769002,
+        "same_answer": true
       }
     },
     {
@@ -5280,16 +6394,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (16.2 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 16,
+        "iterations_total": 10,
         "w_a": 780.0024581882922,
         "w_b": 1026.4453920779367
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 16,
+        "admissible": true,
+        "w_a": 780.0024581882922,
+        "w_b": 1026.4453920779367,
+        "same_answer": true
       }
     },
     {
@@ -5316,15 +6437,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.3 Nm available), but the source case has it stuck",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 621.9671525094642,
+        "w_b": 576.6565992369956
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 7,
+        "admissible": true,
         "w_a": 10.285276658056889,
-        "w_b": 8.025065650923302
+        "w_b": 8.025065650923302,
+        "same_answer": false
       }
     },
     {
@@ -5360,6 +6489,14 @@
         "iterations_total": 5,
         "w_a": 4.695017342744121,
         "w_b": 4.233170024623153
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 4.695017342744121,
+        "w_b": 4.233170024623153,
+        "same_answer": true
       }
     },
     {
@@ -5386,16 +6523,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.9 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 651.6919746636624,
+        "w_b": 1020.7423497430658
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 21,
+        "admissible": true,
         "w_a": 651.6919746636753,
-        "w_b": 1020.742349737032
+        "w_b": 1020.742349737032,
+        "same_answer": true
       }
     },
     {
@@ -5422,16 +6566,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.4 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 17,
+        "iterations_total": 8,
         "w_a": 541.3302929079504,
         "w_b": 753.3674006231429
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 17,
+        "admissible": true,
+        "w_a": 541.3302929079504,
+        "w_b": 753.3674006231429,
+        "same_answer": true
       }
     },
     {
@@ -5467,6 +6618,14 @@
         "iterations_total": 11,
         "w_a": 909.4051523608174,
         "w_b": 1009.4877534044313
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 909.4051523608174,
+        "w_b": 1009.4877534044313,
+        "same_answer": true
       }
     },
     {
@@ -5493,16 +6652,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "envelope",
         "trail": [
           "REFUSE [envelope] Q_nom = 89.86 is outside the archive (30.18 to 89.46)",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 745.4984936043157,
+        "w_b": 639.3073435273953
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 25,
+        "admissible": true,
         "w_a": 745.4984936046174,
-        "w_b": 639.3073435277942
+        "w_b": 639.3073435277942,
+        "same_answer": true
       }
     },
     {
@@ -5538,6 +6704,14 @@
         "iterations_total": 12,
         "w_a": 944.796053745274,
         "w_b": 528.3122342692388
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 12,
+        "admissible": true,
+        "w_a": 944.796053745274,
+        "w_b": 528.3122342692388,
+        "same_answer": true
       }
     },
     {
@@ -5573,6 +6747,14 @@
         "iterations_total": 6,
         "w_a": 1110.5169836088123,
         "w_b": 1293.0509714066127
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 1110.5169836088123,
+        "w_b": 1293.0509714066127,
+        "same_answer": true
       }
     },
     {
@@ -5608,6 +6790,14 @@
         "iterations_total": 5,
         "w_a": 840.394306202955,
         "w_b": 1165.9285885940856
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 840.394306202955,
+        "w_b": 1165.9285885940856,
+        "same_answer": true
       }
     },
     {
@@ -5643,6 +6833,14 @@
         "iterations_total": 5,
         "w_a": 5.665088297476609,
         "w_b": 6.10718488618163
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 5.665088297476609,
+        "w_b": 6.10718488618163,
+        "same_answer": true
       }
     },
     {
@@ -5669,16 +6867,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.8 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 20,
+        "iterations_total": 8,
         "w_a": 519.3392770436881,
-        "w_b": 718.4965387674164
+        "w_b": 718.4965387674163
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 20,
+        "admissible": true,
+        "w_a": 519.3392770436881,
+        "w_b": 718.4965387674164,
+        "same_answer": true
       }
     },
     {
@@ -5714,6 +6919,14 @@
         "iterations_total": 5,
         "w_a": 5.679329651298917,
         "w_b": 5.139523519245979
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 5.679329651298917,
+        "w_b": 5.139523519245979,
+        "same_answer": true
       }
     },
     {
@@ -5749,6 +6962,14 @@
         "iterations_total": 4,
         "w_a": 7.092196529784825,
         "w_b": 6.9458356046764065
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 7.092196529784825,
+        "w_b": 6.9458356046764065,
+        "same_answer": true
       }
     },
     {
@@ -5775,16 +6996,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (16.0 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 19,
+        "iterations_total": 11,
         "w_a": 748.876345419279,
-        "w_b": 924.6001093112478
+        "w_b": 924.6001093112476
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 19,
+        "admissible": true,
+        "w_a": 748.876345419279,
+        "w_b": 924.6001093112478,
+        "same_answer": true
       }
     },
     {
@@ -5820,6 +7048,14 @@
         "iterations_total": 6,
         "w_a": 857.3810927528062,
         "w_b": 890.0104536965624
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 857.3810927528062,
+        "w_b": 890.0104536965624,
+        "same_answer": true
       }
     },
     {
@@ -5855,6 +7091,14 @@
         "iterations_total": 11,
         "w_a": 825.468318759727,
         "w_b": 1040.2518255342172
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 825.468318759727,
+        "w_b": 1040.2518255342172,
+        "same_answer": true
       }
     },
     {
@@ -5890,6 +7134,14 @@
         "iterations_total": 11,
         "w_a": 723.830433153525,
         "w_b": 726.4663328892977
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 723.830433153525,
+        "w_b": 726.4663328892977,
+        "same_answer": true
       }
     },
     {
@@ -5925,6 +7177,14 @@
         "iterations_total": 10,
         "w_a": 875.5455094564354,
         "w_b": 700.0372092496642
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 875.5455094564354,
+        "w_b": 700.0372092496642,
+        "same_answer": true
       }
     },
     {
@@ -5960,6 +7220,14 @@
         "iterations_total": 7,
         "w_a": 7.655775661319192,
         "w_b": 7.467323916423188
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 7,
+        "admissible": true,
+        "w_a": 7.655775661319192,
+        "w_b": 7.467323916423188,
+        "same_answer": true
       }
     },
     {
@@ -5995,6 +7263,14 @@
         "iterations_total": 4,
         "w_a": 1112.5536978136643,
         "w_b": 760.5226101265345
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 1112.5536978136643,
+        "w_b": 760.5226101265345,
+        "same_answer": true
       }
     },
     {
@@ -6030,6 +7306,14 @@
         "iterations_total": 5,
         "w_a": 661.8939911100775,
         "w_b": 920.9537769476477
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 661.8939911100775,
+        "w_b": 920.9537769476477,
+        "same_answer": true
       }
     },
     {
@@ -6065,6 +7349,14 @@
         "iterations_total": 5,
         "w_a": 904.4564824247003,
         "w_b": 726.3882771082534
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 904.4564824247003,
+        "w_b": 726.3882771082534,
+        "same_answer": true
       }
     },
     {
@@ -6100,6 +7392,14 @@
         "iterations_total": 4,
         "w_a": 698.8488160003202,
         "w_b": 494.42468699310245
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 698.8488160003202,
+        "w_b": 494.42468699310245,
+        "same_answer": true
       }
     },
     {
@@ -6135,6 +7435,14 @@
         "iterations_total": 6,
         "w_a": 4.066652579525207,
         "w_b": 4.6562195433228695
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 4.066652579525207,
+        "w_b": 4.6562195433228695,
+        "same_answer": true
       }
     },
     {
@@ -6161,16 +7469,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (16.1 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 613.4485078096395,
+        "w_b": 1032.7118224128671
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 21,
+        "admissible": true,
         "w_a": 613.4485078112258,
-        "w_b": 1032.711822413954
+        "w_b": 1032.711822413954,
+        "same_answer": true
       }
     },
     {
@@ -6206,6 +7521,14 @@
         "iterations_total": 6,
         "w_a": 666.6942645407462,
         "w_b": 882.4016112526591
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 666.6942645407462,
+        "w_b": 882.4016112526591,
+        "same_answer": true
       }
     },
     {
@@ -6241,6 +7564,14 @@
         "iterations_total": 7,
         "w_a": 466.38754982856216,
         "w_b": 417.4285766827879
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 7,
+        "admissible": true,
+        "w_a": 466.38754982856216,
+        "w_b": 417.4285766827879,
+        "same_answer": true
       }
     },
     {
@@ -6276,6 +7607,14 @@
         "iterations_total": 5,
         "w_a": 4.652094550495759,
         "w_b": 4.6511038686669215
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 4.652094550495759,
+        "w_b": 4.6511038686669215,
+        "same_answer": true
       }
     },
     {
@@ -6311,6 +7650,14 @@
         "iterations_total": 11,
         "w_a": 593.443162374163,
         "w_b": 842.285572714663
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 593.443162374163,
+        "w_b": 842.285572714663,
+        "same_answer": true
       }
     },
     {
@@ -6346,6 +7693,14 @@
         "iterations_total": 6,
         "w_a": 6.280658141661549,
         "w_b": 6.381131431197177
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 6.280658141661549,
+        "w_b": 6.381131431197177,
+        "same_answer": true
       }
     },
     {
@@ -6381,6 +7736,14 @@
         "iterations_total": 5,
         "w_a": 812.6873315007264,
         "w_b": 849.8454330277347
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 812.6873315007264,
+        "w_b": 849.8454330277347,
+        "same_answer": true
       }
     },
     {
@@ -6416,6 +7779,14 @@
         "iterations_total": 8,
         "w_a": 702.3019866177196,
         "w_b": 924.7407718010485
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 8,
+        "admissible": true,
+        "w_a": 702.3019866177196,
+        "w_b": 924.7407718010485,
+        "same_answer": true
       }
     },
     {
@@ -6451,6 +7822,14 @@
         "iterations_total": 9,
         "w_a": 874.1702286263742,
         "w_b": 1114.7066991238764
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 874.1702286263742,
+        "w_b": 1114.7066991238764,
+        "same_answer": true
       }
     },
     {
@@ -6486,6 +7865,14 @@
         "iterations_total": 11,
         "w_a": 428.0859260588934,
         "w_b": 1111.4196645741877
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 11,
+        "admissible": true,
+        "w_a": 428.0859260588934,
+        "w_b": 1111.4196645741877,
+        "same_answer": true
       }
     },
     {
@@ -6512,15 +7899,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.1 Nm available), but the source case has it stuck",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 592.3885618371979,
+        "w_b": 797.7702341596602
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 8,
+        "admissible": true,
         "w_a": 9.775958739825533,
-        "w_b": 8.92558198614864
+        "w_b": 8.92558198614864,
+        "same_answer": false
       }
     },
     {
@@ -6547,16 +7942,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "envelope",
         "trail": [
           "REFUSE [envelope] Q_nom = 89.46 is outside the archive (30.18 to 89.46)",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 14,
+        "iterations_total": 9,
         "w_a": 669.1564885119047,
-        "w_b": 508.2561655558374
+        "w_b": 508.25616555583747
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 14,
+        "admissible": true,
+        "w_a": 669.1564885119047,
+        "w_b": 508.2561655558374,
+        "same_answer": true
       }
     },
     {
@@ -6592,6 +7994,14 @@
         "iterations_total": 7,
         "w_a": 6.551183305731744,
         "w_b": 6.6046446188062164
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 7,
+        "admissible": true,
+        "w_a": 6.551183305731744,
+        "w_b": 6.6046446188062164,
+        "same_answer": true
       }
     },
     {
@@ -6627,6 +8037,14 @@
         "iterations_total": 9,
         "w_a": 1091.0685807812254,
         "w_b": 615.6118355201163
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 1091.0685807812254,
+        "w_b": 615.6118355201163,
+        "same_answer": true
       }
     },
     {
@@ -6653,16 +8071,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.6 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 978.22280060596,
+        "w_b": 894.3334550132303
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 16,
+        "admissible": true,
         "w_a": 978.2228006059601,
-        "w_b": 894.3334550132225
+        "w_b": 894.3334550132225,
+        "same_answer": true
       }
     },
     {
@@ -6698,6 +8123,14 @@
         "iterations_total": 4,
         "w_a": 7.7568067091087105,
         "w_b": 7.7578849349927035
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 7.7568067091087105,
+        "w_b": 7.7578849349927035,
+        "same_answer": true
       }
     },
     {
@@ -6733,6 +8166,14 @@
         "iterations_total": 9,
         "w_a": 1097.5577952524798,
         "w_b": 762.8746316380082
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 9,
+        "admissible": true,
+        "w_a": 1097.5577952524798,
+        "w_b": 762.8746316380082,
+        "same_answer": true
       }
     },
     {
@@ -6768,6 +8209,14 @@
         "iterations_total": 4,
         "w_a": 1240.1979517373861,
         "w_b": 776.1258885456665
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 1240.1979517373861,
+        "w_b": 776.1258885456665,
+        "same_answer": true
       }
     },
     {
@@ -6803,6 +8252,14 @@
         "iterations_total": 4,
         "w_a": 934.5086466388356,
         "w_b": 719.4440856602578
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 4,
+        "admissible": true,
+        "w_a": 934.5086466388356,
+        "w_b": 719.4440856602578,
+        "same_answer": true
       }
     },
     {
@@ -6829,16 +8286,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.3 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 9,
+        "w_a": 892.619714782033,
+        "w_b": 616.478772685774
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 15,
+        "admissible": true,
         "w_a": 892.6197147820332,
-        "w_b": 616.4787726857745
+        "w_b": 616.4787726857745,
+        "same_answer": true
       }
     },
     {
@@ -6874,6 +8338,14 @@
         "iterations_total": 5,
         "w_a": 8.21316210618044,
         "w_b": 8.231746916709412
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 5,
+        "admissible": true,
+        "w_a": 8.21316210618044,
+        "w_b": 8.231746916709412,
+        "same_answer": true
       }
     },
     {
@@ -6900,15 +8372,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.2 Nm available), but the source case has it stuck",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 552.2520262229804,
+        "w_b": 568.5221071538781
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 10,
+        "admissible": true,
         "w_a": 10.66193242926688,
-        "w_b": 10.746192771292671
+        "w_b": 10.746192771292671,
+        "same_answer": false
       }
     },
     {
@@ -6944,6 +8424,14 @@
         "iterations_total": 6,
         "w_a": 1088.5872681574767,
         "w_b": 545.7914335963783
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 1088.5872681574767,
+        "w_b": 545.7914335963783,
+        "same_answer": true
       }
     },
     {
@@ -6970,15 +8458,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft b breaks away here (18.3 Nm available), but the source case has it stuck",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 7,
+        "w_a": 795.460284436448,
+        "w_b": 612.555076322804
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 13,
+        "admissible": true,
         "w_a": 795.4602844342821,
-        "w_b": 612.5550764495845
+        "w_b": 612.5550764495845,
+        "same_answer": true
       }
     },
     {
@@ -7014,6 +8510,14 @@
         "iterations_total": 10,
         "w_a": 517.3076801240451,
         "w_b": 614.6819775486845
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 10,
+        "admissible": true,
+        "w_a": 517.3076801240451,
+        "w_b": 614.6819775486845,
+        "same_answer": true
       }
     },
     {
@@ -7040,15 +8544,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "cold",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (17.7 Nm available), but the source case has it stuck",
-          "cold: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 687.8858742096602,
+        "w_b": 772.3651144583828
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "cold",
         "iterations_total": 11,
+        "admissible": true,
         "w_a": 687.8858742096601,
-        "w_b": 772.3651144583591
+        "w_b": 772.3651144583591,
+        "same_answer": true
       }
     },
     {
@@ -7075,16 +8587,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (14.9 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
-        "iterations_total": 17,
-        "w_a": 554.749490093466,
+        "iterations_total": 10,
+        "w_a": 554.7494900934662,
         "w_b": 699.6996899226453
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
+        "iterations_total": 17,
+        "admissible": true,
+        "w_a": 554.749490093466,
+        "w_b": 699.6996899226453,
+        "same_answer": true
       }
     },
     {
@@ -7120,6 +8639,14 @@
         "iterations_total": 6,
         "w_a": 8.895189590300287,
         "w_b": 5.184518678494823
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 8.895189590300287,
+        "w_b": 5.184518678494823,
+        "same_answer": true
       }
     },
     {
@@ -7146,16 +8673,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.0 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 764.5497904137862,
+        "w_b": 594.8592995555504
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 11,
+        "admissible": true,
         "w_a": 764.5497904152924,
-        "w_b": 594.8592995104792
+        "w_b": 594.8592995104792,
+        "same_answer": true
       }
     },
     {
@@ -7191,6 +8725,14 @@
         "iterations_total": 12,
         "w_a": 745.4062039389871,
         "w_b": 644.66083920036
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 12,
+        "admissible": true,
+        "w_a": 745.4062039389871,
+        "w_b": 644.66083920036,
+        "same_answer": true
       }
     },
     {
@@ -7217,16 +8759,23 @@
       },
       "guarded": {
         "admissible": true,
-        "resolved_by": "multistart",
+        "resolved_by": "nominal",
         "gate": "breakaway",
         "trail": [
           "REFUSE [breakaway] shaft a breaks away here (15.5 Nm available), but the source case has it stuck",
-          "cold: line_search_stall",
-          "multistart: ADMIT  [ok] stable operating point"
+          "nominal: ADMIT  [ok] stable operating point"
         ],
+        "iterations_total": 8,
+        "w_a": 618.9905768303777,
+        "w_b": 566.8218892799348
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "multistart",
         "iterations_total": 21,
+        "admissible": true,
         "w_a": 618.9905768316804,
-        "w_b": 566.8218892814095
+        "w_b": 566.8218892814095,
+        "same_answer": true
       }
     },
     {
@@ -7262,6 +8811,14 @@
         "iterations_total": 6,
         "w_a": 5.965964049472237,
         "w_b": 5.956107228184451
+      },
+      "guarded_cold_fallback": {
+        "resolved_by": "warm",
+        "iterations_total": 6,
+        "admissible": true,
+        "w_a": 5.965964049472237,
+        "w_b": 5.956107228184451,
+        "same_answer": true
       }
     }
   ]

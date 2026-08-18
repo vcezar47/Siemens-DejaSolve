@@ -273,3 +273,22 @@ problem, not a UI one.
   Windows cp1252 console. All printed output is now ASCII, and there is an AST
   check in the phase history that catches a regression. Worth re-running before
   the demo on whatever machine it will be presented from.
+
+## Superseded after Phase 1's third arm
+
+The demo output recorded above (`8 -> 4 iterations`) is the flat-start
+comparison. After the nominal baseline was added to Phase 1 — see
+[*A third arm*](phase-1-the-number.md#a-third-arm-the-nominal-baseline) —
+`dejasolve.py` and the web headline report all three:
+
+```
+run-tidy.log      warm_started    8 cold / 7 nominal -> 4 warm iterations
+```
+
+The pipeline, the refusals and the Case Card work are unchanged; only the
+number the demo quotes is wider. **One open item:** when the verifier refuses
+the transfer, the fallback is still the flat cold start (8 iterations) even
+though the nominal guess (7) is available for free and involves no archive.
+The headline now says so out loud rather than hiding it, but the fallback
+itself has not been switched — it changes Act 3's behaviour, so it is a
+deliberate decision rather than a tidy-up.

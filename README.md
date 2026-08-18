@@ -18,7 +18,7 @@ Writes `archive/cases.jsonl`, `results.json` and `figs/convergence.png`.
 Runs in a few seconds. No number in the deck is typed by hand — if it is not in
 `results.json`, it does not go on a slide.
 
-It ends by printing the **Phase 1 summary hash** — `2bdd767bfe02fd5d` — over the
+It ends by printing the **Phase 1 summary hash** — `830da3e6a4480676` — over the
 quotable part of `results.json`, skipping timings and the timestamp so it is
 stable across runs and machines. If that string changes, a number on a slide
 changed with it. Ingest is scored on the parser alone by default; add
@@ -32,7 +32,7 @@ Requires Python 3.11+, numpy and matplotlib (`pip install -r requirements.txt`).
 |---|---|
 | `model.py` | The physics: a hydraulic manifold driving two motors against Stribeck friction. 7 nonlinear equations, analytic Jacobian, damped Newton, dynamic stability |
 | `sweep.py` | Runs a 400-case parameter sweep and keeps what converged — this is the archive |
-| `bench.py` | On 200 *fresh* cases: solve cold, retrieve the nearest archived case, solve warm. Writes `results.json` |
+| `bench.py` | On 200 *fresh* cases: solve from a flat start, from a nominal guess, and warm from the nearest archived case. Writes `results.json` |
 | `verifier.py` | Layer 3: decides whether reusing a case is legitimate, and whether the answer is an operating point at all |
 | `fold.py` | The circuit variant where a warm start *can* be silently wrong, and the naive-vs-verified experiment |
 | `casecard.py` | Layer 1's output record: canonical units, quoted provenance, explicit absence |
@@ -52,7 +52,7 @@ python app.py
 Then open <http://127.0.0.1:8000>. Pick one of the five artifacts (or drop a file
 onto the box), press **Analyse**, and the six pipeline stages resolve in order —
 ingest, units, retrieve, verify, solve, admissible — each with its own verdict.
-The headline is the number: **8 → 4 Newton iterations, same answer to 2.3e-13**.
+The headline is the number, against both baselines: **8 cold / 7 nominal → 4 warm Newton iterations, same answer to 2.3e-13**.
 
 It is a **service with a page attached**, not a notebook app: the page is a
 client of `POST /api/analyse`, which is the same endpoint a Study Manager sweep
@@ -75,8 +75,8 @@ log, an English email, a Romanian note — go through ingest, retrieval, the
 verifier, a warm solve, and an admissibility check:
 
 ```
-run-tidy.log      warm_started         8 -> 4 iterations, from sweep-0212
-run-legacy.log    warm_started         8 -> 4 iterations, from sweep-0125
+run-tidy.log      warm_started         8 cold / 7 nominal -> 4 warm iterations
+run-legacy.log    warm_started         8 cold / 7 nominal -> 4 warm iterations
 run-truncated.log refused_incomplete   missing p_crack
 ```
 
@@ -143,29 +143,51 @@ cracking pressure, fluid density.
 normalised setup vector. Same residual, same Jacobian, same tolerance — the
 only thing that differs is the starting guess.
 
-| | cold start | warm start |
-|---|---|---|
-| mean Newton iterations | 8.3 | 4.9 |
-| total iterations | 1631 | 953 |
-| runs that never converged | 4 / 200 | 0 / 200 |
+Three starting guesses, not two. **Cold** is the flat start — every node at
+tank, every shaft at rest. **Nominal** is what a competent tool defaults to: a
+guess built from the case setup alone (`model.nominal_start`), no archive and
+no solve. **Warm** is the nearest archived case's converged state.
 
-**42% fewer iterations**, every cold-start failure rescued, and the answers
-agree to 4e-08 bar and 3e-08 rev/min across all 196 cases where both converged.
+| | cold (flat) | nominal | warm |
+|---|---|---|---|
+| mean Newton iterations | 8.3 | 7.1 | 4.9 |
+| total iterations | 1631 | 1420 | 953 |
+| runs that never converged | 4 / 200 | 0 / 200 | 0 / 200 |
 
-### One caveat worth stating out loud
+**42% fewer iterations than the flat start, 31% fewer than the nominal guess**,
+and the answers agree to 4e-08 bar and 3e-08 rev/min across all 196 cases where
+both converged. The 31% is the number that matters — see below.
 
-The failure count depends on how good the solver's Jacobian is, so `bench.py`
-reports that sensitivity instead of choosing a flattering setting:
+### Why there is a third column
 
-| solver Jacobian | cold failures | warm failures |
-|---|---|---|
-| exact analytic | 4 / 200 | 0 / 200 |
-| finite difference, `sqrt(eps)` step | 2 / 200 | 0 / 200 |
-| finite difference, coarse step | 45 / 200 | 0 / 200 |
+Reporting a warm start only against a flat start is exactly the methodological
+error [WARP](https://arxiv.org/abs/2605.05728) documents in the warm-start
+literature: the baseline is one nobody would ship, so the win is inflated. The
+flat start is especially weak *here*, and `model.py` says why — equal pressures
+put every orifice on the worst spot of the sqrt curve and zero speed sits in the
+Stribeck regularisation. So the nominal arm was added and the headline is
+reported against both.
 
-The headline uses the **analytic** Jacobian on purpose: it is the best case for
-the cold baseline, so the advantage measured against it is real. The iteration
-saving is stable at ~42% in all three.
+Two claims did not survive it, and both are stated here rather than dropped:
+
+- **The rescues are not the archive's.** All 4 flat-start failures are fixed by
+  the nominal guess too, so the archive rescues nothing the case setup could not.
+- **A worse Jacobian does not make the archive worth more.** It makes the *flat
+  start* worth less. The nominal guess absorbs all of it:
+
+| solver Jacobian | cold failures | nominal failures | warm failures |
+|---|---|---|---|
+| exact analytic | 4 / 200 | 0 / 200 | 0 / 200 |
+| finite difference, `sqrt(eps)` step | 2 / 200 | 0 / 200 | 0 / 200 |
+| finite difference, coarse step | 45 / 200 | 0 / 200 | 0 / 200 |
+
+What does survive is the iteration count: ~31% fewer Newton steps than a good
+engineering guess, stable across all three Jacobian settings, with the same
+answer to 4e-08 bar. That is a smaller claim than "every failure rescued" and
+it is the one the numbers support.
+
+The headline still uses the **analytic** Jacobian on purpose: it is the best
+case for both baselines, so the advantage measured against them is real.
 
 ## The verifier (Phase 2)
 
@@ -187,11 +209,20 @@ fold and the torque balance picks up three roots.
 | valid operating point | 147 | **200** |
 | **unstable root (silently wrong)** | **4** | **0** |
 | no answer | 49 | **0** |
-| total Newton iterations | 1571 | 2130 |
+| total Newton iterations | 1571 | **1579** |
 
-**4 silently wrong answers → 0, for +36% solver work.** The gate is built from
+**4 silently wrong answers → 0, for +1% solver work.** The gate is built from
 physics rather than a distance threshold, because setup distance turned out to
 predict transfer cost with r = 0.18 — barely at all.
+
+The +1% is recent. When a refused transfer fell back to the flat start this cost
++36%; falling back to the nominal guess instead makes safety almost free. But
+the swap is **answer-changing, not just cheaper**, and `fold.py` measures that
+rather than footnoting it: **12 of 200 cases resolve to a different operating
+point** (max |dw| 789 rev/min). Both are stable and both pass the verifier —
+these cases are genuinely bistable. The guarantee is that you never land on an
+*impossible* operating point, not that you land on the same valid one a
+different starting guess would have found.
 
 ## Not done yet
 

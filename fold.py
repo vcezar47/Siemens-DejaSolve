@@ -106,8 +106,23 @@ def naive_transfer(p: dict, x0) -> dict:
     return r
 
 
+#: which state entries are pressures and which are speeds, for the answer diff
+PRESSURE_IDX = [0, 1, 2, 4, 5]
+SPEED_IDX = [3, 6]
+
+#: the rung the ladder falls back to when the archive is refused or its answer
+#: is rejected. ``nominal`` is a guess built from the case setup alone;
+#: ``cold`` is the flat start this experiment originally used. Both are
+#: archive-free, so neither weakens a refusal -- but see ``run()``: on this
+#: circuit the choice decides *which* valid root you land on, not just cost.
+FALLBACKS = {
+    "nominal": lambda p: model.nominal_start(p),
+    "cold": lambda p: model.COLD_START,
+}
+
+
 def guarded_transfer(p: dict, x0, source: dict, distance: float,
-                     v: verifier.Verifier) -> dict:
+                     v: verifier.Verifier, fallback: str = "nominal") -> dict:
     """Verified transfer: gate before, check after, escalate rather than lie."""
     trail = []
     vt = v.check_transfer(p, source, distance)
@@ -116,7 +131,7 @@ def guarded_transfer(p: dict, x0, source: dict, distance: float,
     attempts = []
     if vt.admit:
         attempts.append(("warm", x0))
-    attempts.append(("cold", model.COLD_START))
+    attempts.append((fallback, FALLBACKS[fallback](p)))
     attempts += [("multistart", np.array([150.0, 100.0, 20.0, w, 100.0, 20.0, w]))
                  for w in (600.0, 15.0, 1500.0)]
 
@@ -132,11 +147,11 @@ def guarded_transfer(p: dict, x0, source: dict, distance: float,
         if vs.admit:
             return {**r, "resolved_by": label, "admissible": True, "trail": trail,
                     "refused_transfer": not vt.admit, "gate": vt.rule,
-                    "iterations_total": spent}
+                    "fallback": fallback, "iterations_total": spent}
     return {"converged": False, "status": "no_admissible_root", "iterations": 0,
             "resolved_by": None, "admissible": False, "trail": trail,
             "refused_transfer": not vt.admit, "gate": vt.rule,
-            "iterations_total": spent}
+            "fallback": fallback, "iterations_total": spent}
 
 
 # --- experiment -------------------------------------------------------------
@@ -185,7 +200,13 @@ def run(n_archive: int, n_query: int, out: Path, fig: Path) -> dict:
     queries = fold_cases(n_query, seed=77)
     outcomes = {"naive_wrong": 0, "naive_ok": 0, "naive_failed": 0,
                 "guarded_ok": 0, "guarded_unresolved": 0, "guarded_refused": 0,
-                "naive_iterations": 0, "guarded_iterations": 0}
+                "naive_iterations": 0, "guarded_iterations": 0,
+                # the previous ladder, run alongside so the cost of the swap
+                # and the answers it moves are both measured, not asserted
+                "guarded_cold_iterations": 0, "answer_compared": 0,
+                "answer_differs_from_cold_fallback": 0,
+                "max_dp_bar_vs_cold_fallback": 0.0,
+                "max_dw_rpm_vs_cold_fallback": 0.0}
     cases, demo = [], None
 
     for i, p in enumerate(queries):
@@ -195,6 +216,27 @@ def run(n_archive: int, n_query: int, out: Path, fig: Path) -> dict:
 
         naive = naive_transfer(p, arch_x[j])
         guarded = guarded_transfer(p, arch_x[j], records[j], float(d[j]), v)
+        # The fallback rung is not a cost knob. This circuit has several valid
+        # operating points, so where the ladder restarts decides *which* one is
+        # returned. Run the old flat-start ladder alongside and diff the two
+        # answers, so an answer-changing change is a reported number rather
+        # than something the audience discovers.
+        guarded_cold = guarded_transfer(p, arch_x[j], records[j], float(d[j]), v,
+                                        fallback="cold")
+        outcomes["guarded_cold_iterations"] += guarded_cold["iterations_total"]
+
+        same_answer = None
+        if guarded.get("converged") and guarded_cold.get("converged"):
+            dx = np.abs(np.array(guarded["x"]) - np.array(guarded_cold["x"]))
+            dp = float(dx[PRESSURE_IDX].max())
+            dw = float(dx[SPEED_IDX].max())
+            same_answer = dp <= 1e-6 and dw <= 1e-6
+            outcomes["answer_compared"] += 1
+            outcomes["answer_differs_from_cold_fallback"] += not same_answer
+            outcomes["max_dp_bar_vs_cold_fallback"] = max(
+                outcomes["max_dp_bar_vs_cold_fallback"], dp)
+            outcomes["max_dw_rpm_vs_cold_fallback"] = max(
+                outcomes["max_dw_rpm_vs_cold_fallback"], dw)
 
         if not naive["converged"]:
             outcomes["naive_failed"] += 1
@@ -227,6 +269,13 @@ def run(n_archive: int, n_query: int, out: Path, fig: Path) -> dict:
                         "iterations_total": guarded["iterations_total"],
                         "w_a": guarded["x"][3] if guarded.get("converged") else None,
                         "w_b": guarded["x"][6] if guarded.get("converged") else None},
+            "guarded_cold_fallback": {
+                "resolved_by": guarded_cold["resolved_by"],
+                "iterations_total": guarded_cold["iterations_total"],
+                "admissible": guarded_cold["admissible"],
+                "w_a": guarded_cold["x"][3] if guarded_cold.get("converged") else None,
+                "w_b": guarded_cold["x"][6] if guarded_cold.get("converged") else None,
+                "same_answer": same_answer},
         }
         cases.append(entry)
 
@@ -268,6 +317,23 @@ def report(o: dict, n: int, demo) -> None:
     print(f"\n  transfers refused by the gate: {o['guarded_refused']}")
     print(f"  price of never being silently wrong: "
           f"{o['guarded_iterations'] / max(o['naive_iterations'], 1) - 1:+.0%} solver work")
+    if o.get("guarded_cold_iterations"):
+        print(f"    (same ladder with the flat start it used before: "
+              f"{o['guarded_cold_iterations'] / max(o['naive_iterations'], 1) - 1:+.0%})")
+
+    # An answer-changing change has to be reported as a number, not a caveat.
+    diff = o.get("answer_differs_from_cold_fallback", 0)
+    if o.get("answer_compared"):
+        print(f"\n  vs the flat-start ladder: {diff}/{o['answer_compared']} cases "
+              f"resolve to a DIFFERENT operating point")
+        if diff:
+            print(f"    max |dp| {o['max_dp_bar_vs_cold_fallback']:.1f} bar, "
+                  f"max |dw| {o['max_dw_rpm_vs_cold_fallback']:.1f} rev/min")
+            print("    Both are stable, both pass the verifier. On this circuit the "
+                  "fallback decides")
+            print("    WHICH valid operating point you get: the gate promises *a* "
+                  "correct answer,")
+            print("    not *the* one another starting guess would have found.")
     if demo:
         s = demo["unstable_shaft"]
         print(f"\n  demo case {demo['case_id']}: naive converged in "

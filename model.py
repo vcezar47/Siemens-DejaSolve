@@ -97,6 +97,51 @@ STATE_UNITS = ("bar", "bar", "bar", "rev/min", "bar", "bar", "rev/min")
 #: that the whole project is about.
 COLD_START = np.zeros(7)
 
+#: ceiling on the nominal guess, so a degenerate case setup cannot hand Newton
+#: a starting speed no shaft in this circuit could reach
+W_NOMINAL_MAX = 5000.0     # rev/min
+
+
+def nominal_start(p: dict) -> np.ndarray:
+    """The guess a *competent* tool makes from the case setup alone.
+
+    ``COLD_START`` is a flat start -- every node at tank pressure, every shaft
+    at rest. It is the weakest defensible baseline, and it is weak here for a
+    reason this module already documents: equal pressures put every orifice on
+    the worst spot of the sqrt curve, and zero speed sits in the Stribeck
+    regularisation. Measuring a warm start against it overstates the win.
+
+    This is the stronger baseline. Still no archive and still no solve -- only
+    the case parameters and three rules of thumb:
+
+      * the pump runs against the relief valve, so the manifold sits at
+        ``p_crack``;
+      * about half of that is metered away across the branch valve, and the
+        return line is near tank;
+      * each shaft settles where motor torque balances its quadratic load,
+        less Coulomb friction.
+
+    It costs no residual evaluation, so any iteration it saves is free. Both
+    baselines are reported, because the gap between them *is* a result: it
+    separates "warm start beats starting from nothing" from "warm start beats
+    a good engineering guess", and only the second claim is interesting.
+    """
+    kt, _ = motor_constants(p)
+    p1 = float(p["p_crack"])
+    p3 = P_TANK
+    p2 = P_TANK + 0.5 * (p1 - P_TANK)
+    t_avail = max(p2 - p3, 0.0) * kt - T_COUL
+
+    def speed(c_load: float) -> float:
+        if t_avail <= 0.0:
+            return 0.0
+        if c_load <= 0.0:
+            return W_NOMINAL_MAX
+        return float(min(np.sqrt(t_avail / c_load), W_NOMINAL_MAX))
+
+    return np.array([p1, p2, p3, speed(p["c_load_a"]),
+                     p2, p3, speed(p["c_load_b"])], dtype=float)
+
 
 # --- constitutive relations -------------------------------------------------
 

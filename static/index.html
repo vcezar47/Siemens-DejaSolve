@@ -79,6 +79,7 @@
   .metric .k{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--faint)}
   .metric .v{font:22px/1.15 var(--mono);font-weight:650}
   .metric .v.cold{color:var(--refuse)} .metric .v.warm{color:var(--ok)}
+  .metric .v.nominal{color:var(--warn)}
   .metric .v.same{color:var(--teal);font-size:17px}
   .arrow{color:var(--faint);font-size:20px}
   .verdictbar{padding:11px 16px;font:12.8px var(--mono);border-bottom:1px solid var(--line)}
@@ -236,9 +237,16 @@ function draw(t){
   // headline: the number, when there is one
   const s = t.solve;
   if(s && s.warm_iterations !== undefined && s.agreement !== undefined){
+    // the nominal guess sits between the two on purpose: it is the baseline
+    // the warm start actually has to beat, not the flat start
+    const nominal = s.nominal_iterations !== undefined
+      ? `<div class="metric"><div class="k">nominal guess</div>
+           <div class="v nominal">${s.nominal_iterations}</div></div>`
+      : '';
     html += `<div class="headline">
       <div class="metric"><div class="k">cold start</div>
         <div class="v cold">${s.cold_iterations}</div></div>
+      ${nominal}
       <div class="arrow">&rarr;</div>
       <div class="metric"><div class="k">warm start</div>
         <div class="v warm">${s.warm_iterations}</div></div>

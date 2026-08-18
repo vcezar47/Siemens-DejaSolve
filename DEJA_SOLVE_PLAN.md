@@ -200,9 +200,9 @@ are back; spend them on Phase 2, not on polishing Phase 1.
 | Phase | Dates | Work | **Gate** |
 |---|---|---|---|
 | ~~0. Validate + scaffold~~ | ~~Tue 11 – Thu 13 Aug~~ | **Done.** Mentor answered (§0). Amesim locked as vocabulary | ✅ confirmed |
-| ~~1. THE NUMBER~~ | ~~Sun 16 – Tue 18 Aug~~ | **Done 16 Aug.** `model.py`, `sweep.py`, `bench.py`, `plot_convergence.py`, `run_all.py`. 400-case archive, 200 fresh queries, 1-NN retrieval | ✅ **plot exists, 42% fewer iterations, answers agree to 4e-08 bar.** *The project can no longer fail* |
-| ~~2. Verifier~~ | ~~Wed 19 – Thu 20 Aug~~ | **Done 17 Aug.** `verifier.py` (5 pre-solve rules + 2 post-solve), `fold.py`. Eigenvalue admissibility check | ✅ **4 silently-wrong answers → 0, at +36% solver work.** [record](phases/phase-2-verifier.md) |
-| ~~3. Agent + UI~~ | ~~Fri 21 – Sun 23 Aug~~ | **Done 17 Aug.** `casecard.py`, `ingest.py` (rules + Claude backends), `make_logs.py`, `dejasolve.py`, and a FastAPI service + single-page UI (`app.py`, `static/index.html`) | ✅ **messy artifact → verified warm start, 8 → 4 iterations, in the browser.** [record](phases/phase-3-ingest.md) |
+| ~~1. THE NUMBER~~ | ~~Sun 16 – Tue 18 Aug~~ | **Done 16 Aug.** `model.py`, `sweep.py`, `bench.py`, `plot_convergence.py`, `run_all.py`. 400-case archive, 200 fresh queries, 1-NN retrieval | ✅ **plot exists, 42% fewer iterations than a flat start and 31% than a nominal guess, answers agree to 4e-08 bar.** *The project can no longer fail* |
+| ~~2. Verifier~~ | ~~Wed 19 – Thu 20 Aug~~ | **Done 17 Aug.** `verifier.py` (5 pre-solve rules + 2 post-solve), `fold.py`. Eigenvalue admissibility check | ✅ **4 silently-wrong answers → 0, at +1% solver work.** [record](phases/phase-2-verifier.md) |
+| ~~3. Agent + UI~~ | ~~Fri 21 – Sun 23 Aug~~ | **Done 17 Aug.** `casecard.py`, `ingest.py` (rules + Claude backends), `make_logs.py`, `dejasolve.py`, and a FastAPI service + single-page UI (`app.py`, `static/index.html`) | ✅ **messy artifact → verified warm start, 8 cold / 7 nominal → 4 warm iterations, in the browser.** [record](phases/phase-3-ingest.md) |
 | **4. Cloud/Docker + final measurements** | Mon 24 – Tue 25 Aug | compose file, AWS architecture slide, re-run all benchmarks clean, freeze numbers | `docker compose up` works on a clean machine |
 | **5. Slides + rehearsal** | Wed 26 – Thu 27 Aug | Deck, script, 3 full rehearsals with a timer | Under 10:00 twice in a row |
 | **Buffer** | Fri 28 morning | Nothing new. Only rehearsal | — |
@@ -236,24 +236,38 @@ mis-read unit (`7.8 m2` → 7.8e+06 mm²) is caught as implausible before it eve
 | Approach | Answer | Cost |
 |---|---|---|
 | Surrogate alone | approximate, no guarantee | instant |
-| Cold-start solver | exact | **11 iterations** |
+| Cold-start solver (flat start) | exact | **11 iterations** |
+| Nominal-guess solver (no archive) | exact | **7 iterations** |
 | **Retrieval → warm-started solver** | **exact, same residual** | **4 iterations** |
 
 *(query-0055, the exemplar the benchmark picks automatically. The surrogate row is still a placeholder —
-that model is not built yet.)*
+that model is not built yet. The nominal row is the honest baseline: a starting guess built from the case
+setup alone, no archive involved — it is the row the warm start actually has to beat.)*
 
-Say the third row out loud: **"the speed of AI, the guarantee of the solver."** Then the sweep-level number
-from §6a: *"Across 200 fresh cases: 42% fewer Newton iterations, all four cold-start failures rescued, and
-the answers agree to 4×10⁻⁸ bar."*
+Say the last row out loud: **"the speed of AI, the guarantee of the solver."** Then the sweep-level number
+from §6a: *"Across 200 fresh cases: 31% fewer Newton iterations than a good engineering guess — 42% against
+a flat start — and the answers agree to 4×10⁻⁸ bar."*
+
+**Quote the 31%, not the 42%.** If someone asks why, the answer is the strongest thing on this slide: *"42%
+is against a flat start, which is a baseline nobody ships. I added the guess a competent tool actually makes
+and re-measured against that."* Do **not** say "all four cold-start failures rescued" — that claim was
+retracted (§6a), because the nominal guess rescues the same four.
 
 **Act 3 — the refusal (60s).** `figs/verifier.png`, case `foldq-0009`. Naive retrieval warm-starts and
 converges in **8 clean iterations** to shaft b at **35.6 rev/min** — residual 1e-8, looks perfect. It is a
 **dynamically unstable root**: the circuit's supply curve crosses the Stribeck load curve three times and it
 landed on the middle crossing, where no machine can run. Déjà Solve refuses in one line — *"converged onto a
 dynamically unstable root; the equations are satisfied but no machine runs here"* — and recovers a real
-operating point at 5.5 rev/min.
+operating point at 462.5 rev/min.
 
-Across 200 cases: **4 silently wrong answers → 0**, for **+36% solver work**.
+Across 200 cases: **4 silently wrong answers → 0**, for **+1% solver work**.
+
+**If asked "how is it almost free?"** — because the fallback after a refusal is a decent guess rather than a
+flat start. And volunteer the other half before it is asked: this circuit is genuinely bistable, so the
+fallback decides *which* valid operating point comes back. **12 of 200 cases resolve to a different root**
+than a flat-start fallback would have found, all of them stable, all of them admissible. The guarantee is
+that you never land on an impossible operating point — not that there is only one right answer. That is
+measured in `fold_results.json`, not hand-waved (§6b, concession 3).
 
 *"Silent wrongness is the failure mode that actually scares engineers. This is the layer nobody builds."*
 
@@ -270,35 +284,55 @@ Regenerate with `python run_all.py`. Everything below comes out of `results.json
 
 Setup: 400-case Latin-hypercube sweep → 395 converged → archive. 200 *fresh* query cases (different seed).
 Retrieval is 1-nearest-neighbour on the min-max normalised 7-parameter setup vector. Same residual, same
-Jacobian, same tolerance (1e-8) for both runs — **the only difference is the starting guess.**
+Jacobian, same tolerance (1e-8) for all three runs — **the only difference is the starting guess.**
 
-| | cold start | warm start |
-|---|---|---|
-| mean Newton iterations | 8.3 | **4.9** |
-| median iterations | 8 | **4** |
-| total iterations (196 cases) | 1631 | **953** |
-| runs that never converged | 4 / 200 | **0 / 200** |
+Three arms, not two. **Cold** is the flat start — every node at tank, every shaft at rest. **Nominal** is
+the guess a competent tool makes from the case setup alone (`model.nominal_start`): no archive, no solve.
+**Warm** is the nearest archived case's converged state.
 
-**42% fewer Newton iterations. All 4 cold-start failures rescued, 0 runs broken.** Answers agree to
+| | cold (flat) | nominal | warm |
+|---|---|---|---|
+| mean Newton iterations | 8.3 | 7.1 | **4.9** |
+| median iterations | 8 | 7 | **4** |
+| total iterations | 1631 | 1420 | **953** |
+| runs that never converged | 4 / 200 | 0 / 200 | **0 / 200** |
+
+**31% fewer Newton iterations than the nominal guess; 42% fewer than the flat start.** Answers agree to
 **3.6e-08 bar** and **3.2e-08 rev/min** across all 196 cases where both converged — 0 disagreements. That
 agreement figure is the one that matters most in this room: it is the evidence that warm-starting changed
 the cost and not the answer.
+
+**The 31% is the headline; the 42% is context.** Reporting a warm start only against a flat start is the
+methodological error [WARP](https://arxiv.org/abs/2605.05728) documents in the warm-start literature — the
+baseline is one nobody would ship, so the win is inflated. The flat start is especially weak *here*: equal
+pressures sit on the worst spot of the orifice sqrt curve and zero speed sits in the Stribeck
+regularisation, so the model punishes that guess specifically.
+
+**One claim was retracted when the third arm went in, and saying so is an asset, not a liability:** *"all 4
+cold-start failures rescued"* is gone. The nominal guess rescues the same four, so the archive rescues
+nothing the case setup could not. What survives is the iteration count — a smaller claim that holds up when
+someone in the room has read the literature.
 
 ### The caveat to state before anyone asks
 
 How often cold start *fails* depends on how good the solver's Jacobian is. `bench.py` reports the
 sensitivity rather than picking the flattering setting:
 
-| solver Jacobian | cold failures | warm failures | iteration saving |
-|---|---|---|---|
-| exact analytic | 4 / 200 | 0 / 200 | 42% |
-| finite difference, `sqrt(eps)` step | 2 / 200 | 0 / 200 | 42% |
-| finite difference, coarse step | **45 / 200** | 0 / 200 | 42% |
+| solver Jacobian | cold failures | nominal failures | warm failures | saving vs cold | vs nominal |
+|---|---|---|---|---|---|
+| exact analytic | 4 / 200 | 0 / 200 | 0 / 200 | 42% | 31% |
+| finite difference, `sqrt(eps)` step | 2 / 200 | 0 / 200 | 0 / 200 | 42% | 31% |
+| finite difference, coarse step | **45 / 200** | 0 / 200 | 0 / 200 | 41% | 31% |
 
-**The headline uses the analytic Jacobian on purpose — it is the best case for the cold baseline**, so the
-advantage measured against it is real. The iteration saving is stable at 42% regardless. Note honestly that
-the dramatic *failure-rate* story only appears when the solver's derivatives are poor, which is what happens
-when components come from a user-extensible library that does not supply them.
+**The headline uses the analytic Jacobian on purpose — it is the best case for both baselines**, so the
+advantage measured against them is real. The iteration saving is stable at ~42% against the flat start and
+exactly 31% against nominal in all three settings.
+
+**The second retraction lives in this table.** The old version of this section argued that the worse the
+solver's Jacobian, the more the archive is worth. That is false: a worse Jacobian makes the **flat start**
+worth less. The nominal guess converges 200/200 in every setting, including the coarse finite-difference one
+where the flat start fails 45 times. The failure-rate story is a story about bad initialisation, not about
+the archive — and the archive's actual case is the iteration column.
 
 **A trap avoided, worth remembering:** the first version of this benchmark showed a 22% cold failure rate.
 That was an artifact of the prototype's finite-difference step size, not of the physics. Had it gone on a
@@ -332,9 +366,15 @@ unstable**; no machine can sit there. Newton cannot tell. The eigenvalues can.
 | valid operating point | 147 | **200** |
 | **unstable root (silently wrong)** | **4** | **0** |
 | no answer | 49 | **0** |
-| total Newton iterations | 1571 | 2130 |
+| total Newton iterations | 1571 | **1579** |
 
-69 of 200 transfers refused by the pre-solve gate. **Price of never being silently wrong: +36% solver work.**
+69 of 200 transfers refused by the pre-solve gate. **Price of never being silently wrong: +1% solver
+work** — it was +36% when a refused transfer fell back to the flat start; the ladder now falls back to the
+nominal guess, which is archive-free either way, so the refusal is unchanged and only the bill shrank.
+
+**Say the trade-off in the same breath, because the swap changes answers, not just cost.** `fold.py`
+measures it: **12 of 200 cases resolve to a different operating point** than the flat-start ladder found
+(max |dw| 789 rev/min). Both are stable, both pass the verifier — see concession 3.
 
 **The gate is physics, not distance** — and this is the strongest argument for Layer 3 existing at all: in
 Phase 1 the correlation between setup distance and what a transfer actually costs is **r = 0.18**. Parameter
@@ -347,12 +387,15 @@ Both cheap regime estimators were validated against solved ground truth before b
 
 1. **The pre-solve gate did not catch the demo case** — it admitted the transfer; the post-solve eigenvalue
    check caught it. The rules do not predict every bad transfer; the backstop is what makes the guarantee.
-2. **The effort comparison is not like-for-like, deliberately.** The verified policy escalates (warm → cold →
-   multi-start) *because it can tell it failed*. The naive one gets one shot because it never knows. +36% is
-   the honest price.
-3. **Admissible ≠ unique.** These cases are genuinely bistable; both 5.5 and ~460 rev/min are valid operating
-   points. The verifier guarantees you never land on an impossible one. Choosing between real branches needs
-   a transient — out of scope, limits slide.
+2. **The effort comparison is not like-for-like, deliberately.** The verified policy escalates (warm →
+   nominal → multi-start) *because it can tell it failed*. The naive one gets one shot because it never
+   knows. +1% is the honest price, and the honest footnote is that it is only that low because the fallback
+   rung is a decent guess rather than a flat start.
+3. **Admissible ≠ unique — and now there is a number for it.** These cases are genuinely bistable; both 5.5
+   and ~460 rev/min are valid operating points. Swapping the fallback rung moved **12 of 200 cases onto a
+   different valid root**, which is the cleanest possible demonstration that the starting guess selects the
+   branch. The verifier guarantees you never land on an impossible operating point; it does not promise a
+   canonical one. Choosing between real branches needs a transient — out of scope, limits slide.
 4. **The wrong-answer demo runs on a variant circuit** (5 cm³/rev motor instead of 32). The base circuit has
    a unique root everywhere — verified by multi-start, not assumed. Say this *first*; it is the credibility
    move, not the weakness.

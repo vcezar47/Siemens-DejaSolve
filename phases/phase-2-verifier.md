@@ -128,10 +128,11 @@ what turns an archive from an asset into a liability.
 | converged to a valid operating point | 147 | **200** |
 | converged to an **unstable root** (silently wrong) | **4** | **0** |
 | no answer | 49 | **0** |
-| total Newton iterations | 1571 | 2130 |
+| total Newton iterations | 1571 | **1579** |
 
 **Transfers refused by the pre-solve gate: 69 of 200.** The price of never being
-silently wrong: **+36% solver work.**
+silently wrong: **+1% solver work** — see *The fallback rung* below; it was +36%
+until the ladder stopped falling back to a flat start.
 
 ### The demo case — `foldq-0009`
 
@@ -144,10 +145,10 @@ ADMIT  [ok] same regime, 0.48 away in setup space
 warm:  REFUSE [unstable] converged onto a dynamically unstable root
        (shaft b sits on the friction downslope); the equations are
        satisfied but no machine runs here
-cold:  ADMIT  [ok] stable operating point
+nominal: ADMIT  [ok] stable operating point
 ```
 
-Resolved from a cold start to shaft b at **5.5 rev/min**.
+Resolved from the nominal guess to shaft b at **462.5 rev/min**.
 
 Panel A of the figure is the explanation: the circuit's supply curve is nearly
 flat and crosses the Stribeck load curve **three times**. Naive warm start lands
@@ -160,14 +161,18 @@ exactly on the middle crossing.
    cheap gate cannot see everything, and the backstop is the part that makes the
    guarantee. Do not claim the rules predict every bad transfer.
 2. **The comparison is not like-for-like on effort, and that is the point.** The
-   verified policy escalates — warm, then cold, then multi-start — *because it
-   can tell when it has failed*. The naive policy gets one shot because it has
-   no idea anything went wrong. The +36% is the honest price.
-3. **Admissible does not mean unique.** These cases are genuinely bistable: for
-   `foldq-0009` both 5.5 and ~460 rev/min are stable operating points. The
-   verifier guarantees you land on *an* operating point, never on an impossible
-   one. Choosing between stable branches needs history — a transient run — and
-   is out of scope. This belongs on the limits slide.
+   verified policy escalates — warm, then the nominal guess, then multi-start —
+   *because it can tell when it has failed*. The naive policy gets one shot
+   because it has no idea anything went wrong. The +1% is the honest price, and
+   it is that low only because the fallback rung is a competent guess.
+3. **Admissible does not mean unique — and the fallback swap proved it.** These
+   cases are genuinely bistable: for `foldq-0009` both 5.5 and ~460 rev/min are
+   stable operating points, and the demo case now resolves to the *other* one
+   than it used to. Across the run, **12 of 200 cases land on a different valid
+   root** depending only on the fallback rung. The verifier guarantees you land
+   on *an* operating point, never on an impossible one. Choosing between stable
+   branches needs history — a transient run — and is out of scope. This belongs
+   on the limits slide.
 4. **The wrong-answer demo lives on a variant circuit**, and the deck must say
    so plainly: *"I checked whether my own demo could produce a silently wrong
    answer. In the base envelope it cannot, and here is the evidence. Here is the
@@ -192,3 +197,33 @@ The verifier already produces one-line human-readable reasons, which is exactly
 what the UI and the LLM explanation layer need — the text does not have to be
 generated, only presented. `Verdict` carries `rule`, `reason` and a `details`
 dict with the estimates behind the decision.
+
+## The fallback rung — changed 18 Aug
+
+When the gate refuses a transfer, or the post-solve check rejects the warm
+answer, the ladder has to restart the solve from somewhere. It used to restart
+from `COLD_START` — the flat all-zeros vector. That rung was swapped for
+`model.nominal_start`, the same archive-free guess Phase 1's third arm uses.
+
+Nothing about the refusal changed: the archive is still refused, the gate rules
+are untouched, and every safety counter is identical — 200/200 valid, 0 unstable
+roots, 0 unresolved, 69 refusals. What changed is the bill:
+
+| | flat-start rung | nominal rung |
+|---|---|---|
+| total Newton iterations (verified) | 2130 | **1579** |
+| price of never being silently wrong | +36% | **+1%** |
+
+**The important part is what a cost table cannot show.** Both ladders are run
+side by side in `fold.py` and their answers are diffed, because the fallback is
+not a cost knob on this circuit — it selects which root Newton falls into.
+**12 of 200 cases resolve to a different operating point** (max |dp| 33.2 bar,
+max |dw| 789 rev/min), and the demo case `foldq-0009` is one of them: it used to
+resolve to shaft b at 5.5 rev/min and now resolves to 462.5 rev/min. Both are
+stable, both pass the eigenvalue check, neither is wrong.
+
+This was already conceded qualitatively in caveat 3 before the change. It is now
+a measured number in `fold_results.json`, which is the better version of the
+same admission — and it is the reason the answer diff is instrumented
+permanently rather than checked once. A change that leaves every summary counter
+identical can still be moving the answers underneath them.

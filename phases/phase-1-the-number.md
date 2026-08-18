@@ -93,7 +93,9 @@ difference is `x0`.** Anything else would make the comparison meaningless.
 | total wall time | 160 ms | 81 ms |
 
 - **41.6% fewer Newton iterations**
-- **4 cold-start failures rescued, 0 runs broken**
+- **4 cold-start failures rescued, 0 runs broken** — but see *A third arm*
+  below: the nominal baseline rescues the same 4, so this is not the
+  archive's win
 - **Answers agree to 3.60e-08 bar and 3.16e-08 rev/min** across all 196 cases
   where both converged — **0 disagreements**
 
@@ -168,3 +170,43 @@ and warm never disagreed. The wrong-answer case has to be constructed
 deliberately near a fold; it does not fall out of the current sweep. If it turns
 out to be hard to construct, say so honestly on the limits slide rather than
 faking it.
+
+
+## A third arm: the nominal baseline
+
+Added after Phase 3, in response to [WARP](https://arxiv.org/abs/2605.05728),
+which shows that warm-start results measured against a *flat* start overstate
+the win because the baseline is one no tool would ship. That critique lands
+squarely on the table above: `COLD_START` is `np.zeros(7)`, and this circuit
+punishes that guess specifically — equal pressures sit on the worst spot of the
+orifice sqrt curve, and zero speed sits in the Stribeck regularisation.
+
+So there is now a middle arm. `model.nominal_start` builds a guess from the case
+setup alone — manifold at `p_crack`, half of it metered away across the branch
+valve, return near tank, each shaft where motor torque balances its quadratic
+load less Coulomb friction. No archive, no solve, no residual evaluation.
+
+| | cold (flat) | nominal | warm |
+|---|---|---|---|
+| mean Newton iterations | 8.3 | 7.1 | **4.9** |
+| total iterations | 1631 | 1420 | **953** |
+| runs that never converged | 4 / 200 | 0 / 200 | **0 / 200** |
+
+**What survived:** 31% fewer Newton iterations than a good engineering guess
+(42% against the flat start), stable across all three Jacobian settings, same
+answer to 4e-08 bar with 0 disagreements.
+
+**What did not, and is now corrected above:**
+
+1. *"4 cold-start failures rescued."* The nominal guess rescues the same 4. The
+   archive rescues nothing the case setup could not.
+2. *"The worse the solver's Jacobian, the more the archive is worth."* False.
+   A worse Jacobian makes the **flat start** worth less. The nominal guess
+   converges 200/200 in every Jacobian setting, including the coarse
+   finite-difference one where the flat start fails 45/200. Panel C of the
+   figure was retitled accordingly.
+
+This is a smaller claim than the one Phase 1 originally closed on. It is also
+the one that holds up when someone in the room has read the literature — and
+"here is the baseline that killed half my headline, here is what was left"
+is a better answer to that question than being asked it cold.

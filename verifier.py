@@ -19,6 +19,24 @@ point any machine can occupy. Newton cannot tell. The eigenvalues can.
 
 Every refusal carries one line of plain English, because a gate an engineer
 cannot argue with is a gate they will switch off.
+
+**Not every refusal is the same kind of statement**, and the two engineers
+interviewed on 19 Aug were explicit about which one they want: *generate a
+report and give out a warning, and leave it up to the engineer to proceed with
+the simulation or not.* So a verdict carries a **severity** as well as a
+decision:
+
+  * ``warn``  -- a judgement about *transferring* a state. The system is
+    unsure, not certain. It reports, recommends against, and lets the engineer
+    override. Every gate-1 rule here is of this kind except ``hardware``.
+  * ``block`` -- a statement of *fact* about the data or the physics: the
+    source case is a different circuit, or the converged root is one no machine
+    can sit at. There is nothing for an engineer to decide, so no override is
+    offered.
+
+The line is: **the engineer decides what to do with a risk; the system decides
+what is a fact.** It falls exactly where the two gates already sat -- before
+the solve the verifier is *estimating*, after the solve it is *measuring*.
 """
 
 from __future__ import annotations
@@ -34,15 +52,35 @@ import model
 P_CAVITATION = -0.9   # bar gauge
 
 
+#: rules where "proceed anyway" is not a judgement an engineer can make. A
+#: source case on different hardware satisfies different equations -- reusing
+#: its state is a category error, not a risk to be weighed.
+BLOCKING_RULES = frozenset({"hardware"})
+
+
 @dataclass
 class Verdict:
     admit: bool
     rule: str
     reason: str
     details: dict = field(default_factory=dict)
+    #: ok | warn | block -- derived from the rule unless stated explicitly
+    severity: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.severity:
+            self.severity = ("ok" if self.admit
+                             else "block" if self.rule in BLOCKING_RULES
+                             else "warn")
+
+    @property
+    def overridable(self) -> bool:
+        """May an engineer accept this verdict's risk and proceed regardless?"""
+        return self.severity == "warn"
 
     def __str__(self) -> str:
-        return f"{'ADMIT ' if self.admit else 'REFUSE'} [{self.rule}] {self.reason}"
+        tag = {"ok": "ADMIT", "warn": "WARN ", "block": "BLOCK"}[self.severity]
+        return f"{tag} [{self.rule}] {self.reason}"
 
 
 # --- cheap regime estimates (no solve allowed) ------------------------------
@@ -105,7 +143,12 @@ class Verifier:
     # --- gate 1: before the solve -----------------------------------------
 
     def check_transfer(self, query: dict, source: dict, distance: float) -> Verdict:
-        """May the query legitimately start from the source case's state?"""
+        """May the query legitimately start from the source case's state?
+
+        Everything decided here is an *estimate* made before any solve, so all
+        of it is advisory (``warn``) except the hardware check -- see the
+        severity note in the module docstring.
+        """
         est = estimate_regime(query)
         src_regime = source["regime"]
         src_params = source["params"]
@@ -172,7 +215,7 @@ class Verifier:
             return Verdict(False, "cavitation",
                            f"converged with {np.min(pressures):.1f} bar in the "
                            "circuit -- below vapour pressure, the model does not "
-                           "describe this", det)
+                           "describe this", det, severity="block")
 
         st = model.stability(x, p)
         det["stability"] = st
@@ -182,6 +225,6 @@ class Verifier:
                            f"converged onto a dynamically unstable root "
                            f"(shaft {shafts} sits on the friction downslope); "
                            "the equations are satisfied but no machine runs here",
-                           det)
+                           det, severity="block")
 
         return Verdict(True, "ok", "stable operating point", det)

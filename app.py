@@ -59,6 +59,15 @@ class AnalyseRequest(BaseModel):
     #: here silently 422s any backend added later, which is how `hybrid` came
     #: to be unreachable from the page while working everywhere else
     backend: str = Field("auto", pattern=f"^({'|'.join(ingest.BACKENDS)})$")
+    #: an override accepts a WARN verdict and warm-starts anyway. It cannot
+    #: force a BLOCK, so it is safe to expose: the worst it can do is use a
+    #: starting guess the verifier advised against, and the admissibility gate
+    #: still runs on the answer.
+    override: bool = Field(False, description="accept a WARN verdict and proceed")
+    operator: str | None = Field(None, max_length=120,
+                                 description="who is accepting the risk")
+    basis: str | None = Field(None, max_length=500,
+                              description="why -- recorded in the audit trail")
 
 
 @api.get("/", response_class=HTMLResponse)
@@ -113,10 +122,18 @@ def samples() -> list[dict]:
 @api.post("/api/analyse")
 def analyse(req: AnalyseRequest) -> JSONResponse:
     """The whole pipeline. Refusals are 200s with an outcome, not HTTP errors —
-    a refusal is a result the caller must read, not a transport failure."""
+    a refusal is a result the caller must read, not a transport failure.
+
+    Every response carries a `report` (severity, reason, consequence) and, where
+    a human took responsibility for a warning, an `audit` trail. That is the
+    shape the interviewed engineers asked for: warn and report, then let the
+    engineer decide — rather than refuse silently on their behalf.
+    """
     if not req.text.strip():
         raise HTTPException(422, "empty artifact")
-    trace = dejasolve.analyse(req.text, req.name, archive(), backend=req.backend)
+    trace = dejasolve.analyse(req.text, req.name, archive(), backend=req.backend,
+                              override=req.override, operator=req.operator,
+                              basis=req.basis)
     return JSONResponse(trace)
 
 

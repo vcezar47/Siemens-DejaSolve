@@ -6,16 +6,34 @@ allowed to stop the run:
     artifact -> Case Card -> unit sanity -> retrieval -> verifier
              -> warm solve -> admissibility check -> report
 
-It refuses in three distinct ways, and saying which one fired is the point:
+Nothing here ends in a bare refusal. Asked whether the system should refuse
+when unsure or warn and let them decide, the two engineers interviewed on
+19 Aug chose the second: *generate a report and give out a warning, and leave
+it up to the engineer to proceed with the simulation or not.* So every path
+produces a ``report`` -- and stopping comes in two tiers, because "warn about
+everything" is its own kind of useless:
 
-  * **incomplete** -- the artifact never stated a parameter. The nearest
-    archived case is shown as a *suggestion*, never applied. Auto-filling a
-    missing parameter from a neighbour is precisely the silent wrongness the
-    rest of the system exists to prevent.
-  * **implausible** -- a value survives ingest but is orders of magnitude out,
-    which in practice means a unit was misread.
-  * **inadmissible transfer** -- retrieval found a case, and the verifier
-    refused it.
+  * **warned** -- a *risk*. The verifier estimated, before any solve, that this
+    transfer is not legitimate. It says why, does not use the archive, and
+    offers an override: the engineer may accept the risk and warm-start anyway,
+    which is recorded in the audit trail with their name and their reason.
+  * **blocked** -- a *fact*, where there is nothing for an engineer to decide:
+      - **incomplete** -- the artifact never stated a parameter. The nearest
+        archived case is shown as a *suggestion*, never applied. Auto-filling a
+        missing parameter from a neighbour is precisely the silent wrongness
+        the rest of the system exists to prevent.
+      - **implausible** -- a value survives ingest but is orders of magnitude
+        out, which in practice means a unit was misread.
+      - **inadmissible** -- the converged root is not an operating point. This
+        one is measured after the solve, not estimated before it.
+
+The line is *the engineer decides what to do with a risk; the system decides
+what is a fact*, and it falls exactly where the verifier's two gates already
+sat. See ``verifier.py``.
+
+Simulation is a departmental activity, not one engineer's -- so an override is
+attributed. ``operator`` and ``basis`` travel with the request and land in
+``trace["audit"]``.
 
 ``analyse()`` is pure: it returns a structured trace and prints nothing, so the
 CLI renderer and the HTTP service in ``app.py`` share one implementation instead
@@ -28,7 +46,9 @@ of drifting apart.
 from __future__ import annotations
 
 import argparse
+import getpass
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -87,18 +107,56 @@ class Archive:
         return j, float(d[j])
 
 
+#: how a verifier severity presents as a pipeline stage
+SEVERITY_STATE = {"ok": "ok", "warn": "warned", "block": "blocked"}
+
+
+def _report(trace: dict, severity: str, rule: str, reason: str,
+            consequence: str, override_available: bool = False) -> dict:
+    """The report the engineer reads -- built on every path, including clean ones.
+
+    `consequence` is the half that makes a warning actionable: not just what is
+    wrong, but what the system did about it and what happens if they do nothing.
+    """
+    prior = trace.get("report", {})
+    trace["report"] = {
+        "severity": severity, "rule": rule, "reason": reason,
+        "consequence": consequence,
+        "override_available": override_available,
+        # a later, more severe report must not erase the fact that a human
+        # already took responsibility for getting here
+        "override_applied": prior.get("override_applied", False),
+    }
+    return trace["report"]
+
+
+def _audit(trace: dict, action: str, **fields) -> dict:
+    """Append to the audit trail. Who decided what, when, and on what basis."""
+    entry = {"at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+             "action": action, **fields}
+    trace.setdefault("audit", []).append(entry)
+    return entry
+
+
 def _stage(sid: str, state: str, headline: str, detail=None) -> dict:
-    """state is one of: ok | refused | skipped"""
+    """state is one of: ok | warned | blocked | skipped"""
     title, subtitle = next((t, s) for i, t, s in STAGES if i == sid)
     return {"id": sid, "title": title, "subtitle": subtitle,
             "state": state, "headline": headline, "detail": detail or {}}
 
 
 def analyse(text: str, name: str, archive: Archive,
-            backend: str = "auto") -> dict:
-    """Run the full pipeline over one artifact. Pure -- returns a trace."""
+            backend: str = "auto", override: bool = False,
+            operator: str | None = None, basis: str | None = None) -> dict:
+    """Run the full pipeline over one artifact. Pure -- returns a trace.
+
+    `override` accepts a WARN verdict and warm-starts anyway. It cannot force a
+    blocked one, and it is never the default: the engineer asks for it, and
+    `operator`/`basis` record who asked and why.
+    """
     stages: list[dict] = []
-    trace = {"artifact": name, "stages": stages, "backend": backend}
+    trace = {"artifact": name, "stages": stages, "backend": backend,
+             "operator": operator or "unattributed", "audit": []}
 
     # -- Layer 1: ingest ---------------------------------------------------
     # An unavailable backend is a refusal like any other, not a crash: it gets
@@ -107,12 +165,15 @@ def analyse(text: str, name: str, archive: Archive,
     try:
         card = ingest_text(text, name, backend=backend)
     except RuntimeError as exc:
-        stages.append(_stage("ingest", "refused", str(exc),
+        stages.append(_stage("ingest", "blocked", str(exc),
                              {"backend": backend}))
         for sid in ("plausible", "retrieve", "verify", "solve", "admissible"):
             stages.append(_stage(sid, "skipped", "not reached"))
         trace.update(outcome="ingest_unavailable", summary=str(exc),
                      fields=[], card={})
+        _report(trace, "block", "backend", str(exc),
+                "nothing was read, so no starting state was proposed -- this is "
+                "a configuration fault, not a judgement about the physics")
         return trace
     trace["card"] = card.to_dict()
     trace["fields"] = [
@@ -122,7 +183,7 @@ def analyse(text: str, name: str, archive: Archive,
     ]
     found = len(card.params)
     stages.append(_stage(
-        "ingest", "ok" if found else "refused",
+        "ingest", "ok" if found else "blocked",
         f"{found} of {len(model.PARAM_NAMES)} parameters read"
         f" by {card.source.get('ingested_by', '?')}",
         {"missing": card.missing, "notes": card.notes}))
@@ -130,10 +191,13 @@ def analyse(text: str, name: str, archive: Archive,
     # -- unit sanity -------------------------------------------------------
     problems = card.validate()
     if problems:
-        stages.append(_stage("plausible", "refused", problems[0],
+        stages.append(_stage("plausible", "blocked", problems[0],
                              {"problems": problems}))
         trace["outcome"] = "refused_implausible"
         trace["summary"] = problems[0]
+        _report(trace, "block", "implausible", problems[0],
+                "a value this far out is a misread unit, not a risky transfer -- "
+                "the artifact has to be corrected; nothing here is overridable")
         return trace
     stages.append(_stage("plausible", "ok" if found else "skipped",
                          f"all {found} values are within a physical range" if found
@@ -156,7 +220,7 @@ def analyse(text: str, name: str, archive: Archive,
         # second -- the areas are there in prose and the model walks past them.
         # The refusal is right either way; only the stronger claim is unsupported.
         stages.append(_stage(
-            "retrieve", "refused",
+            "retrieve", "blocked",
             f"not read from the artifact: {', '.join(card.missing)}",
             {"suggestion": suggestion,
              "note": "A missing parameter is a question for the engineer, not a "
@@ -165,6 +229,11 @@ def analyse(text: str, name: str, archive: Archive,
             stages.append(_stage(sid, "skipped", "not reached"))
         trace["outcome"] = "refused_incomplete"
         trace["summary"] = f"missing {', '.join(card.missing)}"
+        _report(trace, "block", "incomplete",
+                f"not read from the artifact: {', '.join(card.missing)}",
+                "there is no risk here to weigh up -- the value has to come from "
+                "an engineer. The nearest case is shown for context and is not "
+                "applied")
         return trace
 
     # -- Layer 2: retrieval ------------------------------------------------
@@ -183,10 +252,48 @@ def analyse(text: str, name: str, archive: Archive,
 
     # -- Layer 3a: is the transfer legitimate? -----------------------------
     verdict = archive.verifier.check_transfer(card.params, source, distance)
+    # An override accepts a *risk*, so it can only move a WARN verdict. A block
+    # is a statement of fact and there is no flag that argues with one.
+    overridden = bool(override and verdict.overridable and not verdict.admit)
+    accepted = verdict.admit or overridden
     trace["verdict"] = {"admit": verdict.admit, "rule": verdict.rule,
-                        "reason": verdict.reason}
-    stages.append(_stage("verify", "ok" if verdict.admit else "refused",
-                         verdict.reason, {"rule": verdict.rule}))
+                        "reason": verdict.reason, "severity": verdict.severity,
+                        "overridable": verdict.overridable,
+                        "overridden": overridden}
+
+    who = trace["operator"]
+    if overridden:
+        _audit(trace, "override", rule=verdict.rule, reason=verdict.reason,
+               operator=who, basis=basis or "not stated")
+        verify_state, verify_head = "warned", f"{verdict.reason} -- overridden by {who}"
+    else:
+        verify_state = SEVERITY_STATE[verdict.severity]
+        verify_head = verdict.reason
+    stages.append(_stage("verify", verify_state, verify_head,
+                         {"rule": verdict.rule, "severity": verdict.severity,
+                          "overridable": verdict.overridable,
+                          "overridden": overridden,
+                          "basis": basis if overridden else None}))
+
+    if verdict.admit:
+        _report(trace, "ok", verdict.rule, verdict.reason,
+                "the archived state is used as the initial guess")
+    elif overridden:
+        rep = _report(trace, "warn", verdict.rule, verdict.reason,
+                      f"warning accepted by {who}; the archived state is used as "
+                      f"the initial guess regardless. The answer is still checked "
+                      f"against the admissibility gate below")
+        rep["override_applied"] = True
+    elif verdict.overridable:
+        _report(trace, "warn", verdict.rule, verdict.reason,
+                "the archive is not used: the solver starts from the nominal "
+                "guess built from this case's own parameters, so refusing costs "
+                "nothing. Override to warm-start anyway",
+                override_available=True)
+    else:
+        _report(trace, "block", verdict.rule, verdict.reason,
+                "a state from different hardware solves different equations -- "
+                "there is no judgement to make here, so no override is offered")
 
     cold = model.solve(card.params)
     # The flat cold start is the weakest baseline there is, so the demo quotes
@@ -194,13 +301,14 @@ def analyse(text: str, name: str, archive: Archive,
     # own parameters, no archive involved. If the archive only beats the flat
     # start, it has not earned the stage it is standing on.
     nom = model.solve(card.params, x0=model.nominal_start(card.params))
-    if verdict.admit:
+    if accepted:
         warm = model.solve(card.params, x0=archive.states[j])
         chosen, label = warm, "warm"
     else:
-        # A refused transfer should not cost the engineer anything. The archive
-        # stays refused; the fallback is simply the best guess that does not
-        # involve it. Cold remains the last resort if the nominal guess fails.
+        # A warning the engineer left standing should not cost them anything.
+        # The archive stays unused; the fallback is simply the best guess that
+        # does not involve it. Cold remains the last resort if nominal fails --
+        # and this is what makes the warning cheap enough to be worth reading.
         warm = None
         chosen, label = ((nom, "nominal") if nom["converged"]
                          else (cold, "cold"))
@@ -224,11 +332,14 @@ def analyse(text: str, name: str, archive: Archive,
     trace["solve"] = solve
 
     if not chosen["converged"]:
-        stages.append(_stage("solve", "refused",
+        stages.append(_stage("solve", "blocked",
                              f"{label} start did not converge ({chosen['status']})"))
         stages.append(_stage("admissible", "skipped", "not reached"))
         trace["outcome"] = "no_answer"
         trace["summary"] = f"{label} start did not converge"
+        _report(trace, "block", "no_answer",
+                f"the {label} start did not converge ({chosen['status']})",
+                "there is no answer to report on, warned or otherwise")
         return trace
 
     if warm is not None and "saved" in solve:
@@ -238,15 +349,17 @@ def analyse(text: str, name: str, archive: Archive,
                     f"same answer to {solve['agreement']:.1e}")
     elif label == "nominal":
         headline = (f"nominal guess, {nom['iterations']} iterations "
-                    f"(archive refused, none used)")
+                    f"(archive not used -- warned, not overridden)")
     else:
         headline = f"cold start, {cold['iterations']} iterations"
     stages.append(_stage("solve", "ok", headline, solve))
 
     # -- Layer 3b: is the answer an operating point? -----------------------
     admissible = verifier.Verifier.check_solution(chosen["x"], card.params)
-    stages.append(_stage("admissible", "ok" if admissible.admit else "refused",
-                         admissible.reason, {"rule": admissible.rule}))
+    stages.append(_stage("admissible",
+                         "ok" if admissible.admit else SEVERITY_STATE[admissible.severity],
+                         admissible.reason,
+                         {"rule": admissible.rule, "severity": admissible.severity}))
 
     reg = model.regime(chosen["x"], card.params)
     trace["regime"] = reg
@@ -257,9 +370,21 @@ def analyse(text: str, name: str, archive: Archive,
     if not admissible.admit:
         trace["outcome"] = "inadmissible_solution"
         trace["summary"] = admissible.reason
+        # This is measured, not estimated, so it outranks whatever gate 1 said --
+        # including an override, which _report deliberately remembers.
+        _report(trace, "block", admissible.rule, admissible.reason,
+                "the answer is reported in full so it can be inspected, but it is "
+                "not an operating point and must not be used as one")
+        if overridden:
+            # exactly the sequence an audit trail exists for
+            _audit(trace, "inadmissible_after_override", rule=admissible.rule,
+                   reason=admissible.reason, operator=who)
         return trace
 
-    trace["outcome"] = "warm_started" if verdict.admit else "refused_transfer"
+    # not "refused": the engineer was warned and left the warning standing
+    trace["outcome"] = ("warm_started_override" if overridden
+                        else "warm_started" if verdict.admit
+                        else "warned_not_used")
     trace["summary"] = headline
     return trace
 
@@ -278,7 +403,7 @@ def render(trace: dict) -> str:
     for st in trace["stages"]:
         if st["state"] == "skipped":
             continue
-        mark = {"ok": "OK    ", "refused": "REFUSE"}[st["state"]]
+        mark = {"ok": "OK    ", "warned": "WARN  ", "blocked": "BLOCK "}[st["state"]]
         out.append(f"\n{mark} {st['title']:<12} {st['headline']}")
         sug = st["detail"].get("suggestion")
         if sug:
@@ -291,6 +416,21 @@ def render(trace: dict) -> str:
         out.append("")
         for s in trace["solution"]:
             out.append(f"  {s['name']:<8}{s['value']:>12.2f}   {s['unit']}")
+
+    # The report is the deliverable the engineers asked for, so it is printed
+    # even when everything passed -- a report that only appears on bad news is
+    # one nobody learns to read.
+    rep = trace.get("report")
+    if rep:
+        out.append("")
+        out.append(f"REPORT  [{rep['severity'].upper()}] {rep['reason']}")
+        out.append(f"        {rep['consequence']}.")
+        if rep["override_available"]:
+            out.append("        This is a warning, not a block -- re-run with "
+                       "--override to proceed anyway.")
+    for a in trace.get("audit", []):
+        out.append(f"AUDIT   {a['at']}  {a['action']}  by {a.get('operator', '?')}"
+                   f"  [{a.get('rule', '-')}]  basis: {a.get('basis', '-')}")
     return "\n".join(out)
 
 
@@ -301,6 +441,13 @@ def main() -> None:
     ap.add_argument("--logs", type=Path, default=Path("logs"))
     ap.add_argument("--archive", type=Path, default=Path("archive/cases.jsonl"))
     ap.add_argument("--backend", default="auto", choices=list(ingest.BACKENDS))
+    ap.add_argument("--override", action="store_true",
+                    help="accept a WARN verdict and warm-start anyway "
+                         "(cannot force a BLOCK)")
+    ap.add_argument("--operator", default=getpass.getuser(),
+                    help="who is accepting the risk -- goes in the audit trail")
+    ap.add_argument("--basis", default=None,
+                    help="why, in one line -- goes in the audit trail too")
     ap.add_argument("--json", action="store_true", help="emit the trace as JSON")
     args = ap.parse_args()
 
@@ -314,7 +461,9 @@ def main() -> None:
     if not targets or targets == [None]:
         ap.error("give an artifact path, or pass --all")
 
-    traces = [analyse(p.read_text(encoding="utf-8"), p.name, archive, args.backend)
+    traces = [analyse(p.read_text(encoding="utf-8"), p.name, archive, args.backend,
+                      override=args.override, operator=args.operator,
+                      basis=args.basis)
               for p in targets]
 
     if args.json:

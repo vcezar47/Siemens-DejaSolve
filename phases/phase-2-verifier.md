@@ -227,3 +227,53 @@ a measured number in `fold_results.json`, which is the better version of the
 same admission — and it is the reason the answer diff is instrumented
 permanently rather than checked once. A change that leaves every summary counter
 identical can still be moving the answers underneath them.
+
+---
+
+## Addendum — 19 Aug: the gate stopped being a gate
+
+Not a re-opening of the phase. A change to the verifier's **contract**, driven by
+the engineer interview recorded in [`../DEJA_SOLVE_PLAN.md`](../DEJA_SOLVE_PLAN.md)
+§0b. Asked whether the system should refuse when it is unsure or warn and leave
+the decision to them, both engineers chose the second: generate a report, give a
+warning, let the engineer decide whether to proceed.
+
+The rules did not change and no number in this record moved. What changed is what
+a refusal *is*:
+
+> **The engineer decides what to do with a risk. The system decides what is a fact.**
+
+A `Verdict` now carries a severity alongside its decision, and the split landed on
+a boundary this phase had already built for other reasons — which is the only
+reason it is defensible rather than convenient:
+
+- **Gate 1 estimates**, before any solve, from closed-form bounds. Everything it
+  decides is a **warning**: reported, not applied, and overridable by a named
+  engineer with a stated reason. The one exception is `hardware` — a source case
+  on a different circuit solves different equations, so reusing its state is a
+  category error rather than a risk to weigh.
+- **Gate 2 measures**, after the solve, from the eigenvalues. What it finds is a
+  **fact** and carries no override. The equations are satisfied and no machine
+  runs there; there is nothing for an engineer to decide.
+
+**Why this does not weaken the phase's result.** The 4-silently-wrong-answers → 0
+number is produced by `fold.py`, which never had an override and still does not:
+it measures the gates themselves. In the end-to-end pipeline, an engineer who
+overrides a gate-1 warning still has their answer checked by gate 2 — so the
+worst an override can buy is a starting guess the verifier advised against, never
+an inadmissible answer presented as a valid one. The override is safe *because*
+the second gate is not overridable.
+
+**One artifact did change, and it is worth knowing why.** `fold_results.json` records `str(verdict)` in a
+human-readable `trail` per case, so the severity rename shows up there: transfer refusals now read
+`WARN  [envelope] ...` where they read `REFUSE [envelope] ...`. **Every counter in that file is bit-identical**
+— 4 naive-wrong → 0, 200 valid, 69 refusals, 1579 vs 1571 iterations, 12 answers differing from the
+cold-fallback ladder, max |dw| 788.84 rev/min — verified by diffing the regenerated file against the committed
+one with the trail strings and timings excluded. The wording moved; no decision did.
+
+**What it cost to demonstrate:** one new fixture, `logs/run-bigpump.log`, a 118
+L/min pump against an archive swept over 30–90. Warned, not blocked; overridden,
+it converges in 5 Newton iterations against 7 nominal and 10 cold, agreeing to
+2.4e-09, and passes gate 2. **In that case the warning was conservative and the
+override was right** — which is the argument for warning instead of refusing,
+made with this project's own numbers.

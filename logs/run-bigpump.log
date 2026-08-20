@@ -1,0 +1,21 @@
+=== HydroSim 4.2 :: batch runner ===
+run id      : SIM-2026-0533
+started     : 2026-04-02 07:55:19
+model file  : manifold_2motor_hiflow.hsm
+operator    : a.dumitrescu
+note        : uprated pump, new supplier - first time on this bench
+
+[parameters]
+Q_nom       = 118.0 L/min
+A_valve_a   = 6.4 mm^2
+A_valve_b   = 5.9 mm^2
+c_load_a    = 1.6e-05 Nm/(rev/min)^2
+c_load_b    = 1.9e-05 Nm/(rev/min)^2
+p_crack     = 205.0 bar
+rho         = 868.0 kg/m^3
+
+[init]
+solving steady state ...
+  iter  1  residual 7.204e+01
+  iter  6  residual 1.118e+01
+initialisation slow - continuing under operator supervision

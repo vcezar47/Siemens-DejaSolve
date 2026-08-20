@@ -1,0 +1,4453 @@
+{
+  "generated_utc": "2026-08-20T06:48:35+00:00",
+  "circuit": {
+    "D_mot_cm3_per_rev": 5.0,
+    "note": "the Stribeck fold: three roots, the middle one unstable"
+  },
+  "archive": {
+    "n": 300,
+    "kept": 135,
+    "rejected_unstable": 1,
+    "failed": 164
+  },
+  "n_queries": 200,
+  "surrogate": {
+    "kind": "quadratic response surface (ridge least squares)",
+    "features": 36,
+    "train_rmse": 50.06978300139669
+  },
+  "prediction_quality": {
+    "solver_tolerance": 1e-08,
+    "median_residual_inf": 15.25183256773077,
+    "max_residual_inf": 53.51735419953581,
+    "inadmissible_predictions": 64,
+    "by_rule": {
+      "unstable": 64
+    }
+  },
+  "naive": {
+    "ok": 158,
+    "wrong": 40,
+    "failed": 2
+  },
+  "guarded": {
+    "resolved": 200,
+    "unresolved": 0,
+    "total_iterations": 1300,
+    "resolved_by": {
+      "predicted": 135,
+      "nominal": 65
+    }
+  },
+  "post_only": {
+    "resolved": 200,
+    "unresolved": 0,
+    "total_iterations": 1559,
+    "resolved_by": {
+      "predicted": 158,
+      "nominal": 42
+    }
+  },
+  "cases": [
+    {
+      "case_id": "foldq-0000",
+      "prediction": {
+        "residual_inf": 15.278635479578654,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0001",
+      "prediction": {
+        "residual_inf": 5.929987887546893,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0002",
+      "prediction": {
+        "residual_inf": 29.30310531855551,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0003",
+      "prediction": {
+        "residual_inf": 24.141101442371408,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 10
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 10
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 20
+      }
+    },
+    {
+      "case_id": "foldq-0004",
+      "prediction": {
+        "residual_inf": 21.500117452783964,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0005",
+      "prediction": {
+        "residual_inf": 24.446448201536242,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0006",
+      "prediction": {
+        "residual_inf": 15.895657152290187,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 9
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 17
+      }
+    },
+    {
+      "case_id": "foldq-0007",
+      "prediction": {
+        "residual_inf": 33.143053952686095,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 12
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 12
+      }
+    },
+    {
+      "case_id": "foldq-0008",
+      "prediction": {
+        "residual_inf": 3.5287381809018896,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0009",
+      "prediction": {
+        "residual_inf": 20.412786002680193,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0010",
+      "prediction": {
+        "residual_inf": 29.306010184115955,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0011",
+      "prediction": {
+        "residual_inf": 16.728887196960454,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 14
+      }
+    },
+    {
+      "case_id": "foldq-0012",
+      "prediction": {
+        "residual_inf": 20.32588609597689,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0013",
+      "prediction": {
+        "residual_inf": 6.820995022235369,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0014",
+      "prediction": {
+        "residual_inf": 12.529146817738473,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0015",
+      "prediction": {
+        "residual_inf": 21.326600726507948,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0016",
+      "prediction": {
+        "residual_inf": 4.944994101974395,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0017",
+      "prediction": {
+        "residual_inf": 21.47722322540838,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0018",
+      "prediction": {
+        "residual_inf": 21.521472636008895,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 12
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 20
+      }
+    },
+    {
+      "case_id": "foldq-0019",
+      "prediction": {
+        "residual_inf": 14.041528082568732,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0020",
+      "prediction": {
+        "residual_inf": 3.7545035827250413,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0021",
+      "prediction": {
+        "residual_inf": 7.131916501237917,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0022",
+      "prediction": {
+        "residual_inf": 27.156632696151256,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "failed",
+        "iterations": 10
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 12
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 22
+      }
+    },
+    {
+      "case_id": "foldq-0023",
+      "prediction": {
+        "residual_inf": 23.480023255556368,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0024",
+      "prediction": {
+        "residual_inf": 12.779542266902542,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0025",
+      "prediction": {
+        "residual_inf": 13.122636701835773,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0026",
+      "prediction": {
+        "residual_inf": 4.855388841759341,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0027",
+      "prediction": {
+        "residual_inf": 20.525203624022097,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0028",
+      "prediction": {
+        "residual_inf": 9.319715197027929,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0029",
+      "prediction": {
+        "residual_inf": 17.79000221904699,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0030",
+      "prediction": {
+        "residual_inf": 9.27868889035679,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0031",
+      "prediction": {
+        "residual_inf": 7.959869498630541,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 14
+      }
+    },
+    {
+      "case_id": "foldq-0032",
+      "prediction": {
+        "residual_inf": 17.106368341701433,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0033",
+      "prediction": {
+        "residual_inf": 26.77677211448137,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0034",
+      "prediction": {
+        "residual_inf": 8.271105825162731,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0035",
+      "prediction": {
+        "residual_inf": 4.591631085500103,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0036",
+      "prediction": {
+        "residual_inf": 12.987307195364364,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 14
+      }
+    },
+    {
+      "case_id": "foldq-0037",
+      "prediction": {
+        "residual_inf": 19.33064927681393,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0038",
+      "prediction": {
+        "residual_inf": 20.807769224539207,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0039",
+      "prediction": {
+        "residual_inf": 7.640678606895349,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0040",
+      "prediction": {
+        "residual_inf": 8.320636767007992,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0041",
+      "prediction": {
+        "residual_inf": 4.629818981716241,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 14
+      }
+    },
+    {
+      "case_id": "foldq-0042",
+      "prediction": {
+        "residual_inf": 7.402770147267056,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0043",
+      "prediction": {
+        "residual_inf": 4.762293866116771,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0044",
+      "prediction": {
+        "residual_inf": 1.9305732669415079,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 3
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 3
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 3
+      }
+    },
+    {
+      "case_id": "foldq-0045",
+      "prediction": {
+        "residual_inf": 8.766819335062108,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0046",
+      "prediction": {
+        "residual_inf": 8.80786915046357,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0047",
+      "prediction": {
+        "residual_inf": 17.247682345926755,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0048",
+      "prediction": {
+        "residual_inf": 15.409745342313805,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0049",
+      "prediction": {
+        "residual_inf": 19.750046017103468,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      }
+    },
+    {
+      "case_id": "foldq-0050",
+      "prediction": {
+        "residual_inf": 25.821358365982185,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0051",
+      "prediction": {
+        "residual_inf": 4.737680330370864,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0052",
+      "prediction": {
+        "residual_inf": 30.607801082998698,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0053",
+      "prediction": {
+        "residual_inf": 41.4049286399308,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0054",
+      "prediction": {
+        "residual_inf": 53.51735419953581,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0055",
+      "prediction": {
+        "residual_inf": 6.408438058127931,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0056",
+      "prediction": {
+        "residual_inf": 24.286129760705478,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 8
+      }
+    },
+    {
+      "case_id": "foldq-0057",
+      "prediction": {
+        "residual_inf": 23.630913542117007,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0058",
+      "prediction": {
+        "residual_inf": 8.31239504955395,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0059",
+      "prediction": {
+        "residual_inf": 16.353643321167098,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0060",
+      "prediction": {
+        "residual_inf": 22.157476216956866,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0061",
+      "prediction": {
+        "residual_inf": 15.287684129019446,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 9
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 9
+      }
+    },
+    {
+      "case_id": "foldq-0062",
+      "prediction": {
+        "residual_inf": 24.07919224968,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0063",
+      "prediction": {
+        "residual_inf": 24.424178318985213,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0064",
+      "prediction": {
+        "residual_inf": 14.596175232548845,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0065",
+      "prediction": {
+        "residual_inf": 24.783314599361663,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0066",
+      "prediction": {
+        "residual_inf": 17.351371409675544,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0067",
+      "prediction": {
+        "residual_inf": 44.47491789284282,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0068",
+      "prediction": {
+        "residual_inf": 21.503806437229613,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0069",
+      "prediction": {
+        "residual_inf": 32.13899909672901,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0070",
+      "prediction": {
+        "residual_inf": 24.02602263236932,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 13
+      }
+    },
+    {
+      "case_id": "foldq-0071",
+      "prediction": {
+        "residual_inf": 11.174432835961692,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0072",
+      "prediction": {
+        "residual_inf": 10.185423728285695,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0073",
+      "prediction": {
+        "residual_inf": 15.225029655882885,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0074",
+      "prediction": {
+        "residual_inf": 8.263589208667437,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0075",
+      "prediction": {
+        "residual_inf": 23.607676407238642,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0076",
+      "prediction": {
+        "residual_inf": 16.256541556854604,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0077",
+      "prediction": {
+        "residual_inf": 14.69647906100968,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0078",
+      "prediction": {
+        "residual_inf": 9.207434101226653,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 13
+      }
+    },
+    {
+      "case_id": "foldq-0079",
+      "prediction": {
+        "residual_inf": 20.02749337373245,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 8
+      }
+    },
+    {
+      "case_id": "foldq-0080",
+      "prediction": {
+        "residual_inf": 30.462931523901943,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0081",
+      "prediction": {
+        "residual_inf": 7.04563807800792,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 14
+      }
+    },
+    {
+      "case_id": "foldq-0082",
+      "prediction": {
+        "residual_inf": 31.809119695781618,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0083",
+      "prediction": {
+        "residual_inf": 27.869373389763815,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0084",
+      "prediction": {
+        "residual_inf": 9.076265616912853,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0085",
+      "prediction": {
+        "residual_inf": 8.593788443216793,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0086",
+      "prediction": {
+        "residual_inf": 23.680869267468267,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0087",
+      "prediction": {
+        "residual_inf": 20.126074675618966,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      }
+    },
+    {
+      "case_id": "foldq-0088",
+      "prediction": {
+        "residual_inf": 13.477026883835148,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0089",
+      "prediction": {
+        "residual_inf": 5.728829478300707,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0090",
+      "prediction": {
+        "residual_inf": 25.014398111936178,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0091",
+      "prediction": {
+        "residual_inf": 21.606693435424937,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0092",
+      "prediction": {
+        "residual_inf": 7.901137503169812,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 12
+      }
+    },
+    {
+      "case_id": "foldq-0093",
+      "prediction": {
+        "residual_inf": 22.615851917237535,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0094",
+      "prediction": {
+        "residual_inf": 10.19913708394363,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0095",
+      "prediction": {
+        "residual_inf": 44.19383384035747,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0096",
+      "prediction": {
+        "residual_inf": 45.463553927726295,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0097",
+      "prediction": {
+        "residual_inf": 21.72264141831282,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0098",
+      "prediction": {
+        "residual_inf": 15.210060770736316,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 8
+      }
+    },
+    {
+      "case_id": "foldq-0099",
+      "prediction": {
+        "residual_inf": 23.891852025257883,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0100",
+      "prediction": {
+        "residual_inf": 12.869136608192475,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      }
+    },
+    {
+      "case_id": "foldq-0101",
+      "prediction": {
+        "residual_inf": 19.859790237546896,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0102",
+      "prediction": {
+        "residual_inf": 22.16807171558379,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 8
+      }
+    },
+    {
+      "case_id": "foldq-0103",
+      "prediction": {
+        "residual_inf": 10.251245098359869,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0104",
+      "prediction": {
+        "residual_inf": 13.041060207052103,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      }
+    },
+    {
+      "case_id": "foldq-0105",
+      "prediction": {
+        "residual_inf": 20.58152024039922,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 10
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0106",
+      "prediction": {
+        "residual_inf": 14.685271138528421,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0107",
+      "prediction": {
+        "residual_inf": 11.598002773459385,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0108",
+      "prediction": {
+        "residual_inf": 13.543698154646673,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0109",
+      "prediction": {
+        "residual_inf": 21.018095190088488,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0110",
+      "prediction": {
+        "residual_inf": 9.634803864844907,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0111",
+      "prediction": {
+        "residual_inf": 23.182285955319074,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0112",
+      "prediction": {
+        "residual_inf": 26.6907609987526,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0113",
+      "prediction": {
+        "residual_inf": 16.158971785077334,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0114",
+      "prediction": {
+        "residual_inf": 26.42288375762509,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0115",
+      "prediction": {
+        "residual_inf": 18.29274512693248,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0116",
+      "prediction": {
+        "residual_inf": 36.56757251743563,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0117",
+      "prediction": {
+        "residual_inf": 9.826796156589545,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 14
+      }
+    },
+    {
+      "case_id": "foldq-0118",
+      "prediction": {
+        "residual_inf": 26.591376747165043,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 8
+      }
+    },
+    {
+      "case_id": "foldq-0119",
+      "prediction": {
+        "residual_inf": 31.30818907385187,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0120",
+      "prediction": {
+        "residual_inf": 20.228248514745953,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0121",
+      "prediction": {
+        "residual_inf": 24.16850009739623,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      }
+    },
+    {
+      "case_id": "foldq-0122",
+      "prediction": {
+        "residual_inf": 11.50578156658566,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0123",
+      "prediction": {
+        "residual_inf": 18.37288578366553,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0124",
+      "prediction": {
+        "residual_inf": 9.799323789007964,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0125",
+      "prediction": {
+        "residual_inf": 21.557180647288146,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0126",
+      "prediction": {
+        "residual_inf": 9.820588559947204,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0127",
+      "prediction": {
+        "residual_inf": 40.724695074203275,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0128",
+      "prediction": {
+        "residual_inf": 8.625100246221969,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0129",
+      "prediction": {
+        "residual_inf": 7.513784672167688,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0130",
+      "prediction": {
+        "residual_inf": 2.7626122276285363,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0131",
+      "prediction": {
+        "residual_inf": 13.935400136321732,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0132",
+      "prediction": {
+        "residual_inf": 8.48944540348191,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0133",
+      "prediction": {
+        "residual_inf": 16.801370186194767,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 13
+      }
+    },
+    {
+      "case_id": "foldq-0134",
+      "prediction": {
+        "residual_inf": 8.656308969215633,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0135",
+      "prediction": {
+        "residual_inf": 3.6097598434153166,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0136",
+      "prediction": {
+        "residual_inf": 16.54882321496273,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0137",
+      "prediction": {
+        "residual_inf": 21.29955039269646,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 8
+      }
+    },
+    {
+      "case_id": "foldq-0138",
+      "prediction": {
+        "residual_inf": 8.306917486017149,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0139",
+      "prediction": {
+        "residual_inf": 17.689928531816975,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0140",
+      "prediction": {
+        "residual_inf": 16.431118618268336,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0141",
+      "prediction": {
+        "residual_inf": 24.076425522571895,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      }
+    },
+    {
+      "case_id": "foldq-0142",
+      "prediction": {
+        "residual_inf": 12.086386192278813,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 13
+      }
+    },
+    {
+      "case_id": "foldq-0143",
+      "prediction": {
+        "residual_inf": 23.297420508279536,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0144",
+      "prediction": {
+        "residual_inf": 20.34067497307161,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 17
+      }
+    },
+    {
+      "case_id": "foldq-0145",
+      "prediction": {
+        "residual_inf": 10.563003545017558,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 14
+      }
+    },
+    {
+      "case_id": "foldq-0146",
+      "prediction": {
+        "residual_inf": 9.60432587534251,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0147",
+      "prediction": {
+        "residual_inf": 10.213580782447243,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "failed",
+        "iterations": 9
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 17
+      }
+    },
+    {
+      "case_id": "foldq-0148",
+      "prediction": {
+        "residual_inf": 7.1369368883917375,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0149",
+      "prediction": {
+        "residual_inf": 8.883544035225157,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0150",
+      "prediction": {
+        "residual_inf": 9.086778282719262,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0151",
+      "prediction": {
+        "residual_inf": 12.76680795558324,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0152",
+      "prediction": {
+        "residual_inf": 13.55881838668364,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0153",
+      "prediction": {
+        "residual_inf": 23.777811679020804,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 10
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 10
+      }
+    },
+    {
+      "case_id": "foldq-0154",
+      "prediction": {
+        "residual_inf": 8.059766244238604,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0155",
+      "prediction": {
+        "residual_inf": 11.634663009229413,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0156",
+      "prediction": {
+        "residual_inf": 12.791726194761816,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      }
+    },
+    {
+      "case_id": "foldq-0157",
+      "prediction": {
+        "residual_inf": 21.694309889538747,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0158",
+      "prediction": {
+        "residual_inf": 5.022503055327078,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0159",
+      "prediction": {
+        "residual_inf": 11.102320028081273,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0160",
+      "prediction": {
+        "residual_inf": 30.678518211467054,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 9
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 9
+      }
+    },
+    {
+      "case_id": "foldq-0161",
+      "prediction": {
+        "residual_inf": 36.05057334993174,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0162",
+      "prediction": {
+        "residual_inf": 14.535994510129456,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      }
+    },
+    {
+      "case_id": "foldq-0163",
+      "prediction": {
+        "residual_inf": 12.415006692524003,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0164",
+      "prediction": {
+        "residual_inf": 13.276029865700526,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0165",
+      "prediction": {
+        "residual_inf": 7.416774913898074,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0166",
+      "prediction": {
+        "residual_inf": 5.108341924531235,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0167",
+      "prediction": {
+        "residual_inf": 21.13118139504946,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0168",
+      "prediction": {
+        "residual_inf": 7.78970326831651,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0169",
+      "prediction": {
+        "residual_inf": 52.11499505545871,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0170",
+      "prediction": {
+        "residual_inf": 13.67095366863264,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0171",
+      "prediction": {
+        "residual_inf": 34.17364331589014,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 15
+      }
+    },
+    {
+      "case_id": "foldq-0172",
+      "prediction": {
+        "residual_inf": 20.765858929016325,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0173",
+      "prediction": {
+        "residual_inf": 4.552842443146231,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 13
+      }
+    },
+    {
+      "case_id": "foldq-0174",
+      "prediction": {
+        "residual_inf": 7.146435814267347,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0175",
+      "prediction": {
+        "residual_inf": 10.327627139647088,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0176",
+      "prediction": {
+        "residual_inf": 27.587087401623908,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0177",
+      "prediction": {
+        "residual_inf": 27.566038065463765,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0178",
+      "prediction": {
+        "residual_inf": 18.070458605208636,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0179",
+      "prediction": {
+        "residual_inf": 19.671704904268267,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0180",
+      "prediction": {
+        "residual_inf": 9.609678024382898,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 13
+      }
+    },
+    {
+      "case_id": "foldq-0181",
+      "prediction": {
+        "residual_inf": 9.716911603729372,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0182",
+      "prediction": {
+        "residual_inf": 10.96296114349613,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0183",
+      "prediction": {
+        "residual_inf": 10.120870543855398,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 9
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      }
+    },
+    {
+      "case_id": "foldq-0184",
+      "prediction": {
+        "residual_inf": 6.453848867347737,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0185",
+      "prediction": {
+        "residual_inf": 21.030204847903192,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 6
+      }
+    },
+    {
+      "case_id": "foldq-0186",
+      "prediction": {
+        "residual_inf": 7.426067452531216,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0187",
+      "prediction": {
+        "residual_inf": 13.75319776309818,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0188",
+      "prediction": {
+        "residual_inf": 21.26655101590856,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 8
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 16
+      }
+    },
+    {
+      "case_id": "foldq-0189",
+      "prediction": {
+        "residual_inf": 23.776087853791466,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0190",
+      "prediction": {
+        "residual_inf": 5.949431516598628,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0191",
+      "prediction": {
+        "residual_inf": 6.829957031605144,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 4
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 4
+      }
+    },
+    {
+      "case_id": "foldq-0192",
+      "prediction": {
+        "residual_inf": 15.207996785553311,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0193",
+      "prediction": {
+        "residual_inf": 23.416957051852687,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0194",
+      "prediction": {
+        "residual_inf": 32.649751609860616,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 7
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 7
+      }
+    },
+    {
+      "case_id": "foldq-0195",
+      "prediction": {
+        "residual_inf": 8.327321778475763,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0196",
+      "prediction": {
+        "residual_inf": 8.173005708829486,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0197",
+      "prediction": {
+        "residual_inf": 6.876460212270933,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0198",
+      "prediction": {
+        "residual_inf": 9.357845677303125,
+        "admissible": true,
+        "rule": "ok"
+      },
+      "naive": {
+        "state": "ok",
+        "iterations": 5
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "predicted",
+        "iterations_total": 5
+      }
+    },
+    {
+      "case_id": "foldq-0199",
+      "prediction": {
+        "residual_inf": 17.23016490513632,
+        "admissible": false,
+        "rule": "unstable"
+      },
+      "naive": {
+        "state": "wrong",
+        "iterations": 6
+      },
+      "guarded": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 8
+      },
+      "post_only": {
+        "converged": true,
+        "resolved_by": "nominal",
+        "iterations_total": 14
+      }
+    }
+  ]
+}

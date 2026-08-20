@@ -16,6 +16,7 @@ import fold
 import ingest
 import make_logs
 import plot_convergence
+import surrogate
 import sweep
 
 ARCHIVE = Path("archive")
@@ -23,6 +24,8 @@ RESULTS = Path("results.json")
 FIGURE = Path("figs/convergence.png")
 FOLD_RESULTS = Path("fold_results.json")
 FOLD_FIGURE = Path("figs/verifier.png")
+SURROGATE_RESULTS = Path("surrogate_results.json")
+SURROGATE_FOLD_RESULTS = Path("surrogate_fold_results.json")
 
 
 def main(score_models: bool = False) -> int:
@@ -36,8 +39,27 @@ def main(score_models: bool = False) -> int:
 
     print()
     print("=" * 62)
+    print("PHASE 1b -- the other source of a warm start: a predicted state")
+    print("=" * 62)
+    # Deliberately after bench: it cross-checks its shared arms against
+    # results.json, which is how two files reporting the same quantity are kept
+    # from drifting into two different numbers on two different slides.
+    surrogate.report(
+        surrogate.run(ARCHIVE / "cases.jsonl", n_queries=200, seed=99,
+                      out=SURROGATE_RESULTS),
+        surrogate.check_against_bench(
+            json.loads(SURROGATE_RESULTS.read_text(encoding="utf-8")), RESULTS))
+
+    print()
+    print("=" * 62)
     print("PHASE 2 -- the verifier, on the fold circuit")
     print("=" * 62)
+    # The prediction arm on the same circuit, first: it is the experiment that
+    # decides whether gating a *predicted* start is safety or merely cost, and
+    # it shares fold.py's archive and query seeds so the two sit side by side.
+    surrogate.report_fold(
+        surrogate.run_fold(n_archive=300, n_query=200, out=SURROGATE_FOLD_RESULTS))
+    print()
     fold.run(n_archive=300, n_query=200, out=FOLD_RESULTS, fig=FOLD_FIGURE)
 
     print()

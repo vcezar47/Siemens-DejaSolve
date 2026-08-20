@@ -1,7 +1,7 @@
 # Déjà Solve — Plan (Siemens Summer School 2026)
 
-**Deadline:** Friday 28 August 2026, 13:00 · **Today:** Sunday 16 August 2026 · **12 days**
-*(plan revised 16 Aug after mentor's answers — see §0)*
+**Deadline:** Friday 28 August 2026, 13:00 · **Today:** Wednesday 19 August 2026 · **9 days**
+*(plan revised 16 Aug after mentor's answers — see §0; revised again 19 Aug after the engineer interview — see §0b)*
 **Presentation:** 10 minutes · **Audience:** SISW SRL Brașov colleagues, incl. teachers/lab assistants
 **Domain to register under:** *Digital Twins & Platforms* (primary) — it is a platform/data layer, and it avoids
 colliding with the colleague who took *Procesare Semnal & Algoritmi* with the ROM idea.
@@ -55,6 +55,18 @@ So: **Amesim = the vocabulary** (states, causality, initialisation, Study Manage
 **PhysicsAI = the AI arrow** (the surrogate that produces a predicted starting state).
 **STAR-CCM+ = one citation** as prior art for manual previous-solution init. Nothing else.
 
+> **Amended 19 Aug (§0b) — the vocabulary stands, the framing does not.** The engineers asked for something
+> general rather than tied to one product, and talked mostly about **Simcenter 3D**. Nothing above changes as
+> a *build* decision; all four reasons still hold. What changes is what you claim out loud:
+>
+> **Do not say** "this is an Amesim project." **Say** "the layer is solver-agnostic — a Case Card, an index
+> and a verifier do not know what produced the state they reason about. The reference implementation is a
+> system-simulation circuit because that is what I could validate end-to-end and prove with numbers."
+>
+> Note that **reason 3 above is now the defence rather than the choice**: the warm-start object here is a
+> 7-element state vector, and in Simcenter 3D it becomes a field mapped between meshes. That is the adapter,
+> it is real engineering, and it goes on the next-steps slide — not into a demo with 9 days left.
+
 ### Q2 — why would an engineer *not* want this? → **She didn't answer. She offered an engineer.**
 
 > *"Nu, ce cred este poate totuși că ar fi fain să luăm legătura cu unul doar ca să îți mai dea niște
@@ -75,6 +87,162 @@ coding block.
 
 **Guardrail:** requirements from that conversation feed the **verifier rules and the Case Card schema only**.
 They do not reopen scope. If the engineer describes a fourth layer, it goes on the "next steps" slide.
+
+---
+
+## 0b. Engineer interview — 19 Aug 2026, and what it changes
+
+Two engineers, in person, just over an hour. This is the conversation the mentor offered in §0/Q2, and it was
+worth more than a day of code.
+
+**Read this first:** the answers below are **recorded paraphrase, not verbatim**. It was a spoken meeting and
+nothing was written down at the time. On a slide say *"the two engineers I spoke to said…"* — never put it in
+quotation marks, and never attribute a sentence to a named person.
+
+Three answers confirm decisions already taken. One produced a code change, shipped the same day. One is a
+request to push back on — carefully.
+
+### Q — "Is this done internally?" → No, with one pointer that must be named first
+
+Not that they know of. There were **implementation ideas and concepts of this in the past, at a very high level
+in the company**. Something slightly similar might exist **at Teamcenter level**.
+
+**What it changes.** Not the plan — the *ordering* of slide 2. Teamcenter SPDM already is the simulation data
+layer: it stores runs, provenance and search. Name it before anyone in the room does, then draw the line:
+
+> Teamcenter answers *which files exist, who made them and when*. Déjà Solve answers *which solved state is
+> physically closest, and whether reusing it is legitimate*. One is a data layer, the other is a selection and
+> verification layer on top of it.
+
+This sits naturally beside the existing §2 bullet 2 about Simcenter Client for Git filtering on typed metadata:
+same argument, one level up.
+
+**On the "concepts existed in the past" half — do not claim novelty, claim evidence.** The line to use:
+
+> This has been thought about at concept level before. What I am bringing is a measurement of whether the gate
+> can be built from physics rather than from a similarity threshold — and the answer is that setup distance
+> predicts transfer cost at r = 0.18, so it cannot.
+
+### Q — "How often does a run fail, and what do you do?" → the answer that validates the Phase 1 pivot
+
+A run **does not really fail at the solver level**. The solver can fail **when integrating**, and it can fail on
+**non-linearity cases, when there is no more congruence — the physical limits are blown away**. When it happens,
+the engineer looks over the results and decides; usually that means **a change of design or material**.
+
+**What it changes — three things, and the first one is the important one.**
+
+1. **The headline stays iteration count. Never sell rescued failures.** §6a already retired that claim after the
+   nominal baseline absorbed all 4 flat-start failures. This answer independently confirms it was right: nobody
+   in that room believes their solver falls over, so "we save your failed runs" reads as a student who has never
+   watched a real sweep. **31% fewer Newton iterations than a good engineering guess** is the claim, and it is
+   the one the numbers support.
+2. **"No more congruence, physical limits blown away" is a plain-English description of the Phase 2 failure
+   mode.** A root on the Stribeck downslope satisfies the equations to 1e-8 and is not an operating point any
+   machine can occupy. That is now *their* framing of the thing `fold.py` measures — **4 silently wrong answers
+   → 0, for +1% solver work**. Open the verifier slide with their words, then show the number.
+3. **The reuse case is a changed design, not a re-run.** "Usually a change of design or material" means the next
+   solve is a *near miss* of the last one — one material property, one dimension. That is exactly what a
+   physics-based nearest-neighbour is for, and exactly what filename or metadata search cannot do. Retire any
+   phrasing that sounds like "run the same case twice".
+
+### Q — "Refuse when unsure, or warn?" → **warn**, and this is now implemented
+
+> Generate a report and give out a warning. Leave it up to the engineer to proceed with the simulation or not.
+
+This was §8b/Q4, the question written specifically to shape Layer 3 — and the answer contradicted what the code
+did. The pipeline **refused**: `refused_incomplete`, nearest case located, shown, and not applied. So it changed
+the same day. **Implemented 19 Aug — see §6d.**
+
+The change is not "warn about everything", which is its own kind of useless. It is two tiers, split on one rule:
+
+> **The engineer decides what to do with a risk. The system decides what is a fact.**
+
+| tier | what it is | what happens |
+|---|---|---|
+| **warn** | a *judgement* about transferring a state — the verifier estimated, before any solve, that this transfer is not legitimate | full report, archive not used, **override offered**; accepting it is recorded with a name and a reason |
+| **block** | a *fact* about the data or the physics — a parameter that was never read, a unit out by 10⁶, a source case on different hardware, a converged root no machine can sit at | full report, no override, because there is nothing to decide |
+
+The split falls exactly where the verifier's two gates already sat: **before** the solve it is estimating (warn),
+**after** the solve it is measuring (block). That is not a coincidence dressed up after the fact — it is why the
+rule is defensible out loud.
+
+**This is the strongest slide available to a student in that room** (§0/Q2 predicted exactly this):
+
+> I asked two engineers whether the system should refuse when it is unsure, or warn and let them decide. They
+> said warn, and give them a report. So the gate stopped being a gate. Here it is.
+
+### The extras — unasked-for, and two of them change the deck
+
+**The three gates.** Vehicle programmes run concept → prototyping (≈25 vehicles, many iterations, real-life
+tests) → series production, and an error or miscalculation at any gate can throw you back to the previous one or
+to the start. **Put this on slide 2 as a diagram**: it is a cost narrative in their language rather than an
+invented one, every backward arrow is the expensive event, and prototyping is the archive-population story told
+for free. Déjà Solve sits on the loop-back arrows.
+
+**Domains: automotive, aerospace, heavy industry.** Narrate automotive — it is the one the three gates belong to
+— and name the other two as transferable in a single line.
+
+**"Make it general, almost universal."** Offered STAR-CCM+ or Amesim as anchors, they said those would each be
+slightly different in implementation and they would rather it be general. The product they talked about most,
+by a distance, was **Simcenter 3D**.
+
+**Do not rewrite the demo onto Simcenter 3D**, and be clear-eyed about why: 9 days left, and in 3D the
+warm-start object stops being a 7-element state vector and becomes a field that must be mapped mesh-to-mesh.
+§4 scoped that out for good reasons and none of them have changed. Shipping an unvalidated 3D story would cost
+the one thing that makes this project credible — every number reproducible from `run_all.py`.
+
+**The honest answer that satisfies them is that generality is a property of the layer, not of the demo** — and
+here that happens to be true rather than a dodge. The Case Card, the retrieval index and the verifier do not
+know what produced the state they reason about. So:
+
+- **Re-anchor the wording.** §0/Q1 locked Amesim as "the vocabulary". It becomes: *the layer is solver-agnostic;
+  the reference implementation is a system-simulation circuit because that is what could be validated
+  end-to-end and proved with numbers.* Amesim stays the demo's vocabulary; it stops being the pitch's scope.
+- **Add one slide: what changes per solver.** Three rows — Amesim (state vector, essentially free), STAR-CCM+
+  (field plus XYZ-table, the existing manual path), Simcenter 3D (field mapped between meshes, the real
+  engineering work). Same three layers, different adapter. This answers "is it universal?" with an engineering
+  answer instead of a marketing one, and converts their Simcenter 3D interest into the next-steps slide rather
+  than a hole in the demo.
+
+**"There are whole departments behind the simulations, not just one engineer."** The sleeper. It independently
+validates Layer 1: different people, different tools, different naming, different *languages* is precisely why
+the fixtures include an English email and a Romanian note, and why the hybrid backend scores 33/35 with zero
+inventions. It also made the override **attributed** rather than anonymous — an accepted risk in a departmental
+workflow needs a name, a reason and a timestamp, which is what `trace["audit"]` now carries.
+
+### What did *not* change
+
+The §0 guardrail holds: this feeds the **verifier's contract and the Case Card schema only**. No new layer, no
+new scope. Simcenter 3D goes on next steps. The three gates go on slide 2. Neither reopens the build.
+
+### Still unanswered — and deliberately left that way (decided 19 Aug)
+
+Of the eight questions in §8b, four were covered (Q1 and Q4 directly, plus the two extras). These were not:
+
+- **Q3** — what would they need to *see* to accept a proposed starting state? (a score, which parameters differ,
+  who ran the source case and when)
+- **Q5** — does anything they deliver require the run to be reproducible or documented, and is a differing
+  iteration path a problem even when the converged answer is identical?
+- **Q6** — may results be reused across projects or across customers, and where does that stop?
+- **Q8** — what would make you stop using it after a week?
+
+**Decision: no follow-up round. The remaining time goes to the deck, not to another question.** The reasoning,
+which is also the answer if it comes up in Q&A:
+
+- **Q4 was the load-bearing question and it was answered.** It contradicted the code, the code changed the same
+  day (§6d). That is the validation loop closing, not an open thread.
+- **Q8 was written as Act 3's argument back when Act 3 was a guess.** It no longer is: Act 3 now rests on a
+  requirement two engineers stated out loud, not on speculation about what engineers distrust. Q8 would sharpen
+  the *next-steps* slide; it is no longer load-bearing for the demo.
+- **Q3 would grade the report's fields.** Unasked, they stand as designed — severity, reason, consequence,
+  nearest case and its distance, and who overrode what. That is defensible on its own merits; it is simply not
+  *their* specification, and §6d should not claim it is.
+- **Q5 and Q6 are governance questions** whose honest answer is "out of scope for a 10-minute student project",
+  and they belong on the limits slide either way.
+
+**Say it plainly if asked "did you go back to them?"** — *"I had an hour with two engineers, got the answer that
+changed the design, and spent the remaining days building and rehearsing rather than asking again."* That is a
+better answer than a second round of questions with nothing built on top of the first.
 
 ---
 
@@ -134,13 +302,17 @@ Each layer exists for a reason you must be able to defend out loud.
 
 ### Two sources of warm start, one verifier
 
-| Source | Needs | Works when |
-|---|---|---|
-| **Retrieval** — nearest solved case from the archive | nothing but a second run | from day one; no training, no minimum dataset |
-| **Prediction** — a surrogate's predicted field | a trained model (≥20 runs for PhysicsAI) | once a model exists — **this is where PhysicsAI plugs in** |
+| Source | Needs | Works when | **Measured (§6e)** |
+|---|---|---|---|
+| **Retrieval** — nearest solved case from the archive | nothing but a second run | from day one; no training, no minimum dataset | 4.89 mean iterations, **31%** under the nominal guess |
+| **Prediction** — a surrogate's predicted field | a trained model (≥20 runs for PhysicsAI) | once a model exists — **this is where PhysicsAI plugs in** | 4.62 mean iterations, **34.9%** under the nominal guess |
 
 Both feed the same solver, both gated by the same verifier. Say it as: *"PhysicsAI makes prediction cheap.
 Déjà Solve makes verification cheap."*
+
+**This table stopped being architecture on 20 Aug — both rows are now measured on the same 200 cases.** The
+prediction is the better starting guess *and* the one that satisfies nothing, which is the cleanest statement
+of why the verifier exists. Lead with the concession in §6e when you present it.
 
 ### Positioning the verifier vs. PhysicsAI's similarity score
 
@@ -177,7 +349,10 @@ the room contains people who will check.**
 - Vector index + retrieval
 - **A small surrogate trained on the archive** (sklearn/XGBoost/tiny MLP) — stands in for PhysicsAI so you can
   demo the three-way comparison. It does **not** need to be good; it needs to be *fast and slightly wrong*,
-  which is the whole point
+  which is the whole point.
+  **✅ Built 20 Aug** — `surrogate.py`, a 36-feature quadratic response surface in numpy, no new dependency.
+  It is fast (150 µs) and wrong (0 of 200 predictions satisfy the equations), which is exactly the brief.
+  Measured results and the two concessions that came with them: §6e.
 - Warm-started Newton / initialisation solve
 - Verifier rule set
 - `docker compose up` demo + AWS mapping slide
@@ -185,17 +360,30 @@ the room contains people who will check.**
 
 **Explicitly out (say so on a slide — scoping discipline reads as maturity):**
 - Any real Simcenter integration or file format
-- 3D field mapping between different meshes
+- **3D field mapping between different meshes** — *this is the adapter, and after §0b it is the first
+  next-steps item rather than a footnote.* The three layers are unchanged by it; what changes per solver is
+  the object being transferred. Put the three-row table on the limits/next slide: Amesim (state vector,
+  essentially free) · STAR-CCM+ (field plus XYZ table, the existing manual path) · Simcenter 3D (field mapped
+  between meshes, the real engineering work)
 - Learned embeddings trained from scratch
 - Anything touching GPU
 
 ---
 
-## 5. Timeline — re-baselined 16 Aug
+## 5. Timeline — re-baselined 16 Aug, updated 19 Aug
 
-**Status:** Phase 0 closed. **Phase 1 gate met on Sun 16 Aug, two days early** — `figs/convergence.png`
-exists and every number is regenerable with `python run_all.py`. Measured results in §6a. Two days of slack
-are back; spend them on Phase 2, not on polishing Phase 1.
+**Status, 19 Aug (9 days left).** Phases 0–3 are closed, all of them early. The engineer interview landed
+(§0b) and produced one code change, shipped the same day (§6d). **Phase 4 is further along than this table
+says:** `Dockerfile` and `docker-compose.yml` are written and the compose file records that the Phase 1
+summary hash was already verified identical from inside the container — what remains is a rebuild against the
+current tree and the AWS architecture slide, not two days of work.
+
+**Update 20 Aug: the surrogate arm is built (§6e, [record](phases/phase-1b-surrogate.md)), so §4's In list is
+now complete and there is no open build decision.** Everything that remains is Phase 4's last mile (rebuild,
+architecture slide) and Phase 5.
+
+**So roughly three days (21–23 Aug) are unscheduled.** Spend them on Phase 5 pulled forward — the deck, and
+rehearsals with a timer. A 10-minute talk with a live demo is where this gets lost, not in the code.
 
 | Phase | Dates | Work | **Gate** |
 |---|---|---|---|
@@ -207,8 +395,9 @@ are back; spend them on Phase 2, not on polishing Phase 1.
 | **5. Slides + rehearsal** | Wed 26 – Thu 27 Aug | Deck, script, 3 full rehearsals with a timer | Under 10:00 twice in a row |
 | **Buffer** | Fri 28 morning | Nothing new. Only rehearsal | — |
 
-**Floating, not scheduled:** the engineer interview (§8b). Whenever it lands, it pre-empts that day's coding
-block. It cannot be scheduled because it isn't yours to schedule.
+**~~Floating, not scheduled:~~ the engineer interview — held Wed 19 Aug.** It pre-empted that day's coding
+block exactly as planned, and was worth more than the block would have been: answers in §0b, the code change
+it caused in §6d, and the decision not to run a second round in §0b's closing note.
 
 **Implementation records:** each finished phase gets a file in [`phases/`](phases/) — what was actually
 built, what was decided, what was measured, what was rejected. This plan is what was *intended*; those files
@@ -222,27 +411,38 @@ and a trust story beats a demo with a chat box.
 
 ## 6. The demo — 3 acts, ~3 minutes total
 
-**Act 1 — the archive works (40s).** `python dejasolve.py --all`. Five real artifacts go in — a tidy solver
-log, an older banner log in SI units, a truncated log, an English email, a Romanian note. Each becomes a Case
-Card with canonical units and quoted provenance; retrieval names the nearest archived case and its regime.
+**Act 1 — the archive works (35s).** `python dejasolve.py --all`. Six real artifacts go in — a tidy solver
+log, an older banner log in SI units, a truncated log, an English email, a Romanian note, and a log for a pump
+bigger than anything the archive has seen. Each becomes a Case Card with canonical units and quoted
+provenance; retrieval names the nearest archived case and its regime.
 
-**Show the refusals, they are the better half of Act 1.** The truncated log is missing `p_crack`; the system
-names the gap, finds the nearest case on the six parameters that *were* stated, shows what that case used —
-and refuses to apply it: *"a missing parameter is a question for the engineer, not a value to borrow."* A
-mis-read unit (`7.8 m2` → 7.8e+06 mm²) is caught as implausible before it ever reaches retrieval.
+**Show what it will not do, it is the better half of Act 1.** The truncated log is missing `p_crack`; the
+system names the gap, finds the nearest case on the six parameters that *were* stated, shows what that case
+used — and **blocks** rather than applying it: *"a missing parameter is a question for the engineer, not a
+value to borrow."* A mis-read unit (`7.8 m2` → 7.8e+06 mm²) is caught as implausible before it ever reaches
+retrieval. Say the word **blocked**, not *refused* — Act 3 turns on the difference.
 
-**Act 2 — the number (60s).** Panel A of `figs/convergence.png`, mirroring the PhysicsAI workflow:
+**Act 2 — the number (55s).** Panel A of `figs/convergence.png`, mirroring the PhysicsAI workflow:
 
 | Approach | Answer | Cost |
 |---|---|---|
-| Surrogate alone | approximate, no guarantee | instant |
+| Surrogate alone | **residual 6.2 — satisfies nothing** | **0.15 ms** |
 | Cold-start solver (flat start) | exact | **11 iterations** |
 | Nominal-guess solver (no archive) | exact | **7 iterations** |
 | **Retrieval → warm-started solver** | **exact, same residual** | **4 iterations** |
+| **Prediction → warm-started solver** | **exact, same residual** | **4 iterations** |
 
-*(query-0055, the exemplar the benchmark picks automatically. The surrogate row is still a placeholder —
-that model is not built yet. The nominal row is the honest baseline: a starting guess built from the case
-setup alone, no archive involved — it is the row the warm start actually has to beat.)*
+*(query-0055, the exemplar the benchmark picks automatically. Every row is measured — the surrogate row was a
+placeholder until 20 Aug and is not one any more (§6e). The nominal row is the honest baseline: a starting
+guess built from the case setup alone, no archive involved — it is the row the warm start actually has to
+beat.)*
+
+**The first row is the one to say slowly.** *"The surrogate answers in 0.15 milliseconds. Its residual is 6.2,
+and the solver stops at 1e-8. That is not a slightly-imprecise answer — it is not an answer. And the workflow
+that produced it throws it away and starts the validation run from zero."*
+
+**On this exemplar retrieval and prediction tie at 4.** They separate at sweep level, and not in the direction
+you might expect — the prediction wins by 5.6%. Concede it there (§6e), do not stage it here.
 
 Say the last row out loud: **"the speed of AI, the guarantee of the solver."** Then the sweep-level number
 from §6a: *"Across 200 fresh cases: 31% fewer Newton iterations than a good engineering guess — 42% against
@@ -253,7 +453,20 @@ is against a flat start, which is a baseline nobody ships. I added the guess a c
 and re-measured against that."* Do **not** say "all four cold-start failures rescued" — that claim was
 retracted (§6a), because the nominal guess rescues the same four.
 
-**Act 3 — the refusal (60s).** `figs/verifier.png`, case `foldq-0009`. Naive retrieval warm-starts and
+**Act 3 — the trust layer (80s), in two beats.** This is the act the engineer interview rewrote, and the two
+beats are the two halves of one rule: *the engineer decides what to do with a risk; the system decides what is
+a fact.* Beat A is the fact. Beat B is the risk.
+
+**Rehearsal warning:** beat A is a figure, beat B is the browser. That is the only surface switch in the demo
+— have the page already open on `run-bigpump.log`, on a second window or a second desktop, before you start
+talking. Do not click *Analyse* until you get there.
+
+**Open Act 3 with the honesty, it is stronger than the demo:** *"I first checked whether my own base circuit could
+produce a silently wrong answer. A 16-seed multi-start over all 400 cases found exactly one root every time —
+it can't, and I'll say so. This is the hardware corner where it can."* See §6b.
+
+**Beat A — the fact it will not let you overrule (45s).** `figs/verifier.png`, case `foldq-0009`. Naive
+retrieval warm-starts and
 converges in **8 clean iterations** to shaft b at **35.6 rev/min** — residual 1e-8, looks perfect. It is a
 **dynamically unstable root**: the circuit's supply curve crosses the Stribeck load curve three times and it
 landed on the middle crossing, where no machine can run. Déjà Solve refuses in one line — *"converged onto a
@@ -261,6 +474,14 @@ dynamically unstable root; the equations are satisfied but no machine runs here"
 operating point at 462.5 rev/min.
 
 Across 200 cases: **4 silently wrong answers → 0**, for **+1% solver work**.
+
+**Then land the harder number, which is new as of 20 Aug (§6e).** Run the same circuit and the same 200 cases
+with the *surrogate's* prediction as the starting guess instead of the archive's: **40 silently wrong answers,
+not 4.** The arm that won Act 2 is ten times more dangerous here. And the mechanism is worse than the count —
+naive retrieval simply fails to converge 49 times, which is a loud failure somebody investigates, while the
+prediction converges 198 times out of 200 and lands 40 of them at a residual of 1e-8 on an operating point no
+machine can occupy. *"The surrogate turns loud failures into silent wrongness. That is the failure mode this
+layer exists for, and I found it in my own best component."*
 
 **If asked "how is it almost free?"** — because the fallback after a refusal is a decent guess rather than a
 flat start. And volunteer the other half before it is asked: this circuit is genuinely bistable, so the
@@ -271,9 +492,25 @@ measured in `fold_results.json`, not hand-waved (§6b, concession 3).
 
 *"Silent wrongness is the failure mode that actually scares engineers. This is the layer nobody builds."*
 
-**Open with the honesty, it is stronger than the demo:** *"I first checked whether my own base circuit could
-produce a silently wrong answer. A 16-seed multi-start over all 400 cases found exactly one root every time —
-it can't, and I'll say so. This is the hardware corner where it can."* See §6b.
+**Beat B — the risk it hands back to you (35s).** Switch to the browser, `run-bigpump.log` already loaded. A
+118 L/min pump against an archive swept over 30–90. The Verify stage goes **amber, not red**, and the report
+says what is wrong, what the system did about it, and what happens if you do nothing — *the archive is not
+used; the solver starts from the nominal guess, so the warning costs you nothing.* Then the line that is the
+whole point:
+
+> I asked two engineers whether this should refuse when it is unsure, or warn and let them decide. They said
+> warn, and give us a report. So it does.
+
+Type a name and a reason. **Warm-start anyway.** `10 cold / 7 nominal → 5 warm iterations`, still admissible,
+and the audit trail appears at the bottom of the page with who accepted what and why.
+
+**Volunteer the twist — it is the strongest thing in the act.** *"Here the warning was conservative. The
+override was right, and it saved two iterations against the nominal guess. That is the argument for warning
+instead of refusing — and what makes it safe is that the second gate is not overridable. You can accept a
+risky start. You cannot be handed an impossible answer."*
+
+**If you are running long, cut the typing, not the sentence.** Narrate beat B over a pre-run screen and keep
+the quote and the twist; they carry the act. The typing is theatre, the requirement is the argument.
 
 ---
 
@@ -406,8 +643,9 @@ Both cheap regime estimators were validated against solved ground truth before b
 
 Full record: [`phases/phase-3-ingest.md`](phases/phase-3-ingest.md).
 
-**The model layer is justified by a number, not an assertion.** Five artifacts, 35 fields, scored against
-ground truth (correct = within 1%, *or* correctly reported missing). Inventing a plausible value counts as a
+**The model layer is justified by a number, not an assertion.** Five *scored* artifacts, 35 fields, scored
+against ground truth — a sixth, `run-bigpump.log`, was added on 19 Aug to exercise the verifier and is
+deliberately excluded from this score (§6d) (correct = within 1%, *or* correctly reported missing). Inventing a plausible value counts as a
 miss, not partial credit:
 
 | artifact style | parser | local model (qwen2.5:7b) | **hybrid** |
@@ -452,19 +690,220 @@ grey out as *skipped* so the room sees exactly where the pipeline stopped.
 
 ---
 
+## 6d. Warn, don't refuse — implemented 19 Aug, the same day it was asked for
+
+Driven entirely by §0b: *generate a report and give out a warning; leave it up to the engineer to proceed with
+the simulation or not.* The pipeline used to refuse. Now it reports, warns, and offers an override.
+
+**One rule, two tiers.** The engineer decides what to do with a **risk**; the system decides what is a
+**fact**. A `Verdict` carries a severity as well as a decision (`verifier.py`), and the split lands exactly on
+the two gates that already existed — gate 1 *estimates* before the solve (warn, overridable), gate 2 *measures*
+after it (block, not overridable).
+
+| what | tier | in the demo |
+|---|---|---|
+| transfer outside the archive's envelope / coverage / regime | **warn** | report + override offered |
+| source case on different hardware | **block** | a category error, not a risk |
+| a parameter never read from the artifact | **block** | the value must come from an engineer |
+| a unit out by orders of magnitude | **block** | the artifact has to be corrected |
+| converged root is dynamically unstable or cavitating | **block** | no machine runs there |
+
+**Every path now produces a `report`** — severity, reason, and *consequence*: not only what is wrong but what
+the system did about it and what happens if the engineer does nothing. It is emitted on the clean path too; a
+report that only appears on bad news is one nobody learns to read.
+
+**An override is attributed**, because §0b said simulation is a departmental activity. `operator` and `basis`
+travel with the request and land in `trace["audit"]` with a timestamp. The CLI defaults `--operator` to the OS
+user; the page asks for a name and a reason, and remembers the name. An override that then produces an
+inadmissible answer writes a second audit entry — that sequence is exactly what an audit trail is for.
+
+**A sixth fixture exists to exercise this:** `logs/run-bigpump.log` — a tidy machine log for a **118 L/min**
+pump, against an archive swept over 30–90 L/min. Easy to parse, deliberately outside the envelope, so the
+verifier warns rather than blocks.
+
+| `run-bigpump.log` | cold | nominal | warm |
+|---|---|---|---|
+| warned, not overridden | 10 | **7** (used) | — archive not used |
+| overridden by the engineer | 10 | 7 | **5**, same answer to 2.4e-09, admissible |
+
+**Concede this before anyone asks: here the warning was conservative.** The override converged to a valid
+operating point and beat the nominal guess. That is not an argument against the gate — it is the argument for
+*warning* instead of refusing, made with the project's own numbers. What makes the override safe is that gate 2
+still runs on the result: the engineer can accept a risky *start*, and cannot be handed an impossible *answer*.
+
+**No quoted number moved.** The new fixture is deliberately excluded from ingest scoring (`scored=False` in
+`make_logs.py`) — the accuracy figure measures the parser on messy artifacts, and padding it with an easy
+machine log would move a slide number for a reason that has nothing to do with ingest. After the change,
+`python run_all.py` still prints ingest 23/35 for the parser and the same phase-1 summary hash
+**830da3e6a4480676**.
+
+**Demo beat (Act 3, replacing the old refusal-only ending).** Click `run-bigpump.log` → the Verify stage turns
+amber, not red → the report says the archive has never seen a pump this big, and that the solver is proceeding
+from the nominal guess so the warning costs nothing → type a name and a reason → **Warm-start anyway** → 10 cold
+/ 7 nominal → 5 warm, admissible, and the audit trail appears at the bottom of the page. Then say the sentence:
+
+> I asked two engineers whether it should refuse or warn. They said warn and give them a report. This is what
+> that changed.
+
+---
+
+## 6e. Measured results — the surrogate arm, 20 Aug
+
+Full record: [`phases/phase-1b-surrogate.md`](phases/phase-1b-surrogate.md). Reproduce with
+`python surrogate.py`; it also runs inside `python run_all.py` as *Phase 1b*.
+
+This closes the last In-scope item in §4 and turns §3's *two sources, one verifier* from a claim into two
+measured arms. The surrogate is a **quadratic response surface** — normalise the 7 setup parameters, expand to
+36 polynomial features, ridge-fit the 7 converged states — fitted on the 395-case archive in **1 ms**, and
+predicting a state in **150 µs**. No new dependency; it is ~40 lines of numpy on purpose, and it is
+deliberately not a nearest-neighbour regressor, which would have been retrieval wearing a different hat.
+
+### It is fast, and it is not an answer
+
+| | |
+|---|---|
+| solver tolerance | 1e-8 |
+| residual of the predicted state | **median 8.26**, worst 230 |
+| predictions that were actually solutions | **0 / 200** |
+
+**This is the Act 2 "surrogate alone" row, and it is now a number rather than an adjective.** Say it exactly
+this way: *the prediction satisfies nothing. Its residual is eight orders of magnitude above where the solver
+stops. It is not a slightly-imprecise answer — it is not an answer.*
+
+### As a starting guess it is the best thing on the table
+
+200 fresh cases, same queries as §6a (`sample_cases(200, 99)`), same solver, same tolerance:
+
+| arm | converged | total Newton iterations | mean |
+|---|---|---|---|
+| cold (flat start) | 196 / 200 | 1631 | 8.32 |
+| nominal guess | 200 / 200 | 1420 | 7.10 |
+| warm — retrieval | 200 / 200 | 979 | 4.89 |
+| **predicted — surrogate** | **200 / 200** | **924** | **4.62** |
+| verified — prediction, gated | 200 / 200 | 920 | 4.60 |
+
+**34.9% fewer iterations than the nominal guess** (retrieval gets 31%), and the answers agree with the cold
+solve to **2.9e-08 bar / 3.2e-08 rev/min** across all 196 cases where cold converged. `surrogate.py`
+cross-checks its cold/nominal/warm arms against `results.json` case by case and asserts they are identical —
+two files reporting the same quantity is how two different numbers for the same thing end up on two slides.
+
+### Concede this first, before anyone works it out: the prediction beats the archive
+
+**5.6% fewer iterations than retrieval.** Do not hide it, and do not let it read as a surprise — it is the
+expected result and the reason is one sentence:
+
+> The surrogate sees all 395 archived cases for every query. Retrieval uses exactly one of them. Of course the
+> fitted model is the better guess — it has four hundred times more information per query.
+
+Three things follow, and they are the whole argument for keeping both:
+
+1. **The surrogate needs the archive to exist first.** 395 solved cases had to happen before it could be
+   fitted. Retrieval works from run number two, with no training and no minimum dataset — which is exactly
+   what §3's table already claimed and can now be said with the numbers next to it.
+2. **The better guess is the one you cannot trust.** Retrieval hands the solver a *real converged state of a
+   real case*. The surrogate hands it a state that satisfies nothing. Both end at the same answer here only
+   because the solver is what guarantees the answer — which is the pitch, stated by the results rather than by
+   me.
+3. **It makes the verifier the hero rather than the archive**, and it sharpens the §1 hook rather than
+   blunting it: PhysicsAI's discarded prediction is measurably the *best available starting state*, and the
+   documented workflow throws it away and starts the validation run from zero. That is the missing arrow, now
+   with a number on it.
+
+### And concede this second: the pre-filter on predictions buys nothing *on this circuit*
+
+A predicted state has no source case, so gate 1 does not apply. Gate 2 does, pointed at the *prediction*:
+**15 of 200 predicted states are not legal** — all `cavitation`, i.e. the surrogate extrapolated a pressure
+below the model's validity floor. The `verified` arm declines those and takes the nominal guess instead.
+
+**What that is worth: 4 Newton iterations across 200 cases** (110 → 106 on the 15 affected), and **none of the
+15 failed to converge from the illegal start.** On this circuit the filter is measurably pointless, and saying
+so is worth more than the filter.
+
+**Why, and it is Phase 2's own finding rather than an excuse:** the base circuit has a *unique root everywhere
+in its envelope* — verified with a 16-seed multi-start over all 400 cases (§6b). Where there is one root, a
+bad starting guess can only cost iterations; it cannot change the answer. There is nothing for a pre-filter to
+protect. **The place it would matter is the fold circuit — and that experiment has now been run.**
+
+### The fold circuit answers it, and the answer is the best slide in the deck
+
+`python surrogate.py --fold`, on the circuit where the starting guess selects *which* of three roots Newton
+finds and the middle one is dynamically unstable. Same archive seed (11) and same 200 queries (seed 77) as
+`fold.py`, so this sits directly beside the retrieval result rather than merely near it.
+
+| same circuit, same queries | warm start from **retrieval** | warm start from **prediction** |
+|---|---|---|
+| naive — valid operating point | 147 | 158 |
+| **naive — unstable root, silently wrong** | **4** | **40** |
+| naive — no answer at all | 49 | 2 |
+| verified — valid operating point | **200** | **200** |
+| verified — silently wrong | **0** | **0** |
+| verified — total Newton iterations | 1579 | **1300** |
+
+**Say this out loud, slowly, because it is the whole project in two numbers.** The prediction is the *better*
+starting guess — 200 valid answers for 18% less solver work than retrieval. Used without a verifier it is
+**ten times more dangerous**: 40 silently wrong answers against retrieval's 4.
+
+And the mechanism is worse than the count suggests: **the surrogate converts loud failures into silent
+wrongness.** Naive retrieval simply fails to converge 49 times — you notice that; it ruins your morning and
+you go and look. The prediction converges 198 times out of 200, and 40 of those converge beautifully onto an
+operating point no machine can occupy. *A residual of 1e-8 and an answer that is not real.*
+
+**This is the argument for Layer 3, made against the project's own best component.** "Feed the surrogate's
+prediction to the solver" is not the pitch — it is the dangerous half of the pitch. The pitch is *feed it
+through a verifier first*, and now there is a number for what happens if you do not.
+
+**The third arm, which exists to keep me honest.** A `post_only` policy — no pre-filter on the prediction,
+just the gate on the answer plus escalation — also reaches **200 valid, 0 wrong**, for 1559 iterations against
+the guarded policy's 1300.
+
+> **So the pre-filter is a cost mechanism, not a safety mechanism.** Safety comes from gate 2 on the *answer*,
+> on both circuits and for both sources. Checking the prediction before spending a solve on it is worth
+> nothing on the base circuit and **17% of solver work** on the fold circuit — because there it avoids
+> converging onto a root you are about to reject.
+
+State it that way round. Claiming the pre-filter is what keeps you safe would be the easy version and the
+false one, and the `post_only` arm exists in `surrogate.py` precisely so the claim cannot be made carelessly.
+
+### What this changes in the deck
+
+- **§6 Act 2's table gets a real top row and a fifth row.** Four measured rows, no placeholder.
+- **§3's two-sources table stops being architecture and becomes results.** Both sources measured, one verifier.
+- **Act 3 beat A gains its strongest version.** The unstable-root story is currently told with retrieval's 4
+  silently wrong answers. The prediction's **40** is the same story an order of magnitude louder, on the same
+  circuit and the same queries — and it lands harder because the prediction is the arm that just *won* Act 2.
+- **Do not claim the surrogate is PhysicsAI.** It is a 36-feature polynomial standing in for one, so that the
+  comparison can be shown on a laptop. Say that out loud; the audience built the real thing.
+
+---
+
 ## 7. 10-minute presentation — time budget
+
+*Re-budgeted 19 Aug: one slide added for the engineer interview (§0b), and the demo is 10s longer because
+Act 3 gained a second beat. The time came out of architecture and platform, not out of the demo or the
+results.*
 
 | Time | Slide | Content |
 |---|---|---|
 | 0:00–0:45 | Hook | **The PhysicsAI workflow diagram with the missing arrow drawn in red.** "It predicts the answer at every node. Then, to check it, we start the solver from zero." Name the product once |
-| 0:45–2:00 | Problem | The evidence bullets. PhysicsAI's discarded prediction. HASTT 50%. Client for Git finds files, not physics. DAE init failures |
-| 2:00–2:45 | **What already exists** | PhysicsAI 2026.1, ROM Builder, RomAI, AMR, Insights Hub anomaly detection, Design Copilot NX — *"I checked. Here's what Siemens already has, and here's the one arrow that's missing."* **This slide buys you enormous credibility with this specific audience — they built these** |
-| 2:45–4:00 | Solution architecture | The 4 layers, one sentence each. The precision statement about *what* is warm-started |
-| 4:00–7:00 | **Demo** | The 3 acts |
-| 7:00–8:15 | Results | The measured table. Iterations, failure rate, wall time. Then translate to Simcenter X credits / kg CO₂ |
-| 8:15–9:00 | Why it's a platform | The archive is a flywheel: the more the company simulates, the faster it gets. Cloud/Docker architecture slide |
-| 9:00–9:30 | Limits + next | What you did *not* do, honestly. FMI/FMU initialisation as the obvious next step |
+| 0:45–1:50 | Problem | The evidence bullets. PhysicsAI's discarded prediction. HASTT 50%. Client for Git finds files, not physics. DAE init failures. **Now opens with the three-gate loop** — concept → prototyping (25 vehicles) → series production, every backward arrow expensive (§0b). Their framing, not yours |
+| 1:50–2:30 | **What already exists** | PhysicsAI 2026.1, ROM Builder, RomAI, AMR, Insights Hub anomaly detection, Design Copilot NX — *"I checked. Here's what Siemens already has, and here's the one arrow that's missing."* **Name Teamcenter SPDM here before anyone else does** (§0b): it answers *which files exist*; this answers *which solved state is physically closest, and whether reusing it is legitimate*. **This slide buys you enormous credibility with this specific audience — they built these** |
+| 2:30–3:30 | Solution architecture | The 4 layers, one sentence each. The precision statement about *what* is warm-started. One line on solver-agnosticism (§0/Q1, amended) — do not oversell it here, the adapter table at 8:50 is where it is earned |
+| 3:30–4:10 | **What the engineers asked for** *(new)* | *"I spent an hour with two engineers. Three things came out of it."* The three gates (already used at 0:45), *make it general*, and — the one that changed code — **refuse or warn? They said warn, and give us a report.** State which you implemented and which you did not. **This is the strongest slide a student can put in this room, and it is the setup for Act 3** |
+| 4:10–7:00 | **Demo** | The 3 acts. Act 2's table now has five measured rows and carries the *prediction beats retrieval* concession (§6e); Act 3 is two beats — the fact it will not let you overrule, then the risk it hands back to you |
+| 7:00–8:10 | Results | The measured table. Iterations, failure rate, wall time. Then translate to Simcenter X credits / kg CO₂ |
+| 8:10–8:50 | Why it's a platform | The archive is a flywheel: the more the company simulates, the faster it gets. Cloud/Docker architecture slide |
+| 8:50–9:30 | Limits + next | What you did *not* do, honestly. **The three-row adapter table** — Amesim / STAR-CCM+ / Simcenter 3D, same layers, different object transferred (§4). FMI/FMU initialisation as the obvious next step |
 | 9:30–10:00 | Close | One sentence, the name again |
+
+**Act 2 got heavier on 20 Aug and its 55 seconds did not.** Five rows and a concession will not fit at
+speaking pace. Rehearse it against a timer first, and if it overruns, the thing to drop is the *cold* row —
+it is the baseline you already argue against elsewhere, and §6a's "quote the 31%, not the 42%" rule means you
+are not leaning on it anyway. Do not drop the concession; a table with an unexplained winner invites the
+question you did not get to answer.
+
+**The 3:30 slide has to pay for itself in 40 seconds.** Do not narrate the meeting. Three bullets, one of them
+a requirement that changed the code, and then hand straight to the demo that shows it. If rehearsals run long,
+this slide is *not* the cut — cut 10s from the architecture slide and 10s from the platform slide again.
 
 ---
 
@@ -495,7 +934,12 @@ keeping useful information from successful simulations is a good one.* Premise s
 
 ---
 
-## 8b. The engineer interview — accept, then prepare
+## 8b. The engineer interview — accept, then prepare ✅ **held 19 Aug**
+
+> **Answers and consequences: §0b.** Q1 and Q4 were answered directly; Q3, Q5, Q6, Q7 and **Q8** were not.
+> The two extras they volunteered (the three vehicle gates, and "make it general — Simcenter 3D") changed the
+> deck more than most of the prepared questions would have. Kept below as written, because which questions
+> got answered is itself part of the record.
 
 ### Reply to send (today, short, no hedging)
 
@@ -538,6 +982,11 @@ Q8 is the one to press on. It is the question the mentor deflected, and the answ
 **After the interview:** write the answers into this file, verbatim, same day. Two of them become verifier
 rules; one becomes a quote on the problem slide.
 
+**What actually happened (19 Aug):** it was a spoken meeting, so the record in §0b is *paraphrase, not
+verbatim* — say "the engineers I spoke to said", never use quotation marks on a slide. Q4 became a verifier
+rule the same day (§6d). Q3, Q5, Q6 and Q8 went unanswered, and the decision was taken not to chase them —
+reasoning in §0b.
+
 ---
 
 ## 9. Q&A prep — they *will* ask these
@@ -567,8 +1016,32 @@ memory. And a cold-start rerun is always available as the audit path, because th
 **"Are we allowed to reuse results across projects or customers?"** — Retrieval is scoped by
 project/permission; that's a filter on the index, not a policy document. Worth showing on the cloud slide:
 the archive is per-tenant, and the verifier refuses across a scope boundary before it ever looks at physics.
-*(Flag honestly if the engineer interview hasn't happened yet: "this is the requirement I most want to hear
-from a real user.")*
+*(The interview happened on 19 Aug — §0b. This requirement is no longer a guess, so quote them: "I asked, and
+they told me to warn rather than refuse.")*
+
+**"If the prediction is the better guess, why not just use the prediction?"** — *(The question Act 2 sets up
+and Act 3 answers. It is the best question anyone can ask you.)* Because on the circuit where a starting guess
+can select the answer rather than just the cost, the unverified prediction is **ten times more dangerous** —
+40 silently wrong answers against retrieval's 4, on the same 200 cases. It also converges more often, which
+sounds good and is not: naive retrieval fails outright 49 times and somebody notices, while the prediction
+converges 198 times out of 200 and 40 of those are impossible operating points at a residual of 1e-8. **Use
+the prediction — it is the best starting state available. Just never use it unverified.** That is the product.
+
+**"Your model beat your archive. Why keep the archive?"** — *(The obvious question the moment Act 2's table
+is on screen. Concede before it is asked, §6e.)* It did, by 5.6%, and it should have: the surrogate sees all
+395 archived cases for every query and retrieval uses exactly one. Three things keep the archive. It needed
+those 395 solved cases to exist before it could be fitted, and retrieval works from run number two — no
+training, no minimum dataset. The prediction satisfies nothing; median residual 8.26 against a solver
+tolerance of 1e-8, and 0 of 200 predictions were solutions — the recalled state is at least a real answer to a
+real case. And both end at the same converged answer only because the solver is what guarantees it, which is
+the argument I am making. **The better guess is the one you can trust least. That is why the verifier gates
+both, and why it is the layer worth building.**
+
+**"Is your surrogate PhysicsAI?"** — No, and I would not claim it. It is a 36-feature quadratic response
+surface in 40 lines of numpy, standing in for a PhysicsAI-class model so the comparison fits on a laptop.
+PhysicsAI does geometric deep learning on full fields; mine does polynomial regression on seven numbers. The
+point it demonstrates is structural, not numerical: whatever produces the prediction, the prediction is
+currently thrown away before the validation run.
 
 **"How is this different from PhysicsAI / ROM Builder / RomAI?"** — They *replace* the solver with an
 approximation you can't certify. Déjà Solve keeps the exact solver and only improves its starting guess. The
@@ -587,12 +1060,35 @@ gap is my whole premise, and I'd rather be corrected now than in this room.
 manual, per-case, and requires you to already know which run to use. My contribution is the *retrieval* and
 the *verification*, not the initialisation itself.
 
-**"What if the retrieved case is wrong?"** — That's Layer 3, and it's Act 3 of the demo. Refusal is a
-feature.
+**"What if the retrieved case is wrong?"** — That's Layer 3, and it's Act 3 of the demo. Not using the
+archive is a feature.
 
-**"Does this scale to 3D fields / real meshes?"** — Not in this demo, and I say so on the limits slide. The
-mapping problem between different meshes is real work. The retrieval and verification layers are
-mesh-agnostic; the transfer operator is the part that would need engineering.
+**"If the engineer can override the verifier, what is it actually for?"** — *(The sharpest question in the
+list, and it exists because of the 19 Aug change. Have this one cold.)* Two things are being conflated. Before
+the solve the verifier is **estimating** — it has closed-form bounds and no answer yet, so it can be
+conservative and wrong, and my own demo case proves it: it warns about the 118 L/min pump, the engineer
+overrides, and the override is right. Making that a hard refusal would mean a tool that is wrong and cannot be
+argued with, which is a tool people switch off. After the solve it is **measuring** — eigenvalues of a
+converged state — and there is no override, because "no machine runs at this operating point" is not an
+opinion. So: you can accept a risky *start*; you cannot be handed an impossible *answer*. And every
+acceptance is recorded with a name, a reason and a timestamp, which is more than the current process produces.
+
+**"Why not just warn about everything, then?"** — Because a warning you cannot act on is noise, and noise is
+how a gate gets ignored. A missing parameter is not a risk to weigh, it is a value that has to come from a
+person; there is nothing for an engineer to decide, so the system does not pretend to offer them a decision.
+
+**"Does this scale to 3D fields / real meshes?"** — *(Expect it: the engineers I interviewed asked for
+exactly this, and Simcenter 3D is what they talked about most.)* Not in this demo, and I say so on the limits
+slide — with the three-row table: same three layers, different object transferred. Amesim moves a state
+vector and is essentially free; STAR-CCM+ moves a field through an XYZ table, which is the manual path that
+already exists; Simcenter 3D needs a field mapped between meshes, and that is real engineering. The retrieval
+and verification layers are mesh-agnostic — a Case Card and a verifier do not know what produced the state
+they reason about. The transfer operator is the adapter, and it is the first next-steps item.
+
+**"So is this an Amesim project?"** — No. It is a solver-agnostic layer with a system-simulation reference
+implementation, and I chose that implementation because it is the one I could validate end-to-end and prove
+with numbers in the time I had. Every figure in this deck regenerates with one command; a 3D demo I could not
+have measured would have been a better-looking talk and a worse project.
 
 **"Would our simulation data leave our network?"** — *(Expect this one. Run artifacts are customer data, and
 it is the objection most likely to kill adoption regardless of how good the numbers are.)* No. Ingest has

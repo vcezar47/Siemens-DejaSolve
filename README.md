@@ -14,7 +14,8 @@ Siemens Summer School 2026 · domain: *Digital Twins & Platforms*
 python run_all.py
 ```
 
-Writes `archive/cases.jsonl`, `results.json` and `figs/convergence.png`.
+Writes `archive/cases.jsonl`, `results.json`, `surrogate_results.json`,
+`surrogate_fold_results.json` and `figs/convergence.png`.
 Runs in a few seconds. No number in the deck is typed by hand — if it is not in
 `results.json`, it does not go on a slide.
 
@@ -33,11 +34,12 @@ Requires Python 3.11+, numpy and matplotlib (`pip install -r requirements.txt`).
 | `model.py` | The physics: a hydraulic manifold driving two motors against Stribeck friction. 7 nonlinear equations, analytic Jacobian, damped Newton, dynamic stability |
 | `sweep.py` | Runs a 400-case parameter sweep and keeps what converged — this is the archive |
 | `bench.py` | On 200 *fresh* cases: solve from a flat start, from a nominal guess, and warm from the nearest archived case. Writes `results.json` |
-| `verifier.py` | Layer 3: decides whether reusing a case is legitimate, and whether the answer is an operating point at all |
+| `surrogate.py` | The *other* source of a warm start: a quadratic response surface fitted to the archive, predicting a state instead of recalling one. The PhysicsAI arrow, at laptop scale |
+| `verifier.py` | Layer 3: decides whether reusing a case is legitimate, and whether the answer is an operating point at all. Verdicts carry a severity — a *risk* the engineer may override, or a *fact* they may not |
 | `fold.py` | The circuit variant where a warm start *can* be silently wrong, and the naive-vs-verified experiment |
 | `casecard.py` | Layer 1's output record: canonical units, quoted provenance, explicit absence |
 | `ingest.py` | Turns a run artifact into a Case Card — deterministic parser, a local model via Ollama, or Claude, all behind one interface |
-| `make_logs.py` | Five messy artifacts with exact ground truth |
+| `make_logs.py` | Six messy artifacts — five with exact ground truth, plus one built to trip the verifier |
 | `dejasolve.py` | The pipeline: `analyse()` returns a structured trace; the CLI and the service both render it |
 | `app.py` + `static/index.html` | **The demo UI** — FastAPI service, single self-contained page |
 | `plot_convergence.py` | Draws the Phase 1 figure from `results.json` |
@@ -49,9 +51,14 @@ Requires Python 3.11+, numpy and matplotlib (`pip install -r requirements.txt`).
 python app.py
 ```
 
-Then open <http://127.0.0.1:8000>. Pick one of the five artifacts (or drop a file
+Then open <http://127.0.0.1:8000>. Pick one of the six artifacts (or drop a file
 onto the box), press **Analyse**, and the six pipeline stages resolve in order —
 ingest, units, retrieve, verify, solve, admissible — each with its own verdict.
+A stage that warns is amber and a stage that blocks is red, because those are
+different statements. Under the headline sits the **report**: what happened, what
+it means, and — when the verdict is a warning — a name field, a reason field and
+**Warm-start anyway**. Accepting a warning appends to the audit trail shown at the
+bottom of the page.
 The headline is the number, against both baselines: **8 cold / 7 nominal → 4 warm Newton iterations, same answer to 2.3e-13**.
 
 It is a **service with a page attached**, not a notebook app: the page is a
@@ -77,16 +84,43 @@ verifier, a warm solve, and an admissibility check:
 ```
 run-tidy.log      warm_started         8 cold / 7 nominal -> 4 warm iterations
 run-legacy.log    warm_started         8 cold / 7 nominal -> 4 warm iterations
+run-bigpump.log   warned_not_used      nominal guess, 7 iterations (archive not used)
 run-truncated.log refused_incomplete   missing p_crack
 ```
 
-The refusals are the interesting half. A missing parameter is named, the nearest
-archived case is located on the parameters that *were* stated, its value is shown
-— and **not applied**. A misread unit (`7.8 m2` → 7.8e+06 mm²) is caught as
-implausible before it reaches retrieval.
+The half that does not warm-start is the interesting half — and it stops in two
+different ways, on one rule: **the engineer decides what to do with a risk; the
+system decides what is a fact.**
+
+**Warned** is a risk. The verifier estimated, before any solve, that the transfer
+is not legitimate — the 118 L/min pump in `run-bigpump.log` is bigger than
+anything the archive was swept over. It says so, does not use the archive, falls
+back to the nominal guess so the warning costs nothing, and offers an override:
+
+```bash
+python dejasolve.py logs/run-bigpump.log --override --operator you --basis "why"
+```
+
+`10 cold / 7 nominal -> 5 warm iterations, same answer to 2.4e-09` — and the
+acceptance is recorded, with a name, a reason and a timestamp, in the trace's
+audit trail. Here the warning was conservative and the override paid off. That is
+the argument *for* warning rather than refusing; what makes it safe is that the
+admissibility gate still runs on the result, so an engineer can accept a risky
+*start* and still cannot be handed an impossible *answer*.
+
+**Blocked** is a fact, and no flag argues with one. A missing parameter is named,
+the nearest archived case is located on the parameters that *were* stated, its
+value is shown — and **not applied**. A misread unit (`7.8 m2` → 7.8e+06 mm²) is
+caught as implausible before it reaches retrieval. A converged root on the
+friction downslope is reported in full and refused as an operating point.
+
+Every path — including the clean one — ends in a **report**: severity, reason,
+and what the system did about it.
 
 **Ingest accuracy** (5 artifacts, 35 fields, scored against ground truth;
-inventing a value counts as a miss):
+inventing a value counts as a miss). `run-bigpump.log` is deliberately *not*
+scored — it exists to exercise the verifier, and padding the parser's score with
+an easy machine log would move this number for a reason unrelated to ingest:
 
 | | parser | local model | **hybrid** |
 |---|---|---|---|
@@ -234,6 +268,87 @@ it is the one the numbers support.
 The headline still uses the **analytic** Jacobian on purpose: it is the best
 case for both baselines, so the advantage measured against them is real.
 
+## The other warm start: a predicted state
+
+Retrieval recalls a real converged state from a *similar* case. A surrogate predicts an
+approximate state for *this* case. Both are just an `x0` handed to Newton, and
+`surrogate.py` measures the second one on the same 200 queries.
+
+The surrogate is a **quadratic response surface** — 7 normalised parameters → 36
+polynomial features → 7 states, ridge least squares, ~40 lines of numpy and no new
+dependency. It fits the 395-case archive in 1 ms and predicts in 150 µs. It is
+deliberately not good, and deliberately not a nearest-neighbour regressor, which would
+have been retrieval wearing a different hat.
+
+**It is not an answer.** Against a solver tolerance of 1e-8, the predicted state's
+residual has a median of **8.26** and a worst case of **230**. **0 of 200 predictions
+were solutions.**
+
+**It is the best starting guess on the table.**
+
+| arm | converged | total Newton iterations | mean |
+|---|---|---|---|
+| cold (flat start) | 196 / 200 | 1631 | 8.32 |
+| nominal guess | 200 / 200 | 1420 | 7.10 |
+| warm — retrieval | 200 / 200 | 979 | 4.89 |
+| **predicted — surrogate** | **200 / 200** | **924** | **4.62** |
+| verified — prediction, gated | 200 / 200 | 920 | 4.60 |
+
+**34.9% fewer iterations than the nominal guess**, against retrieval's 31% — so the
+prediction beats the archive by 5.6%. That is the expected result, not an upset: the
+surrogate sees all 395 archived cases for every query and retrieval uses exactly one.
+What it costs is the guarantee. Retrieval hands the solver a real converged state of a
+real case; the surrogate hands it something that satisfies nothing. They reach the same
+answer here only because the solver is what guarantees the answer — which is the whole
+argument, stated by the results rather than by the pitch.
+
+The archive still earns its place: the surrogate needed 395 solved cases to exist before
+it could be fitted, and retrieval works from run number two.
+
+**Gating the prediction is honest about not helping — here.** A predicted state has no
+source case, so the transfer gate does not apply; the admissibility gate does, pointed at
+the prediction — *is this even a legal state to start from?* It fires 15 times in 200,
+every one a cavitating pressure the polynomial extrapolated. Using those 15 anyway costs
+**4 Newton iterations across the whole run**, and none of them failed to converge. On this
+circuit the filter is pointless, because the circuit has a unique root everywhere and a
+bad start can only cost iterations — it cannot change the answer.
+
+### The circuit where it does matter
+
+```bash
+python surrogate.py --fold
+```
+
+The fold circuit, where the starting guess selects *which* of three roots Newton finds and
+the middle one is dynamically unstable. Same archive and same 200 queries as `fold.py`:
+
+| same circuit, same queries | from **retrieval** | from **prediction** |
+|---|---|---|
+| naive — valid operating point | 147 | 158 |
+| **naive — unstable root, silently wrong** | **4** | **40** |
+| naive — no answer at all | 49 | 2 |
+| verified — valid operating point | **200** | **200** |
+| verified — silently wrong | **0** | **0** |
+| verified — total Newton iterations | 1579 | **1300** |
+
+**The prediction is the better starting guess and, unverified, ten times more dangerous.**
+200 valid answers for 18% less solver work than retrieval — and 40 silently wrong answers
+against retrieval's 4.
+
+The mechanism is worse than the count. Naive retrieval fails to converge 49 times, which is
+a loud failure a human goes and investigates. The prediction converges 198 times out of 200,
+and 40 of those land at a residual of 1e-8 on an operating point no machine can occupy.
+**The surrogate converts loud failures into silent wrongness.**
+
+**And the pre-filter is a cost mechanism, not a safety one.** A third arm — `post_only`, no
+check on the prediction, only the gate on the answer plus escalation — also returns 200
+valid and 0 wrong, for 1559 iterations against the guarded policy's 1300. Safety comes from
+the gate on the *answer*, on both circuits and for both sources; checking the prediction
+first is worth nothing on the base circuit and 17% of solver work here. That arm exists so
+the easier, false claim cannot be made by accident.
+
+Full record: [phases/phase-1b-surrogate.md](phases/phase-1b-surrogate.md).
+
 ## The verifier (Phase 2)
 
 A converged answer can still be wrong. The steady state is the equilibrium of a
@@ -260,6 +375,14 @@ fold and the torque balance picks up three roots.
 physics rather than a distance threshold, because setup distance turned out to
 predict transfer cost with r = 0.18 — barely at all.
 
+**It is a gate that argues rather than one that refuses.** Asked whether the
+system should refuse when unsure or warn and let them decide, the two engineers
+interviewed for this project chose the second — so a verdict carries a severity.
+Gate 1 *estimates*, before any solve, and everything it decides is a **warning**
+the engineer may override under their own name. Gate 2 *measures*, after the
+solve, and what it finds is a **fact** with no override: the equations are
+satisfied and no machine runs there. Both always produce a report.
+
 The +1% is recent. When a refused transfer fell back to the flat start this cost
 +36%; falling back to the nominal guess instead makes safety almost free. But
 the swap is **answer-changing, not just cheaper**, and `fold.py` measures that
@@ -274,7 +397,6 @@ different starting guess would have found.
 Phase 4 is Docker and the AWS architecture slide. The container needs no
 secrets — the full demo runs on the deterministic ingest backend.
 
-The Streamlit/FastAPI UI was deliberately deferred: it could not be tested here,
-and shipping it alongside the untested LLM path would have put two unverified
-components in a live demo. It is a thin shell over `dejasolve.run()`, which
-already returns a structured outcome.
+The UI shipped in Phase 3 — a FastAPI service with a single-page client, both
+clients of `dejasolve.analyse()`, which returns a structured trace. (An earlier
+draft of this file said it was deferred; it was not.)

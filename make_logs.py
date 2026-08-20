@@ -9,11 +9,19 @@ chosen to span what actually accumulates around a simulation team:
   C  an engineer's email, English prose           — no key=value anywhere
   D  an engineer's note in Romanian, decimal comma — the Brasov reality
   E  a truncated log with a corrupted line        — must be refused, not guessed
+  F  a tidy log for a pump bigger than the archive — must be *warned*, not refused
 
 C and D deliberately describe the shaft loads the way a person does ("the
 standard fan curves", "sarcina e mica") rather than as coefficients. Those
 fields are *not recoverable* from the text, and an honest ingest says so
 instead of inventing a number.
+
+F exists for the verifier, not for the parser: it is deliberately trivial to
+read and deliberately outside the archive's envelope, so it is the artifact
+that exercises the warn-and-override path the interviewed engineers asked for.
+It is therefore **not scored** — the ingest accuracy number measures the parser
+on messy artifacts, and padding it with an easy machine log would move a
+quoted figure for a reason that has nothing to do with ingest.
 
     python make_logs.py
 """
@@ -23,12 +31,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-#: (filename, ground-truth params, fields genuinely absent from the text)
-FIXTURES: list[tuple[str, dict, list[str], str]] = []
+#: (filename, ground-truth params, fields genuinely absent from the text,
+#:  text, whether it counts towards the ingest score)
+FIXTURES: list[tuple[str, dict, list[str], str, bool]] = []
 
 
-def _add(name: str, params: dict, unrecoverable: list[str], text: str) -> None:
-    FIXTURES.append((name, params, unrecoverable, text))
+def _add(name: str, params: dict, unrecoverable: list[str], text: str,
+         scored: bool = True) -> None:
+    FIXTURES.append((name, params, unrecoverable, text, scored))
 
 
 # --- A: tidy machine log ----------------------------------------------------
@@ -159,19 +169,58 @@ solving steady state ...
 """,
 )
 
+# --- F: tidy log, but a bigger pump than the archive has ever seen ----------
+# Everything here parses cleanly; the problem is not the artifact, it is that
+# 118 L/min sits outside the 30-90 L/min the archive was swept over. That is a
+# risk to be weighed, not a fact to be refused -- so the verifier warns, offers
+# the override, and the admissibility gate still has the last word.
+_add(
+    "run-bigpump.log",
+    {"Q_nom": 118.0, "A_valve_a": 6.4, "A_valve_b": 5.9,
+     "c_load_a": 1.6e-05, "c_load_b": 1.9e-05, "p_crack": 205.0, "rho": 868.0},
+    [],
+    """=== HydroSim 4.2 :: batch runner ===
+run id      : SIM-2026-0533
+started     : 2026-04-02 07:55:19
+model file  : manifold_2motor_hiflow.hsm
+operator    : a.dumitrescu
+note        : uprated pump, new supplier - first time on this bench
+
+[parameters]
+Q_nom       = 118.0 L/min
+A_valve_a   = 6.4 mm^2
+A_valve_b   = 5.9 mm^2
+c_load_a    = 1.6e-05 Nm/(rev/min)^2
+c_load_b    = 1.9e-05 Nm/(rev/min)^2
+p_crack     = 205.0 bar
+rho         = 868.0 kg/m^3
+
+[init]
+solving steady state ...
+  iter  1  residual 7.204e+01
+  iter  6  residual 1.118e+01
+initialisation slow - continuing under operator supervision
+""",
+    scored=False,
+)
+
 
 def main() -> None:
     out = Path("logs")
     out.mkdir(exist_ok=True)
     truth = {}
-    for name, params, unrecoverable, text in FIXTURES:
+    for name, params, unrecoverable, text, scored in FIXTURES:
         (out / name).write_text(text, encoding="utf-8")
-        truth[name] = {"params": params, "unrecoverable": unrecoverable}
+        # ingest.compare() iterates ground truth, not the directory, so leaving
+        # a fixture out of here is what keeps it out of the accuracy score
+        if scored:
+            truth[name] = {"params": params, "unrecoverable": unrecoverable}
     (out / "ground_truth.json").write_text(json.dumps(truth, indent=2),
                                            encoding="utf-8")
     print(f"wrote {len(FIXTURES)} artifacts + ground_truth.json -> {out}/")
-    for name, params, unrecoverable, _ in FIXTURES:
+    for name, params, unrecoverable, _, scored in FIXTURES:
         note = f"  ({len(unrecoverable)} field(s) not in the text)" if unrecoverable else ""
+        note += "" if scored else "  [not scored -- verifier fixture]"
         print(f"  {name:20} {len(params)} params{note}")
 
 

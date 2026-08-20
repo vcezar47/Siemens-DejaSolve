@@ -67,8 +67,16 @@ def run_sweep(n: int, seed: int, out_dir: Path) -> dict:
                 },
             })
         else:
+            # Kept, not counted. An engineer asked for the failures to be in
+            # the archive too, and they were right: a run that died is expensive
+            # evidence about *where* initialisation is hard, and reducing it to
+            # a tally throws that away. What it is actually worth is measured in
+            # `failure_zone.py` rather than assumed here.
             failures.append({"case_id": case_id, "status": res["status"],
-                             "params": {k: float(v) for k, v in p.items()}})
+                             "params": {k: float(v) for k, v in p.items()},
+                             "iterations": res["iterations"],
+                             "residual_inf": res["residual_inf"],
+                             "wall_ms": wall_ms})
 
     wall_s = time.perf_counter() - t_start
     iters = np.array([r["solve"]["iterations"] for r in records])
@@ -76,6 +84,13 @@ def run_sweep(n: int, seed: int, out_dir: Path) -> dict:
     with (out_dir / "cases.jsonl").open("w", encoding="utf-8") as fh:
         for rec in records:
             fh.write(json.dumps(rec) + "\n")
+
+    # A separate file rather than a flag on cases.jsonl: everything downstream
+    # reads the archive expecting a converged `solution` on every line, and a
+    # record without one would be a landmine in every consumer.
+    with (out_dir / "failures.jsonl").open("w", encoding="utf-8") as fh:
+        for rec in failures:
+            print(json.dumps(rec), file=fh)
 
     status_counts: dict[str, int] = {}
     for f in failures:
@@ -107,7 +122,8 @@ def run_sweep(n: int, seed: int, out_dir: Path) -> dict:
     print(f"  cold iterations: mean {iters.mean():.1f}  median "
           f"{np.median(iters):.0f}  max {iters.max()}")
     print(f"  relief valve open in {100 * summary['relief_open_share']:.0f}% of the archive")
-    print(f"  -> {out_dir / 'cases.jsonl'}")
+    print(f"  -> {out_dir / 'cases.jsonl'}  ({len(failures)} failures -> "
+          f"{out_dir / 'failures.jsonl'})")
     return summary
 
 

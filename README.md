@@ -14,8 +14,10 @@ Siemens Summer School 2026 · domain: *Digital Twins & Platforms*
 python run_all.py
 ```
 
-Writes `archive/cases.jsonl`, `results.json`, `surrogate_results.json`,
-`surrogate_fold_results.json` and `figs/convergence.png`.
+Writes `archive/cases.jsonl`, `archive/failures.jsonl`, `results.json`,
+`surrogate_results.json`, `surrogate_fold_results.json`,
+`failure_zone_results.json`, `dimensionality_results.json` and the figures
+in `figs/`.
 Runs in a few seconds. No number in the deck is typed by hand — if it is not in
 `results.json`, it does not go on a slide.
 
@@ -32,14 +34,16 @@ Requires Python 3.11+, numpy and matplotlib (`pip install -r requirements.txt`).
 | file | what it does |
 |---|---|
 | `model.py` | The physics: a hydraulic manifold driving two motors against Stribeck friction. 7 nonlinear equations, analytic Jacobian, damped Newton, dynamic stability |
-| `sweep.py` | Runs a 400-case parameter sweep and keeps what converged — this is the archive |
+| `sweep.py` | Runs a 400-case parameter sweep. What converged becomes the archive; what failed is kept too, in `archive/failures.jsonl` |
 | `bench.py` | On 200 *fresh* cases: solve from a flat start, from a nominal guess, and warm from the nearest archived case. Writes `results.json` |
 | `surrogate.py` | The *other* source of a warm start: a quadratic response surface fitted to the archive, predicting a state instead of recalling one. The PhysicsAI arrow, at laptop scale |
+| `dimensionality.py` | What happens to retrieval when the Case Card carries hundreds of parameters instead of 7 — and which gate stops working |
+| `failure_zone.py` | Are the failed runs worth keeping? Tests whether proximity to a failure predicts anything — with the controls that decide whether it is real |
 | `verifier.py` | Layer 3: decides whether reusing a case is legitimate, and whether the answer is an operating point at all. Verdicts carry a severity — a *risk* the engineer may override, or a *fact* they may not |
 | `fold.py` | The circuit variant where a warm start *can* be silently wrong, and the naive-vs-verified experiment |
 | `casecard.py` | Layer 1's output record: canonical units, quoted provenance, explicit absence |
 | `ingest.py` | Turns a run artifact into a Case Card — deterministic parser, a local model via Ollama, or Claude, all behind one interface |
-| `make_logs.py` | Six messy artifacts — five with exact ground truth, plus one built to trip the verifier |
+| `make_logs.py` | Seven messy artifacts — five with exact ground truth, plus two built to trip the verifier |
 | `dejasolve.py` | The pipeline: `analyse()` returns a structured trace; the CLI and the service both render it |
 | `app.py` + `static/index.html` | **The demo UI** — FastAPI service, single self-contained page |
 | `plot_convergence.py` | Draws the Phase 1 figure from `results.json` |
@@ -51,19 +55,29 @@ Requires Python 3.11+, numpy and matplotlib (`pip install -r requirements.txt`).
 python app.py
 ```
 
-Then open <http://127.0.0.1:8000>. Pick one of the six artifacts (or drop a file
+Then open <http://127.0.0.1:8000>. Pick one of the seven artifacts (or drop a file
 onto the box), press **Analyse**, and the six pipeline stages resolve in order —
 ingest, units, retrieve, verify, solve, admissible — each with its own verdict.
 A stage that warns is amber and a stage that blocks is red, because those are
-different statements. Under the headline sits the **report**: what happened, what
+different statements. The header badge reads **395 solved · 5 failed**, because
+the archive is two things now, and Retrieve names the nearest *failed* run
+alongside the nearest solved one — as two distances, never as a verdict. Under the headline sits the **report**: what happened, what
 it means, and — when the verdict is a warning — a name field, a reason field and
 **Warm-start anyway**. Accepting a warning appends to the audit trail shown at the
 bottom of the page.
 The headline is the number, against both baselines: **8 cold / 7 nominal → 4 warm Newton iterations, same answer to 2.3e-13**.
 
+Below the pipeline sits an **Evidence** panel: the measured results — the three
+arms, the surrogate arms, the fold circuit's 4-vs-40, the failure-archive AUC and
+its control, and the dimensionality chart — read live from the result JSONs by
+`GET /api/evidence`. It is labelled *measured offline*, because none of it is
+something the service computes per request, and each card states the basis its
+means were taken over. One page to open on stage instead of a browser, a terminal
+and a PNG viewer.
+
 It is a **service with a page attached**, not a notebook app: the page is a
 client of `POST /api/analyse`, which is the same endpoint a Study Manager sweep
-would call. `GET /api/health`, `GET /api/samples`, and OpenAPI docs at `/docs`
+would call. `GET /api/health`, `GET /api/samples`, `GET /api/evidence`, and OpenAPI docs at `/docs`
 come with it. No secrets needed, and nothing leaves the machine: the page offers
 the parser, the local model, and the hybrid of the two. Hosted Claude stays a
 valid backend for the API and the CLI but is deliberately absent from the page —
@@ -108,7 +122,28 @@ the argument *for* warning rather than refusing; what makes it safe is that the
 admissibility gate still runs on the result, so an engineer can accept a risky
 *start* and still cannot be handed an impossible *answer*.
 
-**Blocked** is a fact, and no flag argues with one. A missing parameter is named,
+**Blocked** is a fact, and no flag argues with one. `part-bracket.log` is a
+Simcenter 3D / NX Nastran solver log — a different kind of model entirely. Layer 1
+reads it (SOL 101, the title, modulus, thickness, element counts) and the stage is
+green, because ingest did not fail; the domain gate then stops it at Retrieve,
+*before* the unit check, because plausibility is judged against a schema and this
+one does not apply.
+
+That artifact earns its place on one line. Its banner reads
+`Density ....: 2.70E-09 tonne/mm^3`, and the parser's synonym table maps `density`
+onto `rho` — so without a domain check the Case Card records **aluminium as the
+hydraulic fluid density**. It reports the near miss instead:
+
+```
+would_have_been_mismapped   rho <- 2.70E-09 tonne/mm^3
+```
+
+One collision, because this schema has seven fields and one of them shares a name
+with a structural log — and no synonym was added to manufacture it. Field names
+are domain-scoped, and the count grows with the schema. Nothing here solves,
+reads or maps a 3D field: the transfer adapter is the next-steps item, and this
+is the boundary being shown rather than crossed.
+ A missing hydraulic parameter is named,
 the nearest archived case is located on the parameters that *were* stated, its
 value is shown — and **not applied**. A misread unit (`7.8 m2` → 7.8e+06 mm²) is
 caught as implausible before it reaches retrieval. A converged root on the
@@ -348,6 +383,81 @@ first is worth nothing on the base circuit and 17% of solver work here. That arm
 the easier, false claim cannot be made by accident.
 
 Full record: [phases/phase-1b-surrogate.md](phases/phase-1b-surrogate.md).
+
+## Hundreds of parameters
+
+Real models have hundreds of parameters; this circuit has 7. The useful question
+is which layer breaks first when it is not 7 — so the physics stays untouched and
+the *recorded* vector grows with entries that are real numbers on the Case Card
+and inert in the equations, 7 to 1007. Nuisance entries occupy [0, 1], the same
+range the real parameters do after normalisation, which is the favourable case
+for naive retrieval.
+
+| Case Card width | mean iterations | vs nominal | same neighbour as physics-only retrieval | contrast |
+|---|---|---|---|---|
+| 7 (real only) | 4.89 | **31.1%** | 200/200 | 0.661 |
+| 37 | 5.69 | 19.9% | 3/200 | 0.278 |
+| 107 | 5.96 | 16.0% | 3/200 | 0.161 |
+| 1007 | 6.20 | **12.7%** | 1/200 | 0.052 |
+
+**It degrades without collapsing, and that is not a compliment to the index.** At
+1007 parameters retrieval still beats the nominal guess by 12.7% — because on this
+circuit every archived state is a plausible operating point, so even a random one
+beats a formula. The archive is doing the work; the index has stopped
+contributing. By **37 recorded parameters** it agrees with physics-only retrieval
+on 3 of 200 queries, which is near chance.
+
+**And the distance gate cannot see it.** The coverage rule is re-derived in
+whatever space retrieval indexes, so its radius scales correctly — 0.53 to 12.52 —
+and it goes on admitting **196–198 of 200 at every width**. It does not fail
+loudly; it fails by approving, because the concentration that destroyed the signal
+also inflated the radius the distance is checked against.
+
+> A distance threshold cannot detect the failure of a distance metric.
+
+`envelope`, `breakaway` and `relief` read the 7 real parameters and the source's
+recorded regime, and are independent of the card's width by construction. That is
+the measurement behind the Phase 2 decision to build the gate from cheap physics
+rather than a distance threshold.
+
+![retrieval at hundreds of parameters](figs/dimensionality.png)
+
+Full record: [phases/phase-1c-dimensionality.md](phases/phase-1c-dimensionality.md).
+
+## The failed runs are in the archive too
+
+An engineer asked for them, and they were right: the failures were being counted
+and thrown away. On the fold circuit that meant discarding **165 runs of 300** —
+more than half the compute. `sweep.py` now writes `archive/failures.jsonl`, and
+`fold.sweep_fold()` returns its rejects instead of tallying them.
+
+Then the obvious rule was tested rather than assumed — *warn when the nearest
+failed case is closer than the nearest successful one*:
+
+| | **will this run die?** | **will reuse go wrong?** |
+|---|---|---|
+| base rate | 56.0% | 26.5% |
+| P(bad \| rule fired) | **74.8%** | 30.4% |
+| lift over base rate | **1.34x** | 1.15x |
+| **AUC** | **0.770** | 0.633 |
+
+**The control matters more than the result.** Failures cluster where the circuit
+is hard, and successes are sparse in the same places — so a positive score could
+just mean *"you are far from anything solved"*, which the coverage rule already
+sees. Scoring on distance-to-nearest-success alone gives AUC **0.650**; the rule
+gives **0.770**. The failed runs carry information the successful ones do not.
+
+**And the rule is still not in the gate.** It predicts whether a *case is hard*
+and barely predicts whether a *transfer is legitimate* — different questions, and
+the archive answers one of them. So it is advisory information for the engineer
+rather than a rule the system acts on. Two more reasons: a 56% base rate means
+"this one might die" is not news, and on the base circuit (5 failures in 400) the
+rule fires 3 times in 200 and catches none of the 4 hard cases. `failure_zone.py`
+prints **UNDERPOWERED** rather than letting that be quoted as evidence.
+
+A failure archive is only worth consulting where runs actually fail.
+
+Full record: [phases/phase-2b-failure-archive.md](phases/phase-2b-failure-archive.md).
 
 ## The verifier (Phase 2)
 

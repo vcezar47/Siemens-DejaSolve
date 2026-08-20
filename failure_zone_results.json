@@ -1,0 +1,3704 @@
+{
+  "generated_utc": "2026-08-20T07:52:29+00:00",
+  "min_failures_for_a_conclusion": 30,
+  "results": [
+    {
+      "circuit": "foldq",
+      "archive": {
+        "succeeded": 135,
+        "failed": 165
+      },
+      "n_queries": 200,
+      "rule": "warn when the nearest failed case is closer than the nearest successful one",
+      "fired": 115,
+      "underpowered": false,
+      "targets": {
+        "hard_case": {
+          "n": 200,
+          "base_rate": 0.56,
+          "warned": 115,
+          "true_positive": 86,
+          "false_positive": 29,
+          "false_negative": 26,
+          "true_negative": 59,
+          "precision": 0.7478260869565218,
+          "recall": 0.7678571428571429,
+          "lift": 1.3354037267080745,
+          "auc": 0.7698863636363636,
+          "controls": {
+            "d_success_only": 0.6504667207792207,
+            "d_fail_only": 0.7399553571428571
+          }
+        },
+        "bad_transfer": {
+          "n": 200,
+          "base_rate": 0.265,
+          "warned": 115,
+          "true_positive": 35,
+          "false_positive": 80,
+          "false_negative": 18,
+          "true_negative": 67,
+          "precision": 0.30434782608695654,
+          "recall": 0.660377358490566,
+          "lift": 1.1484823625922889,
+          "auc": 0.6331664741368246,
+          "controls": {
+            "d_success_only": 0.5854190732896932,
+            "d_fail_only": 0.6217430368373764
+          }
+        }
+      },
+      "cases": [
+        {
+          "case_id": "foldq-0000",
+          "d_success": 0.44512400809863356,
+          "d_fail": 0.4800133282604901,
+          "score": -0.03488932016185653,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0001",
+          "d_success": 0.5161556214645546,
+          "d_fail": 0.3890661984654056,
+          "score": 0.12708942299914905,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0002",
+          "d_success": 0.42749757422475276,
+          "d_fail": 0.3119351347530466,
+          "score": 0.11556243947170619,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0003",
+          "d_success": 0.4247188747756505,
+          "d_fail": 0.4292690874831042,
+          "score": -0.004550212707453705,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0004",
+          "d_success": 0.4253080990390768,
+          "d_fail": 0.4454694383665351,
+          "score": -0.020161339327458283,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0005",
+          "d_success": 0.5082493116954871,
+          "d_fail": 0.49055708683749466,
+          "score": 0.01769222485799249,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0006",
+          "d_success": 0.4069595595956213,
+          "d_fail": 0.5180778177313823,
+          "score": -0.11111825813576098,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0007",
+          "d_success": 0.38672725967764676,
+          "d_fail": 0.33146582655664847,
+          "score": 0.05526143312099829,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0008",
+          "d_success": 0.46757773195271496,
+          "d_fail": 0.42212491265002633,
+          "score": 0.04545281930268863,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0009",
+          "d_success": 0.4809405462628636,
+          "d_fail": 0.4002619819540216,
+          "score": 0.08067856430884202,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0010",
+          "d_success": 0.47810392620276554,
+          "d_fail": 0.4164103504109746,
+          "score": 0.06169357579179097,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0011",
+          "d_success": 0.4126871042289558,
+          "d_fail": 0.4904176499728509,
+          "score": -0.0777305457438951,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0012",
+          "d_success": 0.38439988488010257,
+          "d_fail": 0.5095936623282926,
+          "score": -0.12519377744819005,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0013",
+          "d_success": 0.5051702386426873,
+          "d_fail": 0.3468145535240015,
+          "score": 0.1583556851186858,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0014",
+          "d_success": 0.42016784346623615,
+          "d_fail": 0.3246459776730596,
+          "score": 0.09552186579317656,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0015",
+          "d_success": 0.4107150609834835,
+          "d_fail": 0.3406652089184228,
+          "score": 0.0700498520650607,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0016",
+          "d_success": 0.4422323670271964,
+          "d_fail": 0.5146153109125606,
+          "score": -0.0723829438853642,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0017",
+          "d_success": 0.3593754680295637,
+          "d_fail": 0.450444364698178,
+          "score": -0.09106889666861429,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0018",
+          "d_success": 0.5587477001331036,
+          "d_fail": 0.627776974757654,
+          "score": -0.06902927462455044,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0019",
+          "d_success": 0.5270416098407398,
+          "d_fail": 0.5661623254626476,
+          "score": -0.039120715621907776,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0020",
+          "d_success": 0.2785064348672611,
+          "d_fail": 0.4898541319739654,
+          "score": -0.21134769710670426,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0021",
+          "d_success": 0.4101888048254217,
+          "d_fail": 0.4865827754349806,
+          "score": -0.07639397060955888,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0022",
+          "d_success": 0.5652503876252457,
+          "d_fail": 0.5907596779483018,
+          "score": -0.025509290323056044,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0023",
+          "d_success": 0.2934379353800534,
+          "d_fail": 0.4140252483700645,
+          "score": -0.12058731299001108,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0024",
+          "d_success": 0.41165495761333276,
+          "d_fail": 0.45620996884743203,
+          "score": -0.04455501123409927,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0025",
+          "d_success": 0.3132339589718917,
+          "d_fail": 0.46097186753106373,
+          "score": -0.14773790855917202,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0026",
+          "d_success": 0.5787654024338926,
+          "d_fail": 0.45126518867046,
+          "score": 0.12750021376343262,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0027",
+          "d_success": 0.488202119413405,
+          "d_fail": 0.5228672122844896,
+          "score": -0.0346650928710846,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0028",
+          "d_success": 0.3923515446587867,
+          "d_fail": 0.35196250869692364,
+          "score": 0.04038903596186305,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0029",
+          "d_success": 0.5250856019581351,
+          "d_fail": 0.3796731025456102,
+          "score": 0.14541249941252493,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0030",
+          "d_success": 0.5091584594276675,
+          "d_fail": 0.32765646724500175,
+          "score": 0.18150199218266572,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0031",
+          "d_success": 0.33426542523444264,
+          "d_fail": 0.5385760583293662,
+          "score": -0.20431063309492353,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0032",
+          "d_success": 0.5109703020124188,
+          "d_fail": 0.4226008512792728,
+          "score": 0.08836945073314595,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0033",
+          "d_success": 0.48601007336812085,
+          "d_fail": 0.26988852546082653,
+          "score": 0.21612154790729432,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0034",
+          "d_success": 0.3970461237921847,
+          "d_fail": 0.35895135415005924,
+          "score": 0.03809476964212544,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0035",
+          "d_success": 0.3979494116504781,
+          "d_fail": 0.31232645456321395,
+          "score": 0.08562295708726414,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0036",
+          "d_success": 0.533144241077568,
+          "d_fail": 0.4648481626062441,
+          "score": 0.06829607847132385,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0037",
+          "d_success": 0.45933658603997923,
+          "d_fail": 0.2955606085988865,
+          "score": 0.16377597744109273,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0038",
+          "d_success": 0.46514525573516885,
+          "d_fail": 0.3657133195214398,
+          "score": 0.09943193621372903,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0039",
+          "d_success": 0.48003516727359347,
+          "d_fail": 0.47419927292601444,
+          "score": 0.005835894347579029,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0040",
+          "d_success": 0.5601890794872041,
+          "d_fail": 0.3966440490124909,
+          "score": 0.1635450304747132,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0041",
+          "d_success": 0.30601757136305596,
+          "d_fail": 0.47666262047004754,
+          "score": -0.17064504910699158,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0042",
+          "d_success": 0.45022554394113057,
+          "d_fail": 0.4620869727656525,
+          "score": -0.011861428824521958,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0043",
+          "d_success": 0.570047495618572,
+          "d_fail": 0.4185490286345185,
+          "score": 0.15149846698405356,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0044",
+          "d_success": 0.5961280464884253,
+          "d_fail": 0.28807218323618466,
+          "score": 0.30805586325224066,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0045",
+          "d_success": 0.5176134560925565,
+          "d_fail": 0.265084340275993,
+          "score": 0.2525291158165635,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0046",
+          "d_success": 0.3858645643444443,
+          "d_fail": 0.3908729502015443,
+          "score": -0.005008385857099951,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0047",
+          "d_success": 0.5080794393062219,
+          "d_fail": 0.31977808280881925,
+          "score": 0.18830135649740265,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0048",
+          "d_success": 0.5214590211654276,
+          "d_fail": 0.3448197625454376,
+          "score": 0.17663925861999002,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0049",
+          "d_success": 0.6112826297456191,
+          "d_fail": 0.5412760875079593,
+          "score": 0.07000654223765979,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0050",
+          "d_success": 0.45433395915411956,
+          "d_fail": 0.36162460255128914,
+          "score": 0.09270935660283042,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0051",
+          "d_success": 0.4117314521427346,
+          "d_fail": 0.33043291878807457,
+          "score": 0.08129853335466003,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0052",
+          "d_success": 0.476268614093635,
+          "d_fail": 0.39071444866980826,
+          "score": 0.08555416542382677,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0053",
+          "d_success": 0.551348680029324,
+          "d_fail": 0.46133359612202457,
+          "score": 0.09001508390729945,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0054",
+          "d_success": 0.5763814894171412,
+          "d_fail": 0.5515773540129317,
+          "score": 0.02480413540420945,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0055",
+          "d_success": 0.30798448393339095,
+          "d_fail": 0.43497392626136006,
+          "score": -0.1269894423279691,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0056",
+          "d_success": 0.2603579829820681,
+          "d_fail": 0.5582570407286316,
+          "score": -0.2978990577465635,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0057",
+          "d_success": 0.24936949442504594,
+          "d_fail": 0.636349404830125,
+          "score": -0.38697991040507906,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0058",
+          "d_success": 0.5126241716725912,
+          "d_fail": 0.29946282443985917,
+          "score": 0.21316134723273206,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0059",
+          "d_success": 0.515320781056468,
+          "d_fail": 0.315710111189886,
+          "score": 0.19961066986658194,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0060",
+          "d_success": 0.38076247136426405,
+          "d_fail": 0.2661486464942838,
+          "score": 0.11461382486998023,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0061",
+          "d_success": 0.39561732841116826,
+          "d_fail": 0.5887551012816973,
+          "score": -0.19313777287052902,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0062",
+          "d_success": 0.30686604953068775,
+          "d_fail": 0.5739777351632406,
+          "score": -0.26711168563255283,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0063",
+          "d_success": 0.6517915398703907,
+          "d_fail": 0.3444204317287119,
+          "score": 0.30737110814167884,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0064",
+          "d_success": 0.3839156801496823,
+          "d_fail": 0.1907256980526656,
+          "score": 0.1931899820970167,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0065",
+          "d_success": 0.30440199644782745,
+          "d_fail": 0.5497685509387762,
+          "score": -0.24536655449094874,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0066",
+          "d_success": 0.48373009173636183,
+          "d_fail": 0.5100497317458671,
+          "score": -0.026319640009505263,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0067",
+          "d_success": 0.41392723097330125,
+          "d_fail": 0.46161815859513644,
+          "score": -0.04769092762183519,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0068",
+          "d_success": 0.2959262909141438,
+          "d_fail": 0.5294975248924136,
+          "score": -0.23357123397826984,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0069",
+          "d_success": 0.43832137423105905,
+          "d_fail": 0.271575510142409,
+          "score": 0.16674586408865005,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0070",
+          "d_success": 0.4078653635772356,
+          "d_fail": 0.6108497878490112,
+          "score": -0.20298442427177565,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0071",
+          "d_success": 0.5522573777514013,
+          "d_fail": 0.37550341404747933,
+          "score": 0.17675396370392193,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0072",
+          "d_success": 0.5727159752367081,
+          "d_fail": 0.4266524607620466,
+          "score": 0.14606351447466154,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0073",
+          "d_success": 0.5507349207723411,
+          "d_fail": 0.44368448651528375,
+          "score": 0.10705043425705735,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0074",
+          "d_success": 0.4168417173984029,
+          "d_fail": 0.3667988846964998,
+          "score": 0.05004283270190313,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0075",
+          "d_success": 0.41153728389003724,
+          "d_fail": 0.3859169609322795,
+          "score": 0.025620322957757735,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0076",
+          "d_success": 0.283200125827551,
+          "d_fail": 0.395779768161161,
+          "score": -0.11257964233361001,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0077",
+          "d_success": 0.32482410985490656,
+          "d_fail": 0.41926448659588955,
+          "score": -0.09444037674098299,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0078",
+          "d_success": 0.30352555759352884,
+          "d_fail": 0.5061708037470661,
+          "score": -0.2026452461535373,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0079",
+          "d_success": 0.3717671837893746,
+          "d_fail": 0.4899499181387668,
+          "score": -0.1181827343493922,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0080",
+          "d_success": 0.6409799406713952,
+          "d_fail": 0.6053941584402848,
+          "score": 0.03558578223111042,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0081",
+          "d_success": 0.31814943179067057,
+          "d_fail": 0.5213448821276422,
+          "score": -0.20319545033697162,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0082",
+          "d_success": 0.5037701490290727,
+          "d_fail": 0.38828356895508515,
+          "score": 0.11548658007398754,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0083",
+          "d_success": 0.55651973022317,
+          "d_fail": 0.477308849332334,
+          "score": 0.07921088089083606,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0084",
+          "d_success": 0.5246330426766983,
+          "d_fail": 0.38232837033296435,
+          "score": 0.14230467234373395,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0085",
+          "d_success": 0.3856126893911636,
+          "d_fail": 0.3859527028974953,
+          "score": -0.00034001350633167116,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0086",
+          "d_success": 0.28438754442125347,
+          "d_fail": 0.3842521655299771,
+          "score": -0.09986462110872363,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0087",
+          "d_success": 0.2620970494928512,
+          "d_fail": 0.35926241459802716,
+          "score": -0.09716536510517598,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0088",
+          "d_success": 0.5336103689916581,
+          "d_fail": 0.23587650344822778,
+          "score": 0.2977338655434304,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0089",
+          "d_success": 0.46674157842236813,
+          "d_fail": 0.37858064117058216,
+          "score": 0.08816093725178598,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0090",
+          "d_success": 0.491574433086285,
+          "d_fail": 0.45826341010881244,
+          "score": 0.03331102297747257,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0091",
+          "d_success": 0.46317502659473114,
+          "d_fail": 0.3467450352162352,
+          "score": 0.11642999137849597,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0092",
+          "d_success": 0.302501098908455,
+          "d_fail": 0.4778924363805869,
+          "score": -0.17539133747213193,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0093",
+          "d_success": 0.2980111214918567,
+          "d_fail": 0.36819999776048495,
+          "score": -0.07018887626862824,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0094",
+          "d_success": 0.534042755802885,
+          "d_fail": 0.46915980030546334,
+          "score": 0.06488295549742162,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0095",
+          "d_success": 0.5385403785922876,
+          "d_fail": 0.3852737347172488,
+          "score": 0.15326664387503885,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0096",
+          "d_success": 0.6412783668883709,
+          "d_fail": 0.6368277483570927,
+          "score": 0.004450618531278261,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0097",
+          "d_success": 0.42769841774456874,
+          "d_fail": 0.5647064435095174,
+          "score": -0.13700802576494864,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0098",
+          "d_success": 0.4348463790441798,
+          "d_fail": 0.548653508899898,
+          "score": -0.11380712985571817,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0099",
+          "d_success": 0.541785103100443,
+          "d_fail": 0.5095479356960165,
+          "score": 0.0322371674044265,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0100",
+          "d_success": 0.5010603629505054,
+          "d_fail": 0.42594937588779486,
+          "score": 0.07511098706271052,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0101",
+          "d_success": 0.5059465780432464,
+          "d_fail": 0.5254999447351779,
+          "score": -0.01955336669193153,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0102",
+          "d_success": 0.4767250187756362,
+          "d_fail": 0.3463580396656512,
+          "score": 0.13036697910998502,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0103",
+          "d_success": 0.5512783445302134,
+          "d_fail": 0.3402570228099108,
+          "score": 0.21102132172030258,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0104",
+          "d_success": 0.3999056883096905,
+          "d_fail": 0.4528174654902936,
+          "score": -0.05291177718060314,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0105",
+          "d_success": 0.5343772794623218,
+          "d_fail": 0.4267937163534988,
+          "score": 0.10758356310882305,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0106",
+          "d_success": 0.4807193210501854,
+          "d_fail": 0.41774613124547993,
+          "score": 0.06297318980470545,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0107",
+          "d_success": 0.3895514091229576,
+          "d_fail": 0.43141850714029467,
+          "score": -0.04186709801733707,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0108",
+          "d_success": 0.4371089676900308,
+          "d_fail": 0.3272793021761723,
+          "score": 0.10982966551385853,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0109",
+          "d_success": 0.43300846967033435,
+          "d_fail": 0.4881367962677427,
+          "score": -0.05512832659740835,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0110",
+          "d_success": 0.21039510072553244,
+          "d_fail": 0.45866431632311,
+          "score": -0.24826921559757756,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0111",
+          "d_success": 0.32292762287154636,
+          "d_fail": 0.4414394005703878,
+          "score": -0.11851177769884141,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0112",
+          "d_success": 0.4677120291431523,
+          "d_fail": 0.4900846078352973,
+          "score": -0.022372578692144984,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0113",
+          "d_success": 0.41811336522426135,
+          "d_fail": 0.4377359608186525,
+          "score": -0.019622595594391168,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0114",
+          "d_success": 0.5567682100218839,
+          "d_fail": 0.39431041347899043,
+          "score": 0.1624577965428935,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0115",
+          "d_success": 0.5749816813060072,
+          "d_fail": 0.4420977090643872,
+          "score": 0.13288397224162002,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0116",
+          "d_success": 0.5595158352677052,
+          "d_fail": 0.4108010651199494,
+          "score": 0.1487147701477558,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0117",
+          "d_success": 0.37584599262015955,
+          "d_fail": 0.4807659137504198,
+          "score": -0.10491992113026027,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0118",
+          "d_success": 0.5134308776660941,
+          "d_fail": 0.4842894987386066,
+          "score": 0.02914137892748747,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0119",
+          "d_success": 0.6681852817989055,
+          "d_fail": 0.3527954412049355,
+          "score": 0.31538984059396996,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0120",
+          "d_success": 0.4757752214006362,
+          "d_fail": 0.5987666052598871,
+          "score": -0.1229913838592509,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0121",
+          "d_success": 0.4607199395905858,
+          "d_fail": 0.46863060141000756,
+          "score": -0.007910661819421738,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0122",
+          "d_success": 0.4413874487984013,
+          "d_fail": 0.27840365735202205,
+          "score": 0.16298379144637926,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0123",
+          "d_success": 0.49189269734071417,
+          "d_fail": 0.5444290918193542,
+          "score": -0.05253639447864,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0124",
+          "d_success": 0.6631031199388823,
+          "d_fail": 0.4524612137718108,
+          "score": 0.21064190616707146,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0125",
+          "d_success": 0.5358911633007313,
+          "d_fail": 0.3340350539216992,
+          "score": 0.2018561093790321,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0126",
+          "d_success": 0.410132609000997,
+          "d_fail": 0.27162185810289885,
+          "score": 0.13851075089809817,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0127",
+          "d_success": 0.3122644275904111,
+          "d_fail": 0.41991589559699466,
+          "score": -0.10765146800658354,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0128",
+          "d_success": 0.478761902738155,
+          "d_fail": 0.37540335038009454,
+          "score": 0.10335855235806046,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0129",
+          "d_success": 0.4119869197392801,
+          "d_fail": 0.28225661426682985,
+          "score": 0.12973030547245024,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0130",
+          "d_success": 0.6339272655096337,
+          "d_fail": 0.6159930225114273,
+          "score": 0.01793424299820645,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0131",
+          "d_success": 0.46069103197603645,
+          "d_fail": 0.2727605859839917,
+          "score": 0.18793044599204473,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0132",
+          "d_success": 0.2247499891970729,
+          "d_fail": 0.44980493700640023,
+          "score": -0.22505494780932733,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0133",
+          "d_success": 0.3357197634073981,
+          "d_fail": 0.512728704099474,
+          "score": -0.1770089406920759,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0134",
+          "d_success": 0.4550904007185478,
+          "d_fail": 0.29463613328600013,
+          "score": 0.16045426743254765,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0135",
+          "d_success": 0.5770889175765177,
+          "d_fail": 0.571213565824581,
+          "score": 0.005875351751936653,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0136",
+          "d_success": 0.504123348828648,
+          "d_fail": 0.32664311916664907,
+          "score": 0.1774802296619989,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0137",
+          "d_success": 0.4056367893012231,
+          "d_fail": 0.458714071909926,
+          "score": -0.053077282608702925,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0138",
+          "d_success": 0.28201551399798885,
+          "d_fail": 0.41715508453480693,
+          "score": -0.13513957053681808,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0139",
+          "d_success": 0.5037352893022913,
+          "d_fail": 0.4341399134839659,
+          "score": 0.06959537581832537,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0140",
+          "d_success": 0.46557524597845146,
+          "d_fail": 0.41637286928014294,
+          "score": 0.049202376698308514,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0141",
+          "d_success": 0.41451491366941856,
+          "d_fail": 0.49341758380857975,
+          "score": -0.07890267013916119,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0142",
+          "d_success": 0.3004707389685002,
+          "d_fail": 0.3994080359813921,
+          "score": -0.09893729701289189,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0143",
+          "d_success": 0.4336729061017395,
+          "d_fail": 0.45515932336825504,
+          "score": -0.021486417266515567,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0144",
+          "d_success": 0.37261898304815455,
+          "d_fail": 0.45840124451653463,
+          "score": -0.08578226146838008,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0145",
+          "d_success": 0.5198337291733334,
+          "d_fail": 0.7009804318295624,
+          "score": -0.181146702656229,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0146",
+          "d_success": 0.4645412272105568,
+          "d_fail": 0.4960612828012544,
+          "score": -0.03152005559069759,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0147",
+          "d_success": 0.5471487107056002,
+          "d_fail": 0.367804966082882,
+          "score": 0.17934374462271824,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0148",
+          "d_success": 0.40564908018751744,
+          "d_fail": 0.40175472669811535,
+          "score": 0.0038943534894020915,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0149",
+          "d_success": 0.4180014254443994,
+          "d_fail": 0.36219060391241864,
+          "score": 0.05581082153198075,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0150",
+          "d_success": 0.5263080540710221,
+          "d_fail": 0.2738864955227392,
+          "score": 0.2524215585482829,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0151",
+          "d_success": 0.4206839322823169,
+          "d_fail": 0.4113888878469003,
+          "score": 0.009295044435416566,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0152",
+          "d_success": 0.5231683271542438,
+          "d_fail": 0.4504453375953326,
+          "score": 0.07272298955891116,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0153",
+          "d_success": 0.48880634948681734,
+          "d_fail": 0.5605409195766088,
+          "score": -0.07173457008979145,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0154",
+          "d_success": 0.4263621792411526,
+          "d_fail": 0.42485478005805133,
+          "score": 0.0015073991831012767,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0155",
+          "d_success": 0.3965338347849924,
+          "d_fail": 0.5324615410736945,
+          "score": -0.1359277062887021,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0156",
+          "d_success": 0.39208821495088897,
+          "d_fail": 0.38654276364171913,
+          "score": 0.005545451309169835,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0157",
+          "d_success": 0.5178326155617848,
+          "d_fail": 0.3161875071143331,
+          "score": 0.20164510844745176,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0158",
+          "d_success": 0.5952562881676263,
+          "d_fail": 0.4022673146607991,
+          "score": 0.1929889735068272,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0159",
+          "d_success": 0.5182761653883213,
+          "d_fail": 0.3851114786892806,
+          "score": 0.13316468669904075,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0160",
+          "d_success": 0.5389553887337126,
+          "d_fail": 0.4282736823684428,
+          "score": 0.1106817063652698,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0161",
+          "d_success": 0.34000140134620227,
+          "d_fail": 0.33862554778841913,
+          "score": 0.0013758535577831355,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0162",
+          "d_success": 0.3855064531998179,
+          "d_fail": 0.4241199085449616,
+          "score": -0.03861345534514371,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0163",
+          "d_success": 0.3856207565755802,
+          "d_fail": 0.2962525702336078,
+          "score": 0.08936818634197241,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0164",
+          "d_success": 0.4331264324735362,
+          "d_fail": 0.373155862650753,
+          "score": 0.059970569822783204,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0165",
+          "d_success": 0.43940253871695406,
+          "d_fail": 0.386461424711929,
+          "score": 0.05294111400502505,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0166",
+          "d_success": 0.28737111354824674,
+          "d_fail": 0.20178872719406,
+          "score": 0.08558238635418675,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0167",
+          "d_success": 0.39855313991418395,
+          "d_fail": 0.5397565662861245,
+          "score": -0.1412034263719405,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0168",
+          "d_success": 0.5025069126948225,
+          "d_fail": 0.44433561192032295,
+          "score": 0.05817130077449956,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0169",
+          "d_success": 0.5220362121603913,
+          "d_fail": 0.4001899475552395,
+          "score": 0.1218462646051518,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0170",
+          "d_success": 0.4601344948792778,
+          "d_fail": 0.5009557028220026,
+          "score": -0.04082120794272481,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0171",
+          "d_success": 0.4680173181050809,
+          "d_fail": 0.6544868686179012,
+          "score": -0.18646955051282027,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0172",
+          "d_success": 0.4143760620222412,
+          "d_fail": 0.3947196977540875,
+          "score": 0.019656364268153703,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0173",
+          "d_success": 0.2879080701888017,
+          "d_fail": 0.5162282590750519,
+          "score": -0.22832018888625016,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0174",
+          "d_success": 0.4901543586721627,
+          "d_fail": 0.3987581967047041,
+          "score": 0.09139616196745864,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0175",
+          "d_success": 0.3120562174528398,
+          "d_fail": 0.2705660975831565,
+          "score": 0.04149011986968332,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0176",
+          "d_success": 0.30778085142010037,
+          "d_fail": 0.24098746574529595,
+          "score": 0.06679338567480442,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0177",
+          "d_success": 0.5627140995216505,
+          "d_fail": 0.425831495106224,
+          "score": 0.13688260441542655,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0178",
+          "d_success": 0.37345938405099804,
+          "d_fail": 0.43093874347111344,
+          "score": -0.057479359420115395,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0179",
+          "d_success": 0.5204757737613495,
+          "d_fail": 0.542542410673676,
+          "score": -0.022066636912326576,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0180",
+          "d_success": 0.3660607587300131,
+          "d_fail": 0.46541317689919437,
+          "score": -0.09935241816918128,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0181",
+          "d_success": 0.598250292381948,
+          "d_fail": 0.21672144343012995,
+          "score": 0.3815288489518181,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0182",
+          "d_success": 0.5231397395561378,
+          "d_fail": 0.47415977800642256,
+          "score": 0.048979961549715234,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0183",
+          "d_success": 0.35614289491838175,
+          "d_fail": 0.46208347351620055,
+          "score": -0.1059405785978188,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0184",
+          "d_success": 0.3190649409598886,
+          "d_fail": 0.39246565210082707,
+          "score": -0.07340071114093849,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0185",
+          "d_success": 0.38896571678437813,
+          "d_fail": 0.45286229188242183,
+          "score": -0.0638965750980437,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0186",
+          "d_success": 0.40175261469987894,
+          "d_fail": 0.38449735772283683,
+          "score": 0.01725525697704211,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0187",
+          "d_success": 0.3862380915260538,
+          "d_fail": 0.28525292336177105,
+          "score": 0.10098516816428277,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0188",
+          "d_success": 0.3655907543027563,
+          "d_fail": 0.45361262007048,
+          "score": -0.0880218657677237,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0189",
+          "d_success": 0.32041451303182483,
+          "d_fail": 0.37554157293193713,
+          "score": -0.055127059900112296,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0190",
+          "d_success": 0.37036223679747116,
+          "d_fail": 0.39839829110657476,
+          "score": -0.02803605430910361,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0191",
+          "d_success": 0.48931572077690744,
+          "d_fail": 0.40459238273852427,
+          "score": 0.08472333803838317,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0192",
+          "d_success": 0.40685081936662487,
+          "d_fail": 0.4188854203550487,
+          "score": -0.01203460098842385,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0193",
+          "d_success": 0.5078694370391434,
+          "d_fail": 0.31189448408772646,
+          "score": 0.19597495295141698,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0194",
+          "d_success": 0.5492604741868786,
+          "d_fail": 0.3622341178301363,
+          "score": 0.1870263563567423,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0195",
+          "d_success": 0.3706091464156886,
+          "d_fail": 0.3992083589969587,
+          "score": -0.028599212581270128,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0196",
+          "d_success": 0.36207300173719853,
+          "d_fail": 0.33887475918219584,
+          "score": 0.02319824255500269,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0197",
+          "d_success": 0.493725061516237,
+          "d_fail": 0.43444558432587693,
+          "score": 0.059279477190360086,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "foldq-0198",
+          "d_success": 0.41491434837163793,
+          "d_fail": 0.39333814789106375,
+          "score": 0.02157620048057418,
+          "fires": true,
+          "hard_case": true,
+          "bad_transfer": true
+        },
+        {
+          "case_id": "foldq-0199",
+          "d_success": 0.41046526916260834,
+          "d_fail": 0.4788781019854098,
+          "score": -0.06841283282280147,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        }
+      ]
+    },
+    {
+      "circuit": "query",
+      "archive": {
+        "succeeded": 395,
+        "failed": 5
+      },
+      "n_queries": 200,
+      "rule": "warn when the nearest failed case is closer than the nearest successful one",
+      "fired": 3,
+      "underpowered": true,
+      "targets": {
+        "hard_case": {
+          "n": 200,
+          "base_rate": 0.02,
+          "warned": 3,
+          "true_positive": 0,
+          "false_positive": 3,
+          "false_negative": 4,
+          "true_negative": 193,
+          "precision": 0.0,
+          "recall": 0.0,
+          "lift": 0.0,
+          "auc": 0.7818877551020408,
+          "controls": {
+            "d_success_only": 0.7219387755102041,
+            "d_fail_only": 0.7079081632653061
+          }
+        },
+        "bad_transfer": {
+          "n": 200,
+          "base_rate": 0.0,
+          "warned": 3,
+          "true_positive": 0,
+          "false_positive": 3,
+          "false_negative": 0,
+          "true_negative": 197,
+          "precision": 0.0,
+          "recall": null,
+          "lift": null,
+          "auc": null,
+          "controls": {
+            "d_success_only": null,
+            "d_fail_only": null
+          }
+        }
+      },
+      "cases": [
+        {
+          "case_id": "query-0000",
+          "d_success": 0.25452901536726014,
+          "d_fail": 1.0102489110883963,
+          "score": -0.7557198957211362,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0001",
+          "d_success": 0.4859613348728185,
+          "d_fail": 0.937489409606259,
+          "score": -0.45152807473344053,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0002",
+          "d_success": 0.2482166932937976,
+          "d_fail": 0.836595601589958,
+          "score": -0.5883789082961605,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0003",
+          "d_success": 0.3519089835208423,
+          "d_fail": 0.6854290281679558,
+          "score": -0.3335200446471135,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0004",
+          "d_success": 0.3110279313587669,
+          "d_fail": 0.6917135386277,
+          "score": -0.38068560726893313,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0005",
+          "d_success": 0.3517349619035402,
+          "d_fail": 0.8643254433494103,
+          "score": -0.5125904814458702,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0006",
+          "d_success": 0.21934367057556967,
+          "d_fail": 0.8038791940317876,
+          "score": -0.584535523456218,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0007",
+          "d_success": 0.5105615664393431,
+          "d_fail": 0.8866965385533678,
+          "score": -0.3761349721140247,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0008",
+          "d_success": 0.36353862386314845,
+          "d_fail": 0.7358922613820077,
+          "score": -0.37235363751885925,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0009",
+          "d_success": 0.34159591959305274,
+          "d_fail": 0.38978279071657274,
+          "score": -0.04818687112351999,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0010",
+          "d_success": 0.3376196910630623,
+          "d_fail": 0.9075761925618949,
+          "score": -0.5699565014988326,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0011",
+          "d_success": 0.3676991506800249,
+          "d_fail": 1.0550691186198144,
+          "score": -0.6873699679397896,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0012",
+          "d_success": 0.3741495590163926,
+          "d_fail": 0.5440505328283424,
+          "score": -0.1699009738119498,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0013",
+          "d_success": 0.3372446136318451,
+          "d_fail": 0.44356081647731277,
+          "score": -0.10631620284546767,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0014",
+          "d_success": 0.440069860806502,
+          "d_fail": 0.6268940378455427,
+          "score": -0.18682417703904064,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0015",
+          "d_success": 0.42705720337441055,
+          "d_fail": 0.8035002237496741,
+          "score": -0.37644302037526356,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0016",
+          "d_success": 0.3792042037686121,
+          "d_fail": 0.8651285513008303,
+          "score": -0.48592434753221825,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0017",
+          "d_success": 0.2422819149758528,
+          "d_fail": 0.3651504338174881,
+          "score": -0.12286851884163527,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0018",
+          "d_success": 0.496962476401245,
+          "d_fail": 0.8319152143151055,
+          "score": -0.3349527379138605,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0019",
+          "d_success": 0.38704613614968003,
+          "d_fail": 0.7248497272572242,
+          "score": -0.33780359110754415,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0020",
+          "d_success": 0.4074898338690626,
+          "d_fail": 1.0070165329250669,
+          "score": -0.5995266990560042,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0021",
+          "d_success": 0.35399294741890885,
+          "d_fail": 0.36482875892558997,
+          "score": -0.010835811506681114,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0022",
+          "d_success": 0.40992088026893353,
+          "d_fail": 0.7198361943561825,
+          "score": -0.309915314087249,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0023",
+          "d_success": 0.48602920325468746,
+          "d_fail": 0.8429184840440953,
+          "score": -0.35688928078940785,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0024",
+          "d_success": 0.2895327501588296,
+          "d_fail": 0.5290166532030585,
+          "score": -0.23948390304422884,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0025",
+          "d_success": 0.26807542012785207,
+          "d_fail": 0.8024898057679032,
+          "score": -0.5344143856400512,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0026",
+          "d_success": 0.3464982005326276,
+          "d_fail": 0.9988833059757329,
+          "score": -0.6523851054431054,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0027",
+          "d_success": 0.6004512225553417,
+          "d_fail": 0.9923489905687893,
+          "score": -0.39189776801344767,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0028",
+          "d_success": 0.34859476859745975,
+          "d_fail": 0.9450320325978012,
+          "score": -0.5964372640003415,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0029",
+          "d_success": 0.3436431797989443,
+          "d_fail": 0.6422560561121472,
+          "score": -0.2986128763132029,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0030",
+          "d_success": 0.3813548504683779,
+          "d_fail": 0.6752787004981042,
+          "score": -0.2939238500297263,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0031",
+          "d_success": 0.4051316703204853,
+          "d_fail": 0.763225026914875,
+          "score": -0.35809335659438973,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0032",
+          "d_success": 0.2568705512108579,
+          "d_fail": 0.65901548309633,
+          "score": -0.40214493188547207,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0033",
+          "d_success": 0.429006547935686,
+          "d_fail": 0.6981601993004449,
+          "score": -0.26915365136475894,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0034",
+          "d_success": 0.31705397943228747,
+          "d_fail": 1.102688131660239,
+          "score": -0.7856341522279515,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0035",
+          "d_success": 0.2723267478263481,
+          "d_fail": 0.9761039816894527,
+          "score": -0.7037772338631045,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0036",
+          "d_success": 0.2858216425598735,
+          "d_fail": 0.5864211355652776,
+          "score": -0.3005994930054041,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0037",
+          "d_success": 0.379804381663094,
+          "d_fail": 0.764148330134641,
+          "score": -0.384343948471547,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0038",
+          "d_success": 0.3849284753516138,
+          "d_fail": 0.8393784760978462,
+          "score": -0.45445000074623243,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0039",
+          "d_success": 0.2887021469760117,
+          "d_fail": 0.5566774083744803,
+          "score": -0.2679752613984686,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0040",
+          "d_success": 0.2692636899695512,
+          "d_fail": 0.8927413095796963,
+          "score": -0.6234776196101451,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0041",
+          "d_success": 0.35193061351095506,
+          "d_fail": 0.7952931897320862,
+          "score": -0.4433625762211311,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0042",
+          "d_success": 0.38514948971173213,
+          "d_fail": 0.8752175957563327,
+          "score": -0.4900681060446006,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0043",
+          "d_success": 0.3786033155260104,
+          "d_fail": 0.7160560933423982,
+          "score": -0.3374527778163878,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0044",
+          "d_success": 0.3469697179287044,
+          "d_fail": 0.6940479594838057,
+          "score": -0.3470782415551013,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0045",
+          "d_success": 0.33135969042922353,
+          "d_fail": 0.9931322386658368,
+          "score": -0.6617725482366132,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0046",
+          "d_success": 0.27083732620640544,
+          "d_fail": 0.9780272102637464,
+          "score": -0.707189884057341,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0047",
+          "d_success": 0.3634764359401395,
+          "d_fail": 0.7628340108192797,
+          "score": -0.3993575748791402,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0048",
+          "d_success": 0.49060185836856784,
+          "d_fail": 0.8942854252589073,
+          "score": -0.40368356689033946,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0049",
+          "d_success": 0.2597988455084361,
+          "d_fail": 0.5681060884036989,
+          "score": -0.3083072428952628,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0050",
+          "d_success": 0.3332052036898413,
+          "d_fail": 0.49228941040556906,
+          "score": -0.15908420671572776,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0051",
+          "d_success": 0.41393813177917604,
+          "d_fail": 1.0190147098935076,
+          "score": -0.6050765781143316,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0052",
+          "d_success": 0.21118199561820675,
+          "d_fail": 0.8593357605827446,
+          "score": -0.6481537649645379,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0053",
+          "d_success": 0.4180307605929558,
+          "d_fail": 0.9735552949670447,
+          "score": -0.5555245343740889,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0054",
+          "d_success": 0.34076325386860234,
+          "d_fail": 0.9256578624412201,
+          "score": -0.5848946085726177,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0055",
+          "d_success": 0.33338266523370685,
+          "d_fail": 0.7290045972923446,
+          "score": -0.3956219320586377,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0056",
+          "d_success": 0.3608589901908855,
+          "d_fail": 0.9984490035481104,
+          "score": -0.6375900133572249,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0057",
+          "d_success": 0.37956367295237853,
+          "d_fail": 0.9995901696815914,
+          "score": -0.6200264967292128,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0058",
+          "d_success": 0.20514492287644104,
+          "d_fail": 0.740502594087878,
+          "score": -0.535357671211437,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0059",
+          "d_success": 0.2733990950088181,
+          "d_fail": 0.5500864559773543,
+          "score": -0.2766873609685362,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0060",
+          "d_success": 0.29768620105402105,
+          "d_fail": 0.8230809092833818,
+          "score": -0.5253947082293609,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0061",
+          "d_success": 0.35068253829932194,
+          "d_fail": 1.056625840905715,
+          "score": -0.705943302606393,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0062",
+          "d_success": 0.3183064491450562,
+          "d_fail": 0.8139052339686845,
+          "score": -0.49559878482362835,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0063",
+          "d_success": 0.33808333706257143,
+          "d_fail": 0.7117694665484914,
+          "score": -0.37368612948591995,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0064",
+          "d_success": 0.3339209372908222,
+          "d_fail": 0.7758310955181715,
+          "score": -0.44191015822734936,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0065",
+          "d_success": 0.32291473159615247,
+          "d_fail": 0.8324313334657496,
+          "score": -0.5095166018695971,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0066",
+          "d_success": 0.33780120960931187,
+          "d_fail": 0.838259188909595,
+          "score": -0.5004579793002832,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0067",
+          "d_success": 0.4614252164786878,
+          "d_fail": 1.0229162403372785,
+          "score": -0.5614910238585906,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0068",
+          "d_success": 0.349499465068776,
+          "d_fail": 0.6203315040739763,
+          "score": -0.2708320390052003,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0069",
+          "d_success": 0.3780022841734915,
+          "d_fail": 1.007153280219413,
+          "score": -0.6291509960459214,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0070",
+          "d_success": 0.4316437344642143,
+          "d_fail": 1.1730056380163518,
+          "score": -0.7413619035521375,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0071",
+          "d_success": 0.3060815318209481,
+          "d_fail": 0.7719368354700744,
+          "score": -0.4658553036491263,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0072",
+          "d_success": 0.39886567481101076,
+          "d_fail": 0.8958646024821186,
+          "score": -0.49699892767110787,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0073",
+          "d_success": 0.40541115099023334,
+          "d_fail": 0.3434381274230467,
+          "score": 0.06197302356718665,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0074",
+          "d_success": 0.3804008289645996,
+          "d_fail": 0.6873333615661398,
+          "score": -0.3069325326015402,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0075",
+          "d_success": 0.27483892243359553,
+          "d_fail": 0.8040902223922344,
+          "score": -0.5292512999586388,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0076",
+          "d_success": 0.4310832293192256,
+          "d_fail": 0.7197434949094372,
+          "score": -0.28866026559021163,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0077",
+          "d_success": 0.4818002138428992,
+          "d_fail": 0.8350109347401123,
+          "score": -0.3532107208972131,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0078",
+          "d_success": 0.49810101824763875,
+          "d_fail": 0.7910739346223022,
+          "score": -0.2929729163746635,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0079",
+          "d_success": 0.27934443279041804,
+          "d_fail": 1.0949164972570833,
+          "score": -0.8155720644666653,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0080",
+          "d_success": 0.3250819311454139,
+          "d_fail": 0.6911058633868613,
+          "score": -0.3660239322414474,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0081",
+          "d_success": 0.3655066716677733,
+          "d_fail": 0.7000449342246721,
+          "score": -0.3345382625568988,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0082",
+          "d_success": 0.29613519051529025,
+          "d_fail": 0.793127304200924,
+          "score": -0.4969921136856338,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0083",
+          "d_success": 0.3171682354976393,
+          "d_fail": 0.8099582283177089,
+          "score": -0.49278999282006963,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0084",
+          "d_success": 0.4415737338815123,
+          "d_fail": 0.6905038465973162,
+          "score": -0.24893011271580395,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0085",
+          "d_success": 0.38999676503424197,
+          "d_fail": 0.8573058393588691,
+          "score": -0.4673090743246271,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0086",
+          "d_success": 0.2549277895133206,
+          "d_fail": 0.7351784631897613,
+          "score": -0.4802506736764407,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0087",
+          "d_success": 0.4408572267766394,
+          "d_fail": 0.7696320229001077,
+          "score": -0.32877479612346827,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0088",
+          "d_success": 0.43236194018889923,
+          "d_fail": 0.8808352690884483,
+          "score": -0.4484733288995491,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0089",
+          "d_success": 0.343798757101158,
+          "d_fail": 0.6355001419604085,
+          "score": -0.2917013848592505,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0090",
+          "d_success": 0.41362161445984563,
+          "d_fail": 1.0667871246770404,
+          "score": -0.6531655102171947,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0091",
+          "d_success": 0.45712499670814866,
+          "d_fail": 0.9098209700832911,
+          "score": -0.45269597337514245,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0092",
+          "d_success": 0.4049701007323312,
+          "d_fail": 0.3952757151082016,
+          "score": 0.009694385624129609,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0093",
+          "d_success": 0.4096580827631332,
+          "d_fail": 0.8851739329032927,
+          "score": -0.4755158501401595,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0094",
+          "d_success": 0.45981343077007797,
+          "d_fail": 1.1050084791180006,
+          "score": -0.6451950483479226,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0095",
+          "d_success": 0.35016078201749223,
+          "d_fail": 0.7553129433950592,
+          "score": -0.40515216137756693,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0096",
+          "d_success": 0.2887036652218652,
+          "d_fail": 0.5262174826922165,
+          "score": -0.23751381747035127,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0097",
+          "d_success": 0.37952055020844444,
+          "d_fail": 0.5515436882065191,
+          "score": -0.17202313799807467,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0098",
+          "d_success": 0.2997962838491067,
+          "d_fail": 0.8122200423181772,
+          "score": -0.5124237584690705,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0099",
+          "d_success": 0.44986874811452854,
+          "d_fail": 0.8372747427454572,
+          "score": -0.3874059946309287,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0100",
+          "d_success": 0.24225396862930226,
+          "d_fail": 0.57458950133566,
+          "score": -0.33233553270635774,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0101",
+          "d_success": 0.31489718200892036,
+          "d_fail": 0.7664925695655267,
+          "score": -0.45159538755660633,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0102",
+          "d_success": 0.4637206986900361,
+          "d_fail": 0.9858670805301158,
+          "score": -0.5221463818400798,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0103",
+          "d_success": 0.3007018234936398,
+          "d_fail": 1.0008936791395886,
+          "score": -0.7001918556459488,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0104",
+          "d_success": 0.36438212340484394,
+          "d_fail": 0.8938931559503451,
+          "score": -0.5295110325455012,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0105",
+          "d_success": 0.30801063581882027,
+          "d_fail": 0.6221658517197522,
+          "score": -0.314155215900932,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0106",
+          "d_success": 0.36150509389825186,
+          "d_fail": 0.7864472863890615,
+          "score": -0.4249421924908096,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0107",
+          "d_success": 0.3033095315433251,
+          "d_fail": 0.5945715967782176,
+          "score": -0.2912620652348925,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0108",
+          "d_success": 0.3210628085452662,
+          "d_fail": 0.8578707528985434,
+          "score": -0.5368079443532772,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0109",
+          "d_success": 0.33778416295990066,
+          "d_fail": 0.6509864171938176,
+          "score": -0.3132022542339169,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0110",
+          "d_success": 0.3645208860530801,
+          "d_fail": 0.9314611782475105,
+          "score": -0.5669402921944304,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0111",
+          "d_success": 0.40348747108220967,
+          "d_fail": 0.6314642454141294,
+          "score": -0.2279767743319197,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0112",
+          "d_success": 0.40404791960829833,
+          "d_fail": 0.6404453500965588,
+          "score": -0.23639743048826045,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0113",
+          "d_success": 0.31705537655014127,
+          "d_fail": 0.8840435385471547,
+          "score": -0.5669881619970134,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0114",
+          "d_success": 0.34667076317262135,
+          "d_fail": 0.7779217818319227,
+          "score": -0.4312510186593014,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0115",
+          "d_success": 0.14829116345283214,
+          "d_fail": 0.8555840865077546,
+          "score": -0.7072929230549225,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0116",
+          "d_success": 0.3273429366270755,
+          "d_fail": 0.6569987960484626,
+          "score": -0.3296558594213871,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0117",
+          "d_success": 0.45179544544976696,
+          "d_fail": 0.6719059232434343,
+          "score": -0.22011047779366738,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0118",
+          "d_success": 0.3849369017667702,
+          "d_fail": 0.6324715383469092,
+          "score": -0.24753463658013897,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0119",
+          "d_success": 0.35611757200339034,
+          "d_fail": 0.7172432161245004,
+          "score": -0.36112564412111003,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0120",
+          "d_success": 0.3653672404394991,
+          "d_fail": 0.6703321012190093,
+          "score": -0.30496486077951024,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0121",
+          "d_success": 0.34092225186610686,
+          "d_fail": 0.9567901299332517,
+          "score": -0.6158678780671449,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0122",
+          "d_success": 0.35511270872253126,
+          "d_fail": 1.0123135538397907,
+          "score": -0.6572008451172595,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0123",
+          "d_success": 0.36756132607382264,
+          "d_fail": 0.8859851332980931,
+          "score": -0.5184238072242705,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0124",
+          "d_success": 0.3161359420993631,
+          "d_fail": 0.6183992945471655,
+          "score": -0.3022633524478024,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0125",
+          "d_success": 0.3869606888556337,
+          "d_fail": 0.8161084099302609,
+          "score": -0.4291477210746272,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0126",
+          "d_success": 0.3212400072284331,
+          "d_fail": 0.8983107367087594,
+          "score": -0.5770707294803263,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0127",
+          "d_success": 0.36027860607941836,
+          "d_fail": 0.7133280190738777,
+          "score": -0.3530494129944593,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0128",
+          "d_success": 0.42612720622223954,
+          "d_fail": 0.8420509380195965,
+          "score": -0.415923731797357,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0129",
+          "d_success": 0.38201170423964886,
+          "d_fail": 0.8388885287284692,
+          "score": -0.45687682448882033,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0130",
+          "d_success": 0.32553352737335844,
+          "d_fail": 0.534315767169008,
+          "score": -0.20878223979564953,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0131",
+          "d_success": 0.4227878706004957,
+          "d_fail": 1.1205172308074205,
+          "score": -0.6977293602069248,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0132",
+          "d_success": 0.2615472726835723,
+          "d_fail": 0.6265141030381893,
+          "score": -0.364966830354617,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0133",
+          "d_success": 0.3024218535731025,
+          "d_fail": 0.8262997994839298,
+          "score": -0.5238779459108274,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0134",
+          "d_success": 0.40176087041607,
+          "d_fail": 0.6541164563185566,
+          "score": -0.25235558590248663,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0135",
+          "d_success": 0.48343464371863004,
+          "d_fail": 0.7492537895101976,
+          "score": -0.26581914579156757,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0136",
+          "d_success": 0.40042951106761693,
+          "d_fail": 0.9014263980308669,
+          "score": -0.50099688696325,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0137",
+          "d_success": 0.19735932735536676,
+          "d_fail": 0.3689093564226445,
+          "score": -0.17155002906727773,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0138",
+          "d_success": 0.1572888231335286,
+          "d_fail": 0.6074082741413533,
+          "score": -0.45011945100782474,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0139",
+          "d_success": 0.3007202297404801,
+          "d_fail": 0.9140465243198315,
+          "score": -0.6133262945793514,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0140",
+          "d_success": 0.3099311861254361,
+          "d_fail": 0.6185967481799234,
+          "score": -0.3086655620544873,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0141",
+          "d_success": 0.37647467589371275,
+          "d_fail": 0.67142286820388,
+          "score": -0.2949481923101672,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0142",
+          "d_success": 0.19457889061478234,
+          "d_fail": 0.7560428885508185,
+          "score": -0.5614639979360361,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0143",
+          "d_success": 0.41108938719303917,
+          "d_fail": 0.9073832897963793,
+          "score": -0.4962939026033401,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0144",
+          "d_success": 0.3709020372224315,
+          "d_fail": 0.8959812722677359,
+          "score": -0.5250792350453044,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0145",
+          "d_success": 0.34918754096839993,
+          "d_fail": 0.43290855591721855,
+          "score": -0.08372101494881862,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0146",
+          "d_success": 0.35656013756251564,
+          "d_fail": 0.8724105264410295,
+          "score": -0.5158503888785138,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0147",
+          "d_success": 0.3794967834696572,
+          "d_fail": 0.9714948387011318,
+          "score": -0.5919980552314746,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0148",
+          "d_success": 0.3821411364779405,
+          "d_fail": 0.388637877614163,
+          "score": -0.006496741136222506,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0149",
+          "d_success": 0.24014766347178435,
+          "d_fail": 0.7857948823697258,
+          "score": -0.5456472188979415,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0150",
+          "d_success": 0.3910957526327294,
+          "d_fail": 0.8506872624456213,
+          "score": -0.45959150981289193,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0151",
+          "d_success": 0.45250389791613,
+          "d_fail": 0.9177050684915217,
+          "score": -0.4652011705753917,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0152",
+          "d_success": 0.32782133356734006,
+          "d_fail": 0.7244344234155286,
+          "score": -0.3966130898481885,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0153",
+          "d_success": 0.267965167640266,
+          "d_fail": 0.6238053588420319,
+          "score": -0.3558401912017659,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0154",
+          "d_success": 0.3878040970622274,
+          "d_fail": 0.8856938256434554,
+          "score": -0.49788972858122804,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0155",
+          "d_success": 0.37205383945885057,
+          "d_fail": 0.2589832175239929,
+          "score": 0.11307062193485767,
+          "fires": true,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0156",
+          "d_success": 0.308688442416917,
+          "d_fail": 0.802934485142199,
+          "score": -0.494246042725282,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0157",
+          "d_success": 0.34021565212718907,
+          "d_fail": 0.6002329367583187,
+          "score": -0.2600172846311296,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0158",
+          "d_success": 0.3473266771989158,
+          "d_fail": 0.8934814966545328,
+          "score": -0.546154819455617,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0159",
+          "d_success": 0.3064040856723163,
+          "d_fail": 0.8689515373420181,
+          "score": -0.5625474516697018,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0160",
+          "d_success": 0.32406397054158587,
+          "d_fail": 0.6399057425991761,
+          "score": -0.31584177205759023,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0161",
+          "d_success": 0.3887131510066643,
+          "d_fail": 0.7977105866999091,
+          "score": -0.4089974356932448,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0162",
+          "d_success": 0.21368312329103414,
+          "d_fail": 0.8049609165423139,
+          "score": -0.5912777932512798,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0163",
+          "d_success": 0.3174602067298447,
+          "d_fail": 0.7218931315263624,
+          "score": -0.40443292479651766,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0164",
+          "d_success": 0.3469655143006774,
+          "d_fail": 0.7128927693800712,
+          "score": -0.3659272550793938,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0165",
+          "d_success": 0.3562348670998493,
+          "d_fail": 0.694087387630902,
+          "score": -0.33785252053105275,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0166",
+          "d_success": 0.2257696585115464,
+          "d_fail": 0.5679618716025352,
+          "score": -0.3421922130909888,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0167",
+          "d_success": 0.49251850555321347,
+          "d_fail": 0.6911943580398505,
+          "score": -0.19867585248663705,
+          "fires": false,
+          "hard_case": true,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0168",
+          "d_success": 0.3787372441969284,
+          "d_fail": 0.5720596254639462,
+          "score": -0.19332238126701778,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0169",
+          "d_success": 0.34455126939547775,
+          "d_fail": 1.0164414172892624,
+          "score": -0.6718901478937847,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0170",
+          "d_success": 0.3493668001598606,
+          "d_fail": 0.664604742154194,
+          "score": -0.31523794199433336,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0171",
+          "d_success": 0.4643267972536783,
+          "d_fail": 0.8482601689976421,
+          "score": -0.3839333717439638,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0172",
+          "d_success": 0.2672307764605693,
+          "d_fail": 0.5555313614849728,
+          "score": -0.28830058502440353,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0173",
+          "d_success": 0.3975135109086805,
+          "d_fail": 0.8236877375933953,
+          "score": -0.42617422668471483,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0174",
+          "d_success": 0.42927666335338655,
+          "d_fail": 1.085714136821242,
+          "score": -0.6564374734678554,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0175",
+          "d_success": 0.222980949686727,
+          "d_fail": 0.8977754648144177,
+          "score": -0.6747945151276907,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0176",
+          "d_success": 0.32497750185087043,
+          "d_fail": 0.7017225655121966,
+          "score": -0.37674506366132615,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0177",
+          "d_success": 0.4453807172165343,
+          "d_fail": 0.8731343871828124,
+          "score": -0.4277536699662781,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0178",
+          "d_success": 0.35128929303965833,
+          "d_fail": 0.7847065212024907,
+          "score": -0.4334172281628324,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0179",
+          "d_success": 0.47874838936474146,
+          "d_fail": 0.9111897591640328,
+          "score": -0.4324413697992913,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0180",
+          "d_success": 0.44602171154227627,
+          "d_fail": 0.8305213738562901,
+          "score": -0.38449966231401383,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0181",
+          "d_success": 0.3603636951043422,
+          "d_fail": 0.6276923951786197,
+          "score": -0.26732870007427756,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0182",
+          "d_success": 0.409782920318631,
+          "d_fail": 0.865385115733874,
+          "score": -0.455602195415243,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0183",
+          "d_success": 0.43089113112869093,
+          "d_fail": 0.8726204638446373,
+          "score": -0.4417293327159464,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0184",
+          "d_success": 0.3590981552815855,
+          "d_fail": 0.8128162686692924,
+          "score": -0.45371811338770685,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0185",
+          "d_success": 0.489581732809877,
+          "d_fail": 0.9506173139140253,
+          "score": -0.4610355811041483,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0186",
+          "d_success": 0.3493003754824501,
+          "d_fail": 0.7700231576595019,
+          "score": -0.42072278217705184,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0187",
+          "d_success": 0.28176841259206703,
+          "d_fail": 0.6848739667744194,
+          "score": -0.40310555418235233,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0188",
+          "d_success": 0.2502676771192048,
+          "d_fail": 0.9726009473855388,
+          "score": -0.7223332702663341,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0189",
+          "d_success": 0.45022424435725245,
+          "d_fail": 0.6756300374210981,
+          "score": -0.22540579306384562,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0190",
+          "d_success": 0.3104651198315305,
+          "d_fail": 0.6108652573566586,
+          "score": -0.3004001375251281,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0191",
+          "d_success": 0.33918465171544293,
+          "d_fail": 0.7792762816048173,
+          "score": -0.4400916298893744,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0192",
+          "d_success": 0.35550356418205453,
+          "d_fail": 0.5908792449197384,
+          "score": -0.2353756807376839,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0193",
+          "d_success": 0.4993455490150582,
+          "d_fail": 0.9121446476856474,
+          "score": -0.4127990986705892,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0194",
+          "d_success": 0.29448047619479434,
+          "d_fail": 0.756164921535328,
+          "score": -0.46168444534053366,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0195",
+          "d_success": 0.46079827667693873,
+          "d_fail": 0.915829777328529,
+          "score": -0.45503150065159026,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0196",
+          "d_success": 0.33427258946995103,
+          "d_fail": 0.5177471717725558,
+          "score": -0.18347458230260477,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0197",
+          "d_success": 0.44527934802252406,
+          "d_fail": 0.7532216880232495,
+          "score": -0.30794234000072546,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0198",
+          "d_success": 0.3505123671769176,
+          "d_fail": 0.7667768202939941,
+          "score": -0.4162644531170765,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        },
+        {
+          "case_id": "query-0199",
+          "d_success": 0.3193586492428682,
+          "d_fail": 0.9022886547702993,
+          "score": -0.5829300055274311,
+          "fires": false,
+          "hard_case": false,
+          "bad_transfer": false
+        }
+      ]
+    }
+  ]
+}

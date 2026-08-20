@@ -55,6 +55,7 @@ import numpy as np
 
 import model
 import verifier
+import casecard
 from casecard import CANONICAL_UNITS, CaseCard
 import ingest
 from ingest import ingest_text
@@ -62,6 +63,11 @@ from ingest import ingest_text
 #: plain ASCII on purpose -- the Windows console is cp1252 and box-drawing
 #: characters raise UnicodeEncodeError there, which would break the demo
 RULE = "-" * 78
+
+#: what counts as a run artifact. `.dat` is here because a Simcenter 3D
+#: export is a Nastran deck, and the demo has to be able to feed the
+#: pipeline one in order to show it being refused.
+ARTIFACT_SUFFIXES = (".log", ".txt", ".dat", ".bdf")
 
 #: the five pipeline stages, in order, as the UI and the CLI both present them
 STAGES = [
@@ -75,25 +81,67 @@ STAGES = [
 
 
 class Archive:
-    """The archive plus the verifier built from it, loaded once."""
+    """The archive plus the verifier built from it, loaded once.
+
+    Two files, because a run that failed has no converged state to hand over and
+    a record without one would be a landmine in every consumer of `records`. The
+    failures are loaded anyway: they are half of what the archive knows, and an
+    engineer asked for them to be kept (§0b). Nothing in the warm-start path
+    reads them -- `failure_zone.py` measured whether proximity to a failure
+    predicts a bad *transfer* and it barely does, so they are reported as
+    context and never used as a gate.
+    """
 
     def __init__(self, path: Path):
         if not path.exists():
             raise FileNotFoundError(f"no archive at {path} -- run `python sweep.py`")
         self.records = [json.loads(l) for l
                         in path.read_text(encoding="utf-8").splitlines() if l]
+        fail_path = path.with_name("failures.jsonl")
+        self.failures = ([json.loads(l) for l
+                          in fail_path.read_text(encoding="utf-8").splitlines() if l]
+                         if fail_path.exists() else [])
+        self.failure_modes: dict[str, int] = {}
+        for f in self.failures:
+            self.failure_modes[f["status"]] = self.failure_modes.get(f["status"], 0) + 1
+        self.failure_norm = (model.normalise(
+            np.array([[f["params"][k] for k in model.PARAM_NAMES]
+                      for f in self.failures])) if self.failures else None)
         params = np.array([[r["params"][k] for k in model.PARAM_NAMES]
                            for r in self.records])
         self.norm = model.normalise(params)
         self.states = np.array([[r["solution"][k] for k in model.STATE_NAMES]
                                 for r in self.records])
         self.verifier = verifier.Verifier(self.records)
+        #: what kind of model this archive holds. Every record in it came
+        #: through the same Case Card schema, so the archive inherits its
+        #: domain -- and a query from a different one has nothing to retrieve.
+        self.domain = casecard.DOMAIN
 
     def nearest(self, params: dict) -> tuple[int, float]:
         q = model.normalise(model.param_vector(params))
         d = np.linalg.norm(self.norm - q, axis=1)
         j = int(np.argmin(d))
         return j, float(d[j])
+
+    def nearest_failure(self, params: dict) -> dict | None:
+        """The closest run that *died*, as context -- never as a decision.
+
+        Reported because an engineer asked to see the failed runs, and stated as
+        two distances rather than as a prediction: on this circuit there are 5
+        failures in 400 and `failure_zone.py` calls that underpowered. A
+        confident-sounding warning built on five data points would be exactly
+        the kind of thing the rest of this system exists to refuse.
+        """
+        if self.failure_norm is None:
+            return None
+        q = model.normalise(model.param_vector(params))
+        d = np.linalg.norm(self.failure_norm - q, axis=1)
+        j = int(np.argmin(d))
+        return {"case_id": self.failures[j]["case_id"],
+                "status": self.failures[j]["status"],
+                "distance": float(d[j]),
+                "archive_failures": len(self.failures)}
 
     def nearest_on(self, card: CaseCard, fields: list[str]) -> tuple[int, float]:
         """Nearest case using only `fields`, so an incomplete card can still be
@@ -182,11 +230,53 @@ def analyse(text: str, name: str, archive: Archive,
         for f in model.PARAM_NAMES
     ]
     found = len(card.params)
-    stages.append(_stage(
-        "ingest", "ok" if found else "blocked",
-        f"{found} of {len(model.PARAM_NAMES)} parameters read"
-        f" by {card.source.get('ingested_by', '?')}",
-        {"missing": card.missing, "notes": card.notes}))
+    foreign_label = casecard.FOREIGN_DOMAINS.get(card.domain, {}).get(
+        "label", card.domain)
+    if card.foreign_domain:
+        # Ingest did not fail here -- it succeeded at the only thing that was
+        # available to succeed at. Marking this stage as blocked would say the
+        # parser broke, when what happened is that it correctly identified an
+        # artifact whose fields do not exist in this schema.
+        stages.append(_stage(
+            "ingest", "ok",
+            f"{foreign_label} recognised -- {len(card.foreign)} facts read, "
+            f"none of them this schema's",
+            {"foreign": card.foreign, "domain": card.domain}))
+    else:
+        stages.append(_stage(
+            "ingest", "ok" if found else "blocked",
+            f"{found} of {len(model.PARAM_NAMES)} parameters read"
+            f" by {card.source.get('ingested_by', '?')}",
+            {"missing": card.missing, "notes": card.notes}))
+
+    # -- is this even the right kind of model? -----------------------------
+    # Before the unit gate on purpose: a value's plausibility is judged against
+    # a schema, and if the schema does not apply then "off by orders of
+    # magnitude" is the wrong complaint. An aluminium density is not a badly
+    # scaled fluid density; it is a number from another problem.
+    if card.foreign_domain:
+        label = foreign_label
+        stages.append(_stage("plausible", "skipped",
+                             "not this schema's units"))
+        stages.append(_stage(
+            "retrieve", "blocked",
+            f"this is a {label}, not a {casecard.DOMAIN} case",
+            # the facts belong to the Ingest stage that read them; this stage
+            # carries only the decision and what it was decided against
+            {"domain": card.domain, "archive_domain": archive.domain}))
+        for sid in ("verify", "solve", "admissible"):
+            stages.append(_stage(sid, "skipped", "not reached"))
+        trace["outcome"] = "foreign_domain"
+        trace["summary"] = f"{label}; nothing in this archive applies to it"
+        _report(trace, "block", "domain",
+                f"the artifact is a {label}; this archive holds "
+                f"{casecard.DOMAIN} cases",
+                "the three layers are solver-agnostic but the Case Card schema "
+                "is not, and a state cannot be transferred between physics that "
+                "do not share unknowns. Reading this file is Layer 1 working; "
+                "using it would need the field-transfer adapter, which is not "
+                "built")
+        return trace
 
     # -- unit sanity -------------------------------------------------------
     problems = card.validate()
@@ -248,7 +338,9 @@ def analyse(text: str, name: str, archive: Archive,
         "retrieve", "ok",
         f"{source['case_id']} at distance {distance:.3f}",
         {"coverage_radius": archive.verifier.coverage_radius,
-         "regime": source["regime"]}))
+         "regime": source["regime"],
+         "indexed_on": len(model.PARAM_NAMES),
+         "nearest_failure": archive.nearest_failure(card.params)}))
 
     # -- Layer 3a: is the transfer legitimate? -----------------------------
     verdict = archive.verifier.check_transfer(card.params, source, distance)
@@ -406,6 +498,15 @@ def render(trace: dict) -> str:
         mark = {"ok": "OK    ", "warned": "WARN  ", "blocked": "BLOCK "}[st["state"]]
         out.append(f"\n{mark} {st['title']:<12} {st['headline']}")
         sug = st["detail"].get("suggestion")
+        foreign = st["detail"].get("foreign")
+        if foreign:
+            for k, val in foreign.items():
+                out.append(f"       {k:26} {val}")
+        nf = st["detail"].get("nearest_failure")
+        if nf:
+            out.append(f"       indexed on {st['detail']['indexed_on']} parameters; "
+                       f"nearest of {nf['archive_failures']} failed runs is "
+                       f"{nf['case_id']} ({nf['distance']:.2f} away, {nf['status']})")
         if sug:
             out.append(f"       Closest archived case on the {sug['on_fields']} stated "
                        f"parameters is {sug['case_id']} ({sug['distance']:.2f} away):")
@@ -456,7 +557,7 @@ def main() -> None:
     except FileNotFoundError as exc:
         raise SystemExit(str(exc))
 
-    targets = (sorted(p for p in args.logs.iterdir() if p.suffix in (".log", ".txt"))
+    targets = (sorted(p for p in args.logs.iterdir() if p.suffix in ARTIFACT_SUFFIXES)
                if args.all else [args.artifact])
     if not targets or targets == [None]:
         ap.error("give an artifact path, or pass --all")

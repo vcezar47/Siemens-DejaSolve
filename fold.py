@@ -156,34 +156,69 @@ def guarded_transfer(p: dict, x0, source: dict, distance: float,
 
 # --- experiment -------------------------------------------------------------
 
-def build_archive(n: int, seed: int) -> tuple[list[dict], dict]:
-    """Sweep the fold circuit, and keep only *admissible* runs.
+def sweep_fold(n: int, seed: int) -> tuple[list[dict], list[dict], dict]:
+    """Sweep the fold circuit; return (admissible, rejected, stats).
 
-    The verifier runs at ingest too: a converged-but-unstable run is not
-    something the archive should ever hand to a future case as a starting
-    point. Filtering here is what makes the archive an asset rather than a
+    The verifier runs at ingest: a converged-but-unstable run is not something
+    the archive should ever hand to a future case as a starting point, and a run
+    that never converged has no state to hand over at all. Filtering those out
+    of the *warm-start* archive is what makes it an asset rather than a
     liability.
+
+    But `rejected` is returned rather than counted, which is the half this
+    function used to throw away. On this circuit that is **more than half the
+    compute** — an engineer asked for the failed runs to be kept too, on the
+    grounds that a run that died is expensive evidence about where
+    initialisation is hard. Whether that evidence predicts anything is measured
+    in `failure_zone.py`; it is not assumed here, and nothing in the warm-start
+    path reads these records.
     """
-    kept, unstable, failed = [], 0, 0
+    kept, rejected = [], []
     for i, p in enumerate(fold_cases(n, seed)):
         r = model.solve(p)
+        case_id = f"fold-{i:04d}"
+        params = {k: float(v) for k, v in p.items()}
+
         if not r["converged"]:
-            failed += 1
+            rejected.append({"case_id": case_id, "params": params,
+                             "kind": "no_convergence", "detail": r["status"],
+                             "iterations": r["iterations"],
+                             "residual_inf": r["residual_inf"]})
             continue
-        if not verifier.Verifier.check_solution(r["x"], p).admit:
-            unstable += 1
+
+        vs = verifier.Verifier.check_solution(r["x"], p)
+        if not vs.admit:
+            # converged, and to something no machine can sit at -- a different
+            # kind of failure from "no answer", and the more interesting one
+            rejected.append({"case_id": case_id, "params": params,
+                             "kind": "inadmissible", "detail": vs.rule,
+                             "iterations": r["iterations"],
+                             "residual_inf": r["residual_inf"],
+                             "solution": dict(zip(model.STATE_NAMES, r["x"]))})
             continue
+
         kept.append({
-            "case_id": f"fold-{i:04d}",
-            "params": {k: float(v) for k, v in p.items()},
+            "case_id": case_id,
+            "params": params,
             "solution": dict(zip(model.STATE_NAMES, r["x"])),
             "regime": model.regime(r["x"], p),
             "solve": {"start": "cold", "status": r["status"],
                       "iterations": r["iterations"],
                       "residual_inf": r["residual_inf"]},
         })
-    return kept, {"n": n, "kept": len(kept), "rejected_unstable": unstable,
-                  "failed": failed}
+
+    stats = {"n": n, "kept": len(kept),
+             "rejected_unstable": sum(1 for x in rejected
+                                      if x["kind"] == "inadmissible"),
+             "failed": sum(1 for x in rejected
+                           if x["kind"] == "no_convergence")}
+    return kept, rejected, stats
+
+
+def build_archive(n: int, seed: int) -> tuple[list[dict], dict]:
+    """The warm-start archive alone -- unchanged contract for existing callers."""
+    kept, _rejected, stats = sweep_fold(n, seed)
+    return kept, stats
 
 
 def run(n_archive: int, n_query: int, out: Path, fig: Path) -> dict:

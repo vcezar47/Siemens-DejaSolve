@@ -22,6 +22,76 @@ from dataclasses import dataclass, field, asdict
 
 import model
 
+#: the domain this Case Card schema and this archive describe. A Case Card is
+#: not a universal record -- it is a record *of a kind of model*, and the seven
+#: canonical fields below only mean anything inside this one.
+DOMAIN = "hydraulic-1d"
+
+#: Signatures of artifacts from a *different* kind of model. Detected rather
+#: than assumed, because the alternative is worse than useless: a NASTRAN deck
+#: states a material density, `SYNONYMS` maps "density" onto `rho`, and without
+#: this check the pipeline would cheerfully record aluminium at 2.7e-09 as the
+#: hydraulic fluid density and carry on. The unit gate would catch that one by
+#: luck. It would not catch a value that happened to look plausible.
+#:
+#: This is the adapter boundary, made explicit. The three layers above the
+#: solver are domain-agnostic; the *schema* is not, and pretending otherwise is
+#: how a "universal" tool produces confident nonsense.
+FOREIGN_DOMAINS = {
+    "structural-3d-fe": {
+        "label": "3D structural FE (NX Nastran deck)",
+        "markers": ("GRID", "CQUAD4", "CTETRA", "CHEXA", "PSHELL", "PSOLID",
+                    "MAT1", "SPC1", "CBUSH", "BEGIN BULK", "ENDDATA"),
+        "min_markers": 4,
+    },
+}
+
+
+def detect_domain(text: str) -> tuple[str, dict[str, str]]:
+    """Which kind of model produced this artifact, and what can be read of it.
+
+    Returns the domain key and a few human-readable facts. The facts exist to
+    make a refusal *specific*: "this is a 3D structural deck, 4812 elements,
+    linear static" is a different sentence from "I could not read your file",
+    and only one of them tells an engineer what to do next.
+    """
+    upper = text.upper()
+    for key, spec in FOREIGN_DOMAINS.items():
+        hits = [m for m in spec["markers"] if m in upper]
+        if len(hits) >= spec["min_markers"]:
+            return key, _read_foreign(text, key, hits)
+    return DOMAIN, {}
+
+
+def _read_foreign(text: str, domain: str, hits: list[str]) -> dict[str, str]:
+    """Read what is legible in a foreign artifact without pretending to use it."""
+    facts: dict[str, str] = {"markers_seen": ", ".join(sorted(hits))}
+    if domain != "structural-3d-fe":
+        return facts
+
+    sol = re.search(r"^\s*SOL\s+(\d+)", text, re.M)
+    if sol:
+        facts["solution_sequence"] = f"SOL {sol.group(1)}"
+    title = re.search(r"^\s*TITLE\s*=\s*(.+)$", text, re.M)
+    if title:
+        facts["title"] = title.group(1).strip()
+
+    # NASTRAN small-field: 8-column fields, and "2.70-9" means 2.70e-9
+    mat = re.search(r"^MAT1\s+(\S+)\s+(\S+)\s+(\S*)\s+(\S+)", text, re.M)
+    if mat:
+        facts["youngs_modulus"] = mat.group(2)
+        facts["poisson_ratio"] = mat.group(4)
+    shell = re.search(r"^PSHELL\s+\S+\s+\S+\s+(\S+)", text, re.M)
+    if shell:
+        facts["shell_thickness"] = shell.group(1)
+
+    for card in ("GRID", "CQUAD4", "CTETRA", "CHEXA"):
+        n = len(re.findall(rf"^{card}\b", text, re.M))
+        if n:
+            facts[f"{card.lower()}_count"] = str(n)
+    return facts
+
+
 #: canonical unit for each swept parameter
 CANONICAL_UNITS = {
     "Q_nom": "L/min",
@@ -91,6 +161,15 @@ class CaseCard:
     missing: list[str] = field(default_factory=list)
     notes: str = ""
     units: dict[str, str] = field(default_factory=lambda: dict(CANONICAL_UNITS))
+    #: which kind of model produced this artifact. Anything other than DOMAIN
+    #: means the seven canonical fields do not apply to it at all.
+    domain: str = DOMAIN
+    #: what was legible in a foreign artifact, kept so a refusal can be specific
+    foreign: dict[str, str] = field(default_factory=dict)
+
+    @property
+    def foreign_domain(self) -> bool:
+        return self.domain != DOMAIN
 
     @property
     def complete(self) -> bool:

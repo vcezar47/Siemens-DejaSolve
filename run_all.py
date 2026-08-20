@@ -12,6 +12,8 @@ import sys
 from pathlib import Path
 
 import bench
+import dimensionality
+import failure_zone
 import fold
 import ingest
 import make_logs
@@ -26,6 +28,9 @@ FOLD_RESULTS = Path("fold_results.json")
 FOLD_FIGURE = Path("figs/verifier.png")
 SURROGATE_RESULTS = Path("surrogate_results.json")
 SURROGATE_FOLD_RESULTS = Path("surrogate_fold_results.json")
+FAILURE_ZONE_RESULTS = Path("failure_zone_results.json")
+DIMENSIONALITY_RESULTS = Path("dimensionality_results.json")
+DIMENSIONALITY_FIGURE = Path("figs/dimensionality.png")
 
 
 def main(score_models: bool = False) -> int:
@@ -52,6 +57,15 @@ def main(score_models: bool = False) -> int:
 
     print()
     print("=" * 62)
+    print("PHASE 1c -- retrieval when the Case Card has hundreds of parameters")
+    print("=" * 62)
+    dimensionality.report(
+        dimensionality.run(ARCHIVE / "cases.jsonl", n_queries=200, seed=99,
+                           out=DIMENSIONALITY_RESULTS,
+                           fig_path=DIMENSIONALITY_FIGURE))
+
+    print()
+    print("=" * 62)
     print("PHASE 2 -- the verifier, on the fold circuit")
     print("=" * 62)
     # The prediction arm on the same circuit, first: it is the experiment that
@@ -61,6 +75,14 @@ def main(score_models: bool = False) -> int:
         surrogate.run_fold(n_archive=300, n_query=200, out=SURROGATE_FOLD_RESULTS))
     print()
     fold.run(n_archive=300, n_query=200, out=FOLD_RESULTS, fig=FOLD_FIGURE)
+
+    print()
+    print("=" * 62)
+    print("PHASE 2b -- are the failed runs worth keeping?")
+    print("=" * 62)
+    # Needs the base archive's failures.jsonl from Phase 1, so it runs after it.
+    failure_zone.report(
+        failure_zone.run(FAILURE_ZONE_RESULTS, n_archive=300, n_query=200))
 
     print()
     print("=" * 62)

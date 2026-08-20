@@ -1,0 +1,157 @@
+{
+  "generated_utc": "2026-08-20T07:52:23+00:00",
+  "archive_size": 395,
+  "n_queries": 200,
+  "real_parameters": 7,
+  "nuisance": {
+    "distribution": "uniform [0, 1], the range the real parameters occupy after normalisation -- the favourable case",
+    "seed": 4242,
+    "nested": true
+  },
+  "reference": {
+    "nominal": {
+      "converged": 200,
+      "failed": 0,
+      "total_iterations": 1420,
+      "mean_iterations": 7.1
+    },
+    "warm_physics": {
+      "converged": 200,
+      "failed": 0,
+      "total_iterations": 979,
+      "mean_iterations": 4.895
+    }
+  },
+  "by_dimension": [
+    {
+      "extra_parameters": 0,
+      "recorded_parameters": 7,
+      "warm_all": {
+        "converged": 200,
+        "failed": 0,
+        "total_iterations": 979,
+        "mean_iterations": 4.895
+      },
+      "same_neighbour_as_physics": 200,
+      "relative_contrast": 0.6610868544350004,
+      "coverage_radius": 0.5289794677536425,
+      "gate_verdicts": {
+        "ok": 198,
+        "coverage": 1,
+        "envelope": 1
+      }
+    },
+    {
+      "extra_parameters": 3,
+      "recorded_parameters": 10,
+      "warm_all": {
+        "converged": 200,
+        "failed": 0,
+        "total_iterations": 1022,
+        "mean_iterations": 5.11
+      },
+      "same_neighbour_as_physics": 50,
+      "relative_contrast": 0.5516201800342394,
+      "coverage_radius": 0.7841597114254807,
+      "gate_verdicts": {
+        "ok": 198,
+        "coverage": 1,
+        "envelope": 1
+      }
+    },
+    {
+      "extra_parameters": 10,
+      "recorded_parameters": 17,
+      "warm_all": {
+        "converged": 200,
+        "failed": 0,
+        "total_iterations": 1068,
+        "mean_iterations": 5.34
+      },
+      "same_neighbour_as_physics": 23,
+      "relative_contrast": 0.4231347700692135,
+      "coverage_radius": 1.2080995297097874,
+      "gate_verdicts": {
+        "ok": 198,
+        "envelope": 1,
+        "coverage": 1
+      }
+    },
+    {
+      "extra_parameters": 30,
+      "recorded_parameters": 37,
+      "warm_all": {
+        "converged": 200,
+        "failed": 0,
+        "total_iterations": 1138,
+        "mean_iterations": 5.69
+      },
+      "same_neighbour_as_physics": 3,
+      "relative_contrast": 0.27813656810414344,
+      "coverage_radius": 2.0354648752459052,
+      "gate_verdicts": {
+        "ok": 196,
+        "coverage": 3,
+        "envelope": 1
+      }
+    },
+    {
+      "extra_parameters": 100,
+      "recorded_parameters": 107,
+      "warm_all": {
+        "converged": 200,
+        "failed": 0,
+        "total_iterations": 1193,
+        "mean_iterations": 5.965
+      },
+      "same_neighbour_as_physics": 3,
+      "relative_contrast": 0.16095699003572694,
+      "coverage_radius": 3.7912714835617125,
+      "gate_verdicts": {
+        "ok": 196,
+        "coverage": 3,
+        "envelope": 1
+      }
+    },
+    {
+      "extra_parameters": 300,
+      "recorded_parameters": 307,
+      "warm_all": {
+        "converged": 200,
+        "failed": 0,
+        "total_iterations": 1190,
+        "mean_iterations": 5.95
+      },
+      "same_neighbour_as_physics": 2,
+      "relative_contrast": 0.09311576715961473,
+      "coverage_radius": 6.704230641245877,
+      "gate_verdicts": {
+        "ok": 198,
+        "envelope": 1,
+        "coverage": 1
+      }
+    },
+    {
+      "extra_parameters": 1000,
+      "recorded_parameters": 1007,
+      "warm_all": {
+        "converged": 200,
+        "failed": 0,
+        "total_iterations": 1240,
+        "mean_iterations": 6.2
+      },
+      "same_neighbour_as_physics": 1,
+      "relative_contrast": 0.051677824183370066,
+      "coverage_radius": 12.519340885096032,
+      "gate_verdicts": {
+        "ok": 196,
+        "coverage": 3,
+        "envelope": 1
+      }
+    }
+  ],
+  "crossover": {
+    "extra_parameters": null,
+    "note": "naive retrieval still beat the nominal guess at every tested width, up to 1000 extra parameters"
+  }
+}

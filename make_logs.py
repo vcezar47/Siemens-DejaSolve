@@ -10,6 +10,7 @@ chosen to span what actually accumulates around a simulation team:
   D  an engineer's note in Romanian, decimal comma — the Brasov reality
   E  a truncated log with a corrupted line        — must be refused, not guessed
   F  a tidy log for a pump bigger than the archive — must be *warned*, not refused
+  G  a 3D structural deck from another domain      — must be refused as foreign
 
 C and D deliberately describe the shaft loads the way a person does ("the
 standard fan curves", "sarcina e mica") rather than as coefficients. Those
@@ -200,6 +201,69 @@ solving steady state ...
   iter  1  residual 7.204e+01
   iter  6  residual 1.118e+01
 initialisation slow - continuing under operator supervision
+""",
+    scored=False,
+)
+
+
+# --- G: a 3D structural run, from the wrong domain entirely -----------------
+# Not a hydraulic case at all. It is here because the engineers interviewed on
+# 19 Aug asked for something general and talked mostly about Simcenter 3D, and
+# the honest answer to "would this work on our models?" is a demonstration of
+# the boundary rather than a promise: Layer 1 reads the file, Layer 3 refuses it
+# as a different kind of model, and the field-transfer adapter that would be
+# needed to actually use it is not built.
+#
+# A solver log rather than a bare deck, because that is the artifact that
+# accumulates around a team -- and because the banner is where the trap lives.
+# `SYNONYMS` maps "density" onto `rho` -- one field name in this schema genuinely
+# collides with a structural log -- so a parser without a domain check records
+# aluminium at 2.7e-09 tonne/mm^3 as the hydraulic fluid density. The unit gate
+# would catch that particular value by luck; it would not catch one that happened
+# to look plausible. Here the match is caught, reported as what *would* have been
+# mis-mapped, and discarded. No synonym was added to manufacture the collision:
+# it is the only one this schema has, and the count grows with the schema.
+_add(
+    "part-bracket.log",
+    {},
+    [],
+    """ SIMCENTER NASTRAN  2406.0    ANALYSIS SUMMARY
+ ======================================================================
+ Model file ......................:  bracket_lh_v7.prt
+ Subcase .........................:  linear static, 3g vertical
+ Solution sequence ...............:  SOL 101
+ Material ........................:  6061-T6 aluminium
+ Density .........................:  2.70E-09 tonne/mm^3
+ Elastic modulus .................:  68900. MPa
+ Shell thickness .................:  3.0 mm
+ Analyst .........................:  r.marinescu
+ Exported ........................:  2026-04-11 09:24:33
+
+           I N P U T   B U L K   D A T A   E C H O
+ ----------------------------------------------------------------------
+SOL 101
+CEND
+TITLE = BRACKET LH V7 - 3G VERTICAL
+SUBCASE 1
+  LOAD = 10
+  SPC  = 20
+BEGIN BULK
+PARAM,POST,-1
+MAT1    1       68900.  25902.  0.33    2.70-9
+PSHELL  1       1       3.0     1
+GRID    1       0       12.500  0.000   45.000
+GRID    2       0       25.000  0.000   45.000
+GRID    3       0       25.000  12.000  45.000
+GRID    4       0       12.500  12.000  45.000
+GRID    5       0       37.500  0.000   45.000
+GRID    6       0       37.500  12.000  45.000
+CQUAD4  1       1       1       2       3       4
+CQUAD4  2       1       2       5       6       3
+FORCE   10      3       0       1471.   0.      0.      -1.
+SPC1    20      123456  1       4
+ENDDATA
+ ----------------------------------------------------------------------
+ *** ANALYSIS COMPLETE.  MAX VON MISES 214.7 MPA AT ELEMENT 2
 """,
     scored=False,
 )

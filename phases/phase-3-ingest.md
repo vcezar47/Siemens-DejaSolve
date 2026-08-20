@@ -292,3 +292,56 @@ though the nominal guess (7) is available for free and involves no archive.
 The headline now says so out loud rather than hiding it, but the fallback
 itself has not been switched — it changes Act 3's behaviour, so it is a
 deliberate decision rather than a tidy-up.
+
+---
+
+## Addendum — 20 Aug: a Case Card is a record *of a kind of model*
+
+Driven by §0b, where the engineers asked for something general and talked mostly about Simcenter 3D. A
+seventh fixture, `logs/part-bracket.log`, is an NX Nastran solver log with a bulk-data echo — a real artifact
+shape from a domain this project does not solve.
+
+**What was added**
+
+- `casecard.DOMAIN` and `FOREIGN_DOMAINS`: a Case Card now records *which kind of model* produced it, detected
+  by marker count (`GRID`, `CQUAD4`, `PSHELL`, `MAT1`, `BEGIN BULK`, …) rather than by file extension.
+- `detect_domain()` also reads what is legible — solution sequence, title, modulus, Poisson ratio, thickness,
+  element counts — so a refusal can be *specific*. "This is a 3D structural deck, 6 nodes, linear static" and
+  "I could not read your file" are different sentences, and only one tells an engineer what to do next.
+- A domain gate in `dejasolve.analyse()`, placed **before the unit check**. Plausibility is judged against a
+  schema; if the schema does not apply, "off by orders of magnitude" is the wrong complaint.
+- `ingest_hybrid` returns early on a foreign artifact: no model is called, because there is nothing to extract
+  and asking anyway is how one gets talked into inventing seven fields.
+
+**The finding worth quoting.** The log's banner reads `Density ....: 2.70E-09 tonne/mm^3`, and `SYNONYMS` maps
+`density` onto `rho`. Without the domain check the Case Card records aluminium as the hydraulic fluid density.
+The card now reports it instead:
+
+    would_have_been_mismapped   rho <- 2.70E-09 tonne/mm^3
+
+**One collision, and no synonym was added to manufacture it.** This schema has seven fields and exactly one
+shares a name with anything in a structural log. The general claim is not "there is one collision" — it is
+that field names are domain-scoped and the count grows with the schema, which is why this matters more at the
+hundreds of parameters phase 1c is about. The unit gate would have caught *this* value by luck; it would not
+have caught one that looked plausible.
+
+**The Ingest stage stays green.** Ingest did not fail — it succeeded at the only thing available to succeed
+at. Marking it blocked would have said the parser broke, when what happened is that it correctly identified an
+artifact whose fields do not exist here.
+
+**Re-verified 20 Aug, after these changes.** `python ingest.py --compare` with the local model reachable
+reproduces the Phase 3 table exactly — rules 23/35, ollama 27/35, **hybrid 33/35 (94%)**, and **0 invented on
+all three**. That last figure is the one that mattered here: `ingest_rules` and `ingest_hybrid` were both
+edited for the domain gate, and the ingest verifier still holds. It is also the first execution of the model
+path since 17 Aug, so the number on the slide is measured rather than remembered.
+
+**Not scored.** Like `run-bigpump.log`, it carries `scored=False`, so the ingest accuracy figure is still
+5 artifacts / 35 fields / 23 for the parser. It exists for the gate, not for the parser.
+
+**Rejected**
+
+- **Adding a "material density" synonym so the collision would fire.** Introducing the bug in order to
+  demonstrate catching it. The fixture uses the wording that genuinely collides with the table as it stands.
+- **Marking Ingest as failed on a foreign artifact.** It would blame the wrong component.
+- **Anything that implies 3D support.** No mesh is read, no field is mapped, nothing structural is solved. The
+  transfer adapter is the next-steps item, and the demo shows the boundary rather than crossing it.

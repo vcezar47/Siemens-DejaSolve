@@ -1,0 +1,37 @@
+ SIMCENTER NASTRAN  2406.0    ANALYSIS SUMMARY
+ ======================================================================
+ Model file ......................:  bracket_lh_v7.prt
+ Subcase .........................:  linear static, 3g vertical
+ Solution sequence ...............:  SOL 101
+ Material ........................:  6061-T6 aluminium
+ Density .........................:  2.70E-09 tonne/mm^3
+ Elastic modulus .................:  68900. MPa
+ Shell thickness .................:  3.0 mm
+ Analyst .........................:  r.marinescu
+ Exported ........................:  2026-04-11 09:24:33
+
+           I N P U T   B U L K   D A T A   E C H O
+ ----------------------------------------------------------------------
+SOL 101
+CEND
+TITLE = BRACKET LH V7 - 3G VERTICAL
+SUBCASE 1
+  LOAD = 10
+  SPC  = 20
+BEGIN BULK
+PARAM,POST,-1
+MAT1    1       68900.  25902.  0.33    2.70-9
+PSHELL  1       1       3.0     1
+GRID    1       0       12.500  0.000   45.000
+GRID    2       0       25.000  0.000   45.000
+GRID    3       0       25.000  12.000  45.000
+GRID    4       0       12.500  12.000  45.000
+GRID    5       0       37.500  0.000   45.000
+GRID    6       0       37.500  12.000  45.000
+CQUAD4  1       1       1       2       3       4
+CQUAD4  2       1       2       5       6       3
+FORCE   10      3       0       1471.   0.      0.      -1.
+SPC1    20      123456  1       4
+ENDDATA
+ ----------------------------------------------------------------------
+ *** ANALYSIS COMPLETE.  MAX VON MISES 214.7 MPA AT ELEMENT 2

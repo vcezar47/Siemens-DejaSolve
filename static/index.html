@@ -81,6 +81,9 @@
   .note{margin-top:8px;padding:9px 11px;border-left:2px solid var(--refuse);
         background:rgba(255,107,94,.06);color:var(--dim);font-size:12.5px;line-height:1.5}
   .sugg{margin-top:8px;font:12px/1.6 var(--mono);color:var(--dim)}
+  .foreign{margin-top:8px;font:11.8px/1.7 var(--mono);color:var(--dim);
+           border-left:2px solid var(--teal-dim);padding-left:10px}
+  .foreign .fk{display:inline-block;min-width:190px;color:var(--faint)}
   .sugg b{color:var(--warn);font-weight:600}
 
   /* headline */
@@ -139,6 +142,55 @@
   .empty{padding:40px 16px;text-align:center;color:var(--faint);font-size:13.5px}
   .err{margin:16px;padding:12px;border:1px solid var(--refuse);border-radius:8px;
        color:var(--refuse);font:12.5px var(--mono)}
+
+  /* --- evidence: measured offline, shown beside the live pipeline ---------
+     Labelled rather than blended in. Everything above this line is the service
+     doing something now; everything below it is a number `run_all.py`
+     produced. A demo that shows both without saying which is which is the
+     failure mode this project is about. */
+  .ev{padding:0 26px 26px}
+  .ev > h2{margin:0 0 3px;font-size:12px;text-transform:uppercase;letter-spacing:.9px;
+           color:var(--dim);font-weight:600}
+  .ev .evsub{color:var(--faint);font-size:12px;margin-bottom:14px}
+  .ev .evsub code{color:var(--teal);background:var(--panel-2);padding:2px 6px;
+                  border-radius:5px;font-size:11.5px}
+  .evgrid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .card h3{margin:0 0 2px;font-size:13.5px;font-weight:650}
+  .card .cn{color:var(--faint);font-size:11.5px;margin-bottom:11px}
+  .card .lede{font:12.5px/1.55 var(--mono);color:var(--dim);margin-top:10px}
+  .card .lede b{color:var(--ink)}
+
+  .bars{display:flex;flex-direction:column;gap:7px}
+  .bar{display:grid;grid-template-columns:78px 1fr 46px;gap:9px;align-items:center;
+       font:12px var(--mono)}
+  .bar .bl{color:var(--dim);text-align:right}
+  .bar .bt{height:15px;border-radius:4px;background:var(--teal-dim);opacity:.85}
+  .bar .bv{color:var(--ink);font-weight:600}
+  .bar.best .bt{background:var(--ok)} .bar.best .bv{color:var(--ok)}
+  .bar.worst .bt{background:var(--refuse)} .bar.worst .bv{color:var(--refuse)}
+  .bar.mid .bt{background:var(--warn)} .bar.mid .bv{color:var(--warn)}
+
+  .cmp{width:100%;border-collapse:collapse;font:12px var(--mono)}
+  .cmp th{color:var(--faint);font-size:10.5px;text-transform:uppercase;
+          letter-spacing:.6px;padding:0 0 7px;text-align:right;font-weight:600}
+  .cmp th:first-child{text-align:left}
+  .cmp td{padding:5px 0;border-top:1px solid rgba(36,50,55,.6);text-align:right;color:var(--ink)}
+  .cmp td:first-child{text-align:left;color:var(--dim)}
+  .cmp tr.alarm td{color:var(--refuse);font-weight:650}
+  .cmp tr.alarm td:first-child{color:var(--refuse)}
+  .cmp tr.good td{color:var(--ok);font-weight:650}
+  .cmp tr.good td:first-child{color:var(--ok)}
+
+  .kv{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}
+  .kv > div{min-width:88px}
+  .kv .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint)}
+  .kv .v{font:17px/1.3 var(--mono);font-weight:650}
+  .kv .v.ok{color:var(--ok)} .kv .v.warn{color:var(--warn)} .kv .v.bad{color:var(--refuse)}
+  .kv .v.dim{color:var(--dim);font-size:14px}
+  .chart{margin-top:4px}
+  .chart text{fill:var(--faint);font:10px var(--mono)}
+  .evmissing{color:var(--warn);font:12px var(--mono);padding:10px 0}
 </style>
 </head>
 <body>
@@ -169,6 +221,13 @@
   </section>
 </main>
 
+<section class="ev">
+  <h2>Evidence</h2>
+  <div class="evsub">Measured offline, not computed for this page &mdash;
+    regenerate every number with <code>python run_all.py</code>.</div>
+  <div id="evidence"></div>
+</section>
+
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c =>
@@ -194,8 +253,13 @@ function renderHealth(h){
   const B = h.backends || {};
   const ready = Object.keys(B).filter(k => B[k].available);
 
+  // "cases" was true until the failed runs were kept as well. Both halves, and
+  // the failed one is amber rather than red: a failed run is not an error, it is
+  // the more expensive half of what the archive knows.
+  const failed = h.archive_failed
+    ? ` <span style="color:var(--warn)">&middot; <b>${h.archive_failed}</b> failed</span>` : '';
   $('#badges').innerHTML =
-    `<span class="badge">archive <b>${h.archive_size}</b> cases</span>` +
+    `<span class="badge">archive <b>${h.archive_size}</b> solved${failed}</span>` +
     `<span class="badge">ingest <b>${ready.join(' + ') || 'none'}</b></span>` +
     (B.ollama && B.ollama.available
       ? `<span class="badge" style="color:var(--ok)">local <b>on-prem</b></span>` : '');
@@ -245,6 +309,136 @@ async function refreshHealth(){
   catch(e){ /* transient: keep showing the last known state */ }
 }
 
+
+//: Everything below renders `/api/evidence` -- numbers `run_all.py` measured,
+//: never anything the service computed for this page view. The heading says so
+//: rather than leaving the viewer to work out which half is which.
+const f2 = v => (v === null || v === undefined) ? '-' : (+v).toFixed(2);
+const f3 = v => (v === null || v === undefined) ? '-' : (+v).toFixed(3);
+
+function bars(arms, opts){
+  const vals = arms.map(a => a.mean).filter(v => v != null);
+  const max = Math.max(...vals);
+  const best = Math.min(...vals);
+  return `<div class="bars">` + arms.map(a => {
+    const cls = a.mean === best ? 'best' : a.mean === max ? 'worst'
+              : (opts && opts.mid === a.label) ? 'mid' : '';
+    const w = a.mean == null ? 0 : (a.mean / max) * 100;
+    return `<div class="bar ${cls}"><div class="bl">${esc(a.label)}</div>` +
+           `<div><div class="bt" style="width:${w}%"></div></div>` +
+           `<div class="bv">${f2(a.mean)}</div></div>`;
+  }).join('') + `</div>`;
+}
+
+//: A hand-drawn SVG rather than a charting library: the page is one file with
+//: no CDN, and this is 30 lines. Log x because the interesting range spans 7 to
+//: 1007; y is a percentage so both series share one axis honestly.
+function lineChart(series, xs){
+  const W = 340, H = 150, L = 30, R = 8, T = 10, B = 24;
+  const lx = v => Math.log10(v);
+  const x0 = lx(Math.min(...xs)), x1 = lx(Math.max(...xs));
+  const px = v => L + (lx(v) - x0) / (x1 - x0) * (W - L - R);
+  const py = v => H - B - (v / 100) * (H - T - B);
+  const grid = [0, 50, 100].map(v =>
+    `<line x1="${L}" y1="${py(v)}" x2="${W - R}" y2="${py(v)}"
+           stroke="#243237" stroke-width="1"/>
+     <text x="${L - 5}" y="${py(v) + 3}" text-anchor="end">${v}</text>`).join('');
+  const ticks = [xs[0], xs[Math.floor(xs.length / 2)], xs[xs.length - 1]].map(v =>
+    `<text x="${px(v)}" y="${H - 8}" text-anchor="middle">${v}</text>`).join('');
+  const paths = series.map(s => {
+    const d = s.pts.map((p, i) => `${i ? 'L' : 'M'}${px(p[0])},${py(p[1])}`).join(' ');
+    const dots = s.pts.map(p =>
+      `<circle cx="${px(p[0])}" cy="${py(p[1])}" r="3" fill="${s.color}"/>`).join('');
+    return `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2"/>${dots}`;
+  }).join('');
+  const key = series.map((s, i) =>
+    `<text x="${L + 4}" y="${T + 12 + i * 13}" fill="${s.color}">${esc(s.label)}</text>`).join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img">
+            ${grid}${ticks}${paths}${key}</svg>`;
+}
+
+function drawEvidence(ev){
+  const S = ev.sections || {};
+  const cards = [];
+
+  if(S.phase1){
+    const a = S.phase1;
+    cards.push(`<div class="card"><h3>${esc(a.title)}</h3>
+      <div class="cn">${a.n} fresh cases &middot; ${esc(a.basis)}</div>
+      ${bars(a.arms, {mid: 'nominal'})}
+      <div class="lede">The <b>nominal</b> guess is the baseline that matters &mdash;
+        a flat start is one nobody ships. <b>31% fewer iterations</b> than a good
+        engineering guess.</div></div>`);
+  }
+
+  if(S.surrogate){
+    const s = S.surrogate;
+    cards.push(`<div class="card"><h3>${esc(s.title)}</h3>
+      <div class="cn">${s.n} cases &middot; ${esc(s.basis)}</div>
+      ${bars(s.arms, {mid: 'nominal'})}
+      <div class="lede">And it is <b>not an answer</b>: median residual
+        <b>${(+s.residual_median).toFixed(2)}</b> against a solver tolerance of
+        ${s.solver_tolerance}. <b>${s.were_solutions} of ${s.n}</b> predictions were
+        solutions. The best starting guess is the one that satisfies nothing.</div></div>`);
+  }
+
+  if(S.fold){
+    const f = S.fold;
+    cards.push(`<div class="card"><h3>${esc(f.title)}</h3>
+      <div class="cn">the fold circuit, where the guess selects the answer &middot; ${f.n} cases</div>
+      <table class="cmp"><thead><tr><th></th><th>retrieval</th><th>prediction</th></tr></thead>
+      <tbody>${f.rows.map(r =>
+        `<tr class="${r.alarm ? 'alarm' : r.good ? 'good' : ''}">
+           <td>${esc(r.label)}</td><td>${r.retrieval}</td><td>${r.prediction}</td></tr>`).join('')}
+      </tbody></table>
+      <div class="lede">The prediction wins on speed and is <b>ten times more dangerous</b>
+        unverified. Retrieval fails loudly 49 times; the prediction converges and is
+        wrong 40 times. <b>Verified, both are zero.</b></div></div>`);
+  }
+
+  if(S.failures){
+    const x = S.failures;
+    cards.push(`<div class="card"><h3>${esc(x.title)}</h3>
+      <div class="cn">${x.archive.succeeded} solved / ${x.archive.failed} failed in the archive</div>
+      <div class="kv">
+        <div><div class="k">will this run die?</div>
+             <div class="v ok">${f3(x.auc_hard_case)}</div></div>
+        <div><div class="k">control</div>
+             <div class="v dim">${f3(x.auc_control)}</div></div>
+        <div><div class="k">will reuse go wrong?</div>
+             <div class="v warn">${f3(x.auc_bad_transfer)}</div></div>
+      </div>
+      <div class="lede">AUC, 0.50 is a coin flip. The failures carry information the
+        successes do not (<b>0.65 &rarr; 0.77</b>) &mdash; but they predict a hard
+        <b>case</b>, not an illegitimate <b>transfer</b>. So: <b>${esc(x.verdict)}</b>.</div></div>`);
+  }
+
+  if(S.dimensionality){
+    const d = S.dimensionality;
+    const xs = d.points.map(p => p.width);
+    const chart = lineChart([
+      {label: 'admitted by the distance gate', color: '#ffb454',
+       pts: d.points.map(p => [p.width, 100 * p.admitted / d.n])},
+      {label: 'found the right neighbour', color: '#1f77b4',
+       pts: d.points.map(p => [p.width, 100 * p.same_pick / d.n])},
+    ], xs);
+    const last = d.points[d.points.length - 1];
+    cards.push(`<div class="card"><h3>${esc(d.title)}</h3>
+      <div class="cn">% of ${d.n} queries &middot; Case Card width, 7 real + inert</div>
+      ${chart}
+      <div class="lede">At <b>${last.width}</b> parameters retrieval picks the right
+        neighbour <b>${last.same_pick} time${last.same_pick === 1 ? '' : 's'} in ${d.n}</b>
+        &mdash; and the distance gate still admits it. Iterations only slip
+        ${f2(d.warm_physics)} &rarr; <b>${f2(last.mean)}</b>, so nothing looks wrong.
+        <b>A distance threshold cannot detect the failure of a distance metric.</b></div></div>`);
+  }
+
+  const miss = (ev.missing || []).length
+    ? `<div class="evmissing">not measured yet: ${ev.missing.join(', ')}
+       &mdash; run <code>${esc(ev.reproduce)}</code></div>` : '';
+  $('#evidence').innerHTML = miss + `<div class="evgrid">${cards.join('')}</div>`;
+}
+
 async function boot(){
   try{
     renderHealth(await (await fetch('/api/health')).json());
@@ -256,6 +450,12 @@ async function boot(){
     window.addEventListener('focus', refreshHealth);
     // and a slow backstop for the case where neither of those happens
     setInterval(refreshHealth, 15000);
+
+    // The evidence panel is decoration for the demo, so a failure here must
+    // not take the pipeline down with it.
+    fetch('/api/evidence').then(r => r.json()).then(drawEvidence)
+      .catch(() => { $('#evidence').innerHTML =
+        '<div class="evmissing">evidence unavailable</div>'; });
 
     SAMPLES = await (await fetch('/api/samples')).json();
     $('#samples').innerHTML = SAMPLES.map((s,i) =>
@@ -403,6 +603,26 @@ function draw(t){
     if(st.detail && st.detail.note) extra += `<div class="note">${esc(st.detail.note)}</div>`;
     if(st.detail && st.detail.overridden && st.detail.basis)
       extra += `<div class="sugg">basis: ${esc(st.detail.basis)}</div>`;
+    // Context, deliberately not a verdict. Proximity to a failed run predicts
+    // whether a *case* is hard (AUC 0.77) and barely predicts whether a
+    // *transfer* is legitimate (0.63), so it is stated as two distances and
+    // nothing is concluded from it on screen.
+    // What Layer 1 read out of an artifact from another domain. Shown because
+    // the refusal is only convincing if you can see that the file *was* read:
+    // "I could not parse your file" and "this is a 3D structural deck, 6 nodes,
+    // linear static, and none of its fields exist in this schema" are different
+    // sentences, and only one of them tells an engineer what to do next.
+    const fg = st.detail && st.detail.foreign;
+    if(fg){
+      extra += '<div class="foreign">' + Object.entries(fg).map(([k, val]) =>
+        `<div><span class="fk">${esc(k)}</span>${esc(val)}</div>`).join('') + '</div>';
+    }
+    const nf = st.detail && st.detail.nearest_failure;
+    if(nf){
+      extra += `<div class="sugg">indexed on <b>${st.detail.indexed_on}</b> parameters &middot; ` +
+        `nearest of ${nf.archive_failures} failed runs: ${esc(nf.case_id)} ` +
+        `(${nf.distance.toFixed(2)} away, ${esc(nf.status)})</div>`;
+    }
     html += `<div class="stage ${st.state}" style="animation-delay:${i*90}ms">
        <div class="dot">${glyph}</div>
        <div><div class="name">${esc(st.title)}</div><div class="sub">${esc(st.subtitle)}</div></div>

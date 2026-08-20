@@ -12,8 +12,10 @@ happened and the plan is what was intended.
 | 0 · Validate + scaffold | ✅ closed 16 Aug | [phase-0-validation.md](phase-0-validation.md) |
 | 1 · THE NUMBER | ✅ gate met 16 Aug | [phase-1-the-number.md](phase-1-the-number.md) |
 | 1b · Surrogate arm | ✅ built 20 Aug — the *predicted* warm start, measured | [phase-1b-surrogate.md](phase-1b-surrogate.md) |
+| 1c · Dimensionality | ✅ built 20 Aug — retrieval at 1000 parameters, and what the gate misses | [phase-1c-dimensionality.md](phase-1c-dimensionality.md) |
 | 2 · Verifier | ✅ gate met 17 Aug · contract amended 19 Aug (warn/block) | [phase-2-verifier.md](phase-2-verifier.md) |
-| 3 · Agent + UI | ✅ gate met 17 Aug (UI shipped: FastAPI service + single-page UI) | [phase-3-ingest.md](phase-3-ingest.md) |
+| 2b · Failure archive | ✅ built 20 Aug — measured, and declined as a gate rule | [phase-2b-failure-archive.md](phase-2b-failure-archive.md) |
+| 3 · Agent + UI | ✅ gate met 17 Aug (UI shipped) · domain gate added 20 Aug (3D artifact) | [phase-3-ingest.md](phase-3-ingest.md) |
 | 4 · Cloud/Docker + final measurements | not started | — |
 | 5 · Slides + rehearsal | not started | — |
 

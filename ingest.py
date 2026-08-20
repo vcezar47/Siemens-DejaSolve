@@ -96,6 +96,18 @@ def ingest_rules(text: str, artifact: str, case_id: str) -> CaseCard:
         params[canon] = value
         provenance[canon] = f"{m.group('value')} {raw_unit or ''}".strip()
 
+    domain, foreign = casecard.detect_domain(text)
+    if domain != casecard.DOMAIN:
+        # The matches are the point, not an accident. A NASTRAN deck states a
+        # material density; SYNONYMS maps "density" onto `rho`; without the
+        # domain check the card would record aluminium as the hydraulic fluid.
+        # So they are recorded as *what would have been mis-mapped* and the
+        # params are left empty -- nothing in this schema applies to this file.
+        if params:
+            foreign["would_have_been_mismapped"] = ", ".join(
+                f"{k} <- {provenance[k]}" for k in sorted(params))
+        params, provenance = {}, {}
+
     return CaseCard(
         case_id=case_id,
         source={"artifact": artifact, "ingested_by": "rules",
@@ -103,6 +115,8 @@ def ingest_rules(text: str, artifact: str, case_id: str) -> CaseCard:
         params=params,
         provenance=provenance,
         missing=[p for p in model.PARAM_NAMES if p not in params],
+        domain=domain,
+        foreign=foreign,
     )
 
 
@@ -452,6 +466,12 @@ def ingest_hybrid(text: str, name: str, case_id: str,
     card = ingest_rules(text, name, case_id)
     if card.complete:
         card.source["ingested_by"] = "rules (complete, model not needed)"
+        return card
+    if card.foreign_domain:
+        # A foreign artifact never reaches the model. There is nothing for it to
+        # extract -- the fields do not exist in this file -- and asking anyway is
+        # how a language model gets talked into inventing seven of them.
+        card.source["ingested_by"] = "rules (foreign domain, model not asked)"
         return card
 
     which = which or _first_model_backend()

@@ -179,12 +179,24 @@ to the start. **Put this on slide 2 as a diagram**: it is a cost narrative in th
 invented one, every backward arrow is the expensive event, and prototyping is the archive-population story told
 for free. Déjà Solve sits on the loop-back arrows.
 
+**Hundreds of parameters, not seven.** Answered with a measurement rather than an apology: §6g. The index
+degrades (31% → 12.7% at 1007 recorded parameters, picking at near-random by 37) and the physics gate does
+not — which is why the gate was built from physics in the first place.
+
+**Both successful and failed runs in the archive.** Acted on the same week — the failures were being
+collected and thrown away. Built, measured, and *declined as a gate rule* on the evidence: §6f.
+
 **Domains: automotive, aerospace, heavy industry.** Narrate automotive — it is the one the three gates belong to
 — and name the other two as transferable in a single line.
 
 **"Make it general, almost universal."** Offered STAR-CCM+ or Amesim as anchors, they said those would each be
 slightly different in implementation and they would rather it be general. The product they talked about most,
 by a distance, was **Simcenter 3D**.
+
+> **Update 20 Aug — §6h.** The verbal answer below still stands, and it is now backed by a live behaviour:
+> a Simcenter 3D / NX Nastran solver log is the seventh fixture. Layer 1 reads it, the domain gate refuses it
+> as a different kind of model, and the Case Card reports the field-name collision it prevented. A
+> demonstration of the boundary, not a crossing of it.
 
 **Do not rewrite the demo onto Simcenter 3D**, and be clear-eyed about why: 9 days left, and in 3D the
 warm-start object stops being a 7-element state vector and becomes a field that must be mapped mesh-to-mesh.
@@ -873,6 +885,221 @@ false one, and the `post_only` arm exists in `surrogate.py` precisely so the cla
   circuit and the same queries — and it lands harder because the prediction is the arm that just *won* Act 2.
 - **Do not claim the surrogate is PhysicsAI.** It is a 36-feature polynomial standing in for one, so that the
   comparison can be shown on a laptop. Say that out loud; the audience built the real thing.
+
+---
+
+## 6f. Measured results — the failure archive, 20 Aug
+
+Full record: [`phases/phase-2b-failure-archive.md`](phases/phase-2b-failure-archive.md). Reproduce with
+`python failure_zone.py`, or as *Phase 2b* inside `python run_all.py`.
+
+Straight from §0b: the engineers asked for **both successful and failed runs** in the archive. They were right
+and the code was wrong — `sweep.py` was reducing failures to a tally, and `fold.build_archive` was discarding
+**165 of 300 runs**, more than half the compute, behind a comment claiming that filtering is what makes the
+archive an asset.
+
+The runs are now kept. Whether that is a feature or a filing cabinet was then measured rather than assumed.
+
+**The candidate rule**, deliberately the simplest thing that could work and the same shape as the gate it
+would have joined: *warn when the nearest **failed** case is closer than the nearest **successful** one.*
+
+### It predicts one thing well and the other thing barely
+
+Fold circuit, 135 succeeded / 165 failed, 200 queries:
+
+| | **`hard_case`** — will this run die? | **`bad_transfer`** — will reuse go wrong? |
+|---|---|---|
+| base rate | 56.0% | 26.5% |
+| P(bad \| rule fired) | **74.8%** | 30.4% |
+| recall | 76.8% | 66.0% |
+| lift over base rate | **1.34x** | 1.15x |
+| **AUC** | **0.770** | 0.633 |
+
+### The control is the part worth presenting
+
+Failures cluster where the circuit is hard — and successes are **sparse in the same places**. So a positive
+result might mean nothing more than *"you are far from anything solved"*, which the **coverage rule already
+sees**. That confound is checked on every run:
+
+| score | `hard_case` AUC |
+|---|---|
+| distance to nearest **success** only — *what coverage already sees* | 0.650 |
+| distance to nearest **failure** only | 0.740 |
+| **the rule** (success − failure) | **0.770** |
+
+**0.650 → 0.770: the failed runs carry information the successful ones do not.** The engineer's request was
+correct, and it is not an artefact of sparsity.
+
+### And it is *not* being added to the gate — say this before anyone asks why
+
+**Failure-proximity predicts whether the case is hard. It barely predicts whether a transfer is legitimate**
+(0.770 against 0.633). Those are different questions and the archive answers one of them. So it is **advisory
+information for the engineer, not a rule in the transfer gate** — which is exactly the line §0b already drew:
+*the engineer decides what to do with a risk; the system decides what is a fact.*
+
+Two more reasons, both worth saying out loud:
+
+1. **The base rate is 56%.** On a circuit where over half the runs die from cold, *"this one might die"* is
+   not news. The rule beats always-warning on precision and the AUC says the ranking is real, but the value
+   depends on a failure rate the demo circuit does not have.
+2. **It would be inert in the demo.** The base circuit fails 5 times in 400; the rule fires 3 times in 200 and
+   catches 0 of the 4 hard cases. `failure_zone.py` prints **UNDERPOWERED** rather than letting anyone quote
+   that number as evidence.
+
+> **A failure archive is only worth consulting where runs actually fail.** That is the honest scoping
+> sentence, and it is also the answer to *"would this help us?"* — it depends on your failure rate, and here
+> is roughly where it starts paying.
+
+### What this changes in the deck
+
+- **The limits slide gains the best line in it:** *"They asked for the failed runs. I added them, measured
+  whether proximity to a failure predicts anything, and it predicts case difficulty at AUC 0.77 — but not
+  transfer legitimacy, so I did not put it in the gate."* Requested, built, measured, **and declined on the
+  evidence.**
+- **Nothing in the demo changes.** No new stage, no new rule, no new artifact on screen.
+- **It is the third claim this project has tested and not shipped**, after the rescued-failures claim (§6a)
+  and the prediction pre-filter as a safety mechanism (§6e). That pattern is the most credible thing about
+  the work — and this time the measurement happened *before* the code would have gone in.
+
+---
+
+## 6g. Measured results — hundreds of parameters, 20 Aug
+
+Full record: [`phases/phase-1c-dimensionality.md`](phases/phase-1c-dimensionality.md) ·
+figure: `figs/dimensionality.png` · reproduce with `python dimensionality.py`.
+
+From §0b: *these simulations have hundreds of parameters, not seven.* Correct, and the useful question is not
+whether 7 is small — it is **which layer breaks first when it is not 7.**
+
+The realistic case is not hundreds of parameters that all matter; it is hundreds *recorded*, of which a
+handful drive any given output. So the physics stays exactly as it is and the *recorded* vector grows with
+entries that are real numbers on the Case Card and inert in the equations, 7 → 1007. Nuisance entries are
+drawn on [0, 1], the same range the real parameters occupy after normalisation, so they carry no more weight
+in the distance than a real one — **the favourable case for naive retrieval.**
+
+| Case Card width | mean iterations | vs nominal | same neighbour as physics-only retrieval | relative contrast |
+|---|---|---|---|---|
+| 7 (real only) | 4.89 | **31.1%** | 200/200 | 0.661 |
+| 17 | 5.34 | 24.8% | 23/200 | 0.423 |
+| 37 | 5.69 | 19.9% | 3/200 | 0.278 |
+| 107 | 5.96 | 16.0% | 3/200 | 0.161 |
+| 1007 | 6.20 | **12.7%** | 1/200 | 0.052 |
+
+### Say these three in this order
+
+**1. It degrades, it does not collapse — and the reason is not a compliment to the index.** At 1007 recorded
+parameters retrieval still beats the archive-free nominal guess by 12.7%. That is because on this circuit
+every archived state is a plausible operating point, so even a random one beats a formula. *The archive is
+doing the work; the index has stopped contributing.* Circuit-specific — where the starting guess selects the
+answer rather than the cost (the fold circuit), a random neighbour is not slower, it is wrong. **Not
+measured**; say so.
+
+**2. Retrieval stops working long before it stops helping.** By **37 recorded parameters** the index agrees
+with physics-only retrieval on **3 of 200** queries — near chance. Relative contrast collapses 0.661 → 0.052:
+every archived case is about equally far away and "nearest" has stopped meaning anything. The iteration count
+barely notices, which is what makes it dangerous.
+
+**3. The distance gate cannot see any of it. This is the result.** The coverage rule is re-derived in
+whatever space retrieval indexes, so it is compared like with like — its radius scales correctly, 0.53 → 12.52
+— **and it keeps admitting 196–198 of 200 at every width.** It does not fail loudly; it fails by *approving*,
+because the same concentration that destroyed the signal inflated the radius the distance is checked against.
+
+> **A distance threshold cannot detect the failure of a distance metric.**
+
+Every other gate-1 rule — `envelope`, `breakaway`, `relief` — reads the 7 real parameters and the source's
+recorded regime, and is independent of the card's width **by construction rather than by tuning**.
+
+### Why this is the best answer to the question you were actually asked
+
+It justifies the Phase 2 design decision *retrospectively and with a number*. §6b built the gate out of cheap
+physics rather than a distance threshold because setup distance predicted transfer cost at r = 0.18. §6g says
+what the alternative would have done at scale: **a distance-threshold verifier keeps saying "close enough"
+while retrieval degenerates into picking at random.**
+
+And it reframes the whole objection. *"You only have 7 parameters"* is answered not with an apology but with:
+*"Here is what happens to this system at 1000. The index degrades and the physics gate does not, and that is
+why the gate is built the way it is. The fix is not more data — it is knowing which parameters matter, and
+that is a physics question."*
+
+### What to concede before it is asked
+
+- **It is textbook.** Distance concentration in high dimensions is not a discovery. It is still the answer to
+  the question, and the non-textbook part is *which* of the two gates it takes down.
+- **It says nothing about a model with 300 genuinely active parameters.** That is a harder and different
+  problem.
+- **The graceful degradation is a property of this circuit**, not a general result.
+
+### What this changes in the deck
+
+- **The limits slide loses its weakest line.** "Only 7 parameters" stops being an admission and becomes a
+  measured claim with a figure behind it.
+- **Panel C of `figs/dimensionality.png` is a slide on its own** if there is room: two lines, one falling to
+  the floor and one staying flat at the top, captioned *the gate cannot see retrieval failing.*
+- **Nothing in the demo changes.** No new stage, no new artifact on screen.
+
+---
+
+## 6h. The 3D artifact — the boundary, demonstrated rather than promised, 20 Aug
+
+Record: addendum in [`phases/phase-3-ingest.md`](phases/phase-3-ingest.md). Run it with
+`python dejasolve.py logs/part-bracket.log`, or click it in the page.
+
+From §0b: they asked for something general and talked mostly about **Simcenter 3D**. §0b's answer was that
+generality is a property of the layer and the adapter goes on next steps. That is a correct answer and an
+unsatisfying one to hear, so there is now a seventh artifact: **a Simcenter 3D / NX Nastran solver log**, which
+goes through the real pipeline on stage.
+
+### What happens, in the order it happens
+
+1. **Ingest reads it, and the stage is green.** *"3D structural FE (NX Nastran deck) recognised — 9 facts read,
+   none of them this schema's."* SOL 101, the title, Young's modulus, Poisson's ratio, shell thickness, 6
+   GRIDs, 2 CQUAD4s. Layer 1 is format-agnostic and this is it working, so marking the stage as failed would
+   have been a lie about which component did what.
+2. **The domain gate stops it at Retrieve**, before the unit check — deliberately. Plausibility is judged
+   against a schema, so if the schema does not apply then *"off by orders of magnitude"* is the wrong
+   complaint. An aluminium density is not a badly scaled fluid density; it is a number from another problem.
+3. **The report names the boundary:** *the three layers are solver-agnostic but the Case Card schema is not,
+   and a state cannot be transferred between physics that do not share unknowns.*
+
+### The line to say out loud
+
+The banner reads `Density .........: 2.70E-09 tonne/mm^3`. `SYNONYMS` maps **"density" onto `rho`**. So a
+parser without a domain check records **aluminium as the hydraulic fluid density** and carries on — and the
+Case Card says so, in as many words:
+
+    would_have_been_mismapped   rho <- 2.70E-09 tonne/mm^3
+
+**Concede the scale of it honestly.** That is *one* collision, because this schema has seven fields and only
+one of them shares a name with anything in a structural log. **No synonym was added to manufacture it** — that
+would have been introducing the bug in order to demonstrate catching it. The point is not that there is one
+collision here; it is that field names are domain-scoped, and the count grows with the schema. At the hundreds
+of parameters §6g is about, "which fields mean the same thing" stops being a footnote.
+
+The unit gate would have caught this particular value by luck, because 2.7e-09 is absurd as a fluid density.
+It would not have caught one that happened to look plausible.
+
+**And a foreign artifact never reaches the model.** `ingest_hybrid` returns before calling it — there is
+nothing for it to extract, the fields are not in the file, and asking anyway is how a language model gets
+talked into inventing seven of them. Cheaper *and* safer, which is unusual enough to mention.
+
+### What this does not claim, and say it before anyone asks
+
+- **No 3D anything is solved.** No mesh, no field, no mapping. Nothing in this repo does structural FE.
+- **The transfer adapter is not built**, and that is the actual work — the three-row table on the limits slide
+  (§4) is where it lives.
+- **It is a demonstration of a boundary, not a crossing of one.** The claim is exactly: *this layer reads your
+  file and correctly declines to pretend it can use it.*
+
+That is a smaller claim than "it works with Simcenter 3D", and it is the one that survives being asked a
+second question.
+
+### What this changes in the deck
+
+- **The 3D answer stops being verbal.** When someone asks *"would this work on our models?"* — and after §0b
+  they will — the answer is a click rather than a paragraph.
+- **Act 1 gains a fourth beat if there is room**, and it is 15 seconds: read it, refuse it, show the
+  mis-mapping it prevented. If time is tight this belongs in Q&A instead, not in the demo.
+- **The limits slide is now backed by a live behaviour** rather than by a promise about future work.
 
 ---
 

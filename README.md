@@ -7,6 +7,7 @@ Siemens Summer School 2026 · domain: *Digital Twins & Platforms*
 
 - [DEJA_SOLVE_PLAN.md](DEJA_SOLVE_PLAN.md) — the plan, the pitch and the presentation notes
 - [phases/](phases/) — what was actually built in each phase, and what was rejected
+- [docs/architecture.md](docs/architecture.md) — the two services that exist, what each layer becomes at scale, and what is not built
 
 ## Reproduce every number
 
@@ -72,7 +73,7 @@ The headline is the number, against both baselines: **8 cold / 7 nominal → 4 w
 Below the pipeline sits an **Evidence** panel: the measured results — the three
 arms, the surrogate arms, the fold circuit's 4-vs-40, the failure-archive AUC and
 its control, the dimensionality chart, and the 25-parameter sweep with the
-hardware rule's scatter table — read live from the result JSONs by
+hardware rule's scatter table, and the four rankers that all lose to an oracle — read live from the result JSONs by
 `GET /api/evidence`, above a line stating whether the numerical invariants in
 `selftest.py` currently hold. It is labelled *measured offline*, because none of it is
 something the service computes per request, and each card states the basis its

@@ -1,0 +1,35 @@
+{
+  "generated_utc": "2026-08-20T12:40:42+00:00",
+  "model": "granite4",
+  "k": 5,
+  "arms": [
+    {
+      "model": "granite4",
+      "n_scored": 200,
+      "parse_failures": 0,
+      "agreed_with_distance": 55,
+      "mean_iterations": 5.205,
+      "total_iterations": 1041,
+      "inadmissible": 0,
+      "distance_total": 984,
+      "oracle_total": 868,
+      "distance_inadmissible": 0,
+      "oracle_inadmissible": 0,
+      "circuit": "base"
+    },
+    {
+      "model": "granite4",
+      "n_scored": 200,
+      "parse_failures": 0,
+      "agreed_with_distance": 89,
+      "mean_iterations": 7.875,
+      "total_iterations": 1575,
+      "inadmissible": 10,
+      "distance_total": 1589,
+      "oracle_total": 1361,
+      "distance_inadmissible": 11,
+      "oracle_inadmissible": 5,
+      "circuit": "fold"
+    }
+  ]
+}

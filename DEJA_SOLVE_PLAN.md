@@ -227,6 +227,14 @@ workflow needs a name, a reason and a timestamp, which is what `trace["audit"]` 
 The §0 guardrail holds: this feeds the **verifier's contract and the Case Card schema only**. No new layer, no
 new scope. Simcenter 3D goes on next steps. The three gates go on slide 2. Neither reopens the build.
 
+### Backlog — wanted, not scheduled
+
+- **3D visualisation (requested 20 Aug).** Something visual and three-dimensional, beyond the domain gate's
+  refusal of `part-bracket.log`. Not scoped yet, and worth being clear-eyed when it is: rendering a mesh is
+  presentation, whereas *transferring a field between meshes* is the adapter §4 lists as the first
+  next-steps item. Decide which of the two is being asked for before starting — one is an afternoon and the
+  other is the real engineering.
+
 ### Still unanswered — and deliberately left that way (decided 19 Aug)
 
 Of the eight questions in §8b, four were covered (Q1 and Q4 directly, plus the two extras). These were not:
@@ -1169,6 +1177,109 @@ constant: at 5% scatter against a 5% band it refuses again, correctly, because t
 
 ---
 
+## 6j. Measured results — top-k retrieval, declined, 20 Aug
+
+Full record: [`phases/phase-2c-topk.md`](phases/phase-2c-topk.md) · `python topk.py`.
+
+§3 promised a retrieval layer that decides *which* past run to start from; one `argmin` is a thin version of
+that. So: take the k nearest, gate each, start from the first admitted. On the fold circuit the gate refuses
+**69 of 200** transfers, and each refusal abandons an archive that might hold an admissible case two rows down.
+
+Two ways to spend the candidates were measured, because testing only the one that loses would be worthless —
+**selection** (first candidate gate 1 admits) and **escalation** (try the next archived candidate when gate 2
+rejects the answer).
+
+| fold, k | selection: used archive | mean iters | inadmissible | escalation: mean iters | inadmissible |
+|---|---|---|---|---|---|
+| 1 | 131 | 7.75 | 3 | 7.89 | **0** |
+| 3 | 160 | 7.78 | 3 | 8.35 | **0** |
+| 10 | 172 | 7.88 | **4** | 8.60 | **0** |
+
+Base circuit: identical at every k.
+
+**Both directions say k = 1 is right.** Selection depth uses the archive far more and is worse for it —
+iterations up, and one more inadmissible answer, because a deeper candidate is further away and further away
+is a worse guess than a formula built from the case's own parameters. Escalation depth is already perfect at
+k = 1, so every extra candidate is a 9% bill for an improvement of zero.
+
+**And on the base circuit depth cannot help even in principle.** The refusals there are `envelope` and
+`coverage` — rules about the **query**, not the source. No candidate can satisfy a rule the source was never
+party to.
+
+> **A refusal is a statement about the archive, not about the candidate.** *"This archive has nothing for
+> you"*, not *"try the next one"*.
+
+### What to say, and what it opens
+
+The Phase 1 policy — one neighbour, gated, nominal fallback — was chosen for simplicity before any of this
+could be measured. It is now **the measured optimum among the obvious alternatives**, which is a better thing
+to have than an untested default.
+
+And it sharpens the open question rather than closing it. Depth ordered *by distance* does not pay — but this
+project already knows distance is weak (r = 0.18). The well-posed question is now **whether a better
+*ordering* of the same candidates pays**, and that is exactly where a selection agent would have to earn its
+place. `topk.py` is the harness: candidates, gate, cost accounting and answer-movement check all exist.
+Prediction on record, as with the surrogate: it will not beat the physics gate.
+
+---
+
+## 6k. Measured results — the selection agent, declined, 20 Aug
+
+Full record: [`phases/phase-2d-selection-agent.md`](phases/phase-2d-selection-agent.md) ·
+`python agent_select.py` · `--model granite4` for the model arm.
+
+§6j left one question open: depth ordered *by distance* does not pay, but distance is a weak signal (r = 0.18),
+so does a better **ordering** pay? A selection agent is the obvious thing to try, and this is it — measured.
+
+**The ceiling came first, before any GPU time.** Solving every candidate bounds what *any* ranker could win.
+At 1% the question would have closed without an inference call; it came back at **11.8% (base)** and
+**14.3% (fold)**, so the experiment was worth running. **A random floor came second**, because a ranker that
+contributes nothing still lands somewhere between distance and oracle.
+
+Four rankers, k = 5, the gate holding the veto in every arm — no ranker can admit what the physics refuses:
+
+| arm | base (200) | fold (200) |
+|---|---|---|
+| **oracle** — solves every candidate; not achievable | **868** | **1361**, 5 inadmissible |
+| distance — today | 984 | 1589, 11 |
+| physics — by estimated regime match | 996 | 1589, 11 |
+| random — no opinion | 1018 | 1584, 13 |
+| **granite4** (3.4B) | **1038** | 1575, 10 |
+| **qwen2.5:7b** (7.6B, 40 cases) | 205 vs distance 198, random 207 | 319 vs distance 303, random 314 |
+
+**Zero parse failures throughout.** The models answered cleanly and chose badly.
+
+### The five things to say, in order
+
+1. **Both models rank at or below chance.** granite4 lands *below* the random floor on the base circuit. They
+   disagreed with distance on most queries, so they were choosing — the choices just carried no information.
+2. **The 7.6B model is no better than the 3.4B one**, which is why it was run: without that control,
+   *"you only used a small model"* is an unanswerable objection to a null.
+3. **Ranking by physics fails for the interesting reason.** On the fold circuit it is byte-identical to
+   distance, because **the gate already uses regime match to decide admission** — among admitted candidates
+   the agreement is constant and every score ties. *A signal cannot be spent twice.*
+4. **On the fold circuit distance is itself no better than chance** (1589 against 1584). That is r = 0.18 made
+   visible as an ordering rather than a correlation.
+5. **The headroom is real and nothing cheap reaches it.** The oracle is 12–14% below everything, and it gets
+   there by solving each candidate. Capturing it needs a predictor of *transfer cost* — exactly the quantity
+   §6b measured distance as failing to predict. Naming that is more honest than promising a better prompt.
+
+> *"I built the agent. I measured the ceiling first, so I would know whether it could help at all, and a random
+> floor, so I would know whether it did anything. Two local models — 3.4B and 7.6B — both ranked at or below
+> random, and so did ranking by physics, because the gate had already used that information to decide
+> admission. The 12% a perfect ranker would win is real, and nothing I tried could see it."*
+
+**Quote the model arm as "at or below chance", not to three significant figures.** `temperature: 0` and a
+fixed seed did not make Ollama bit-reproducible: two runs over the same 200 queries captured -47% and -49%.
+The conclusion is unmoved -- both are below the random floor -- but the digits are not stable, so the model
+arm writes its own file and stays out of `run_all.py`. The deterministic arms are exact and are in it.
+
+**This is the fifth claim the project has tested and declined**, after rescued failures (§6a), the prediction
+pre-filter as a safety mechanism (§6e), the failure-proximity gate rule (§6f) and top-k retrieval (§6j). The
+pattern is the most credible thing in the deck — and this one cost two models and a prompt to establish.
+
+---
+
 ## 7. 10-minute presentation — time budget
 
 *Re-budgeted 19 Aug: one slide added for the engineer interview (§0b), and the demo is 10s longer because
@@ -1402,8 +1513,21 @@ this a platform rather than a script. Architecture maps to ECS/Batch, S3, SQS, p
 
 ## 10. Stack
 
-Python · NumPy/SciPy (`solve_ivp`, `fsolve`/Newton; `casadi` if you go DAE) · FAISS or sklearn NN or pgvector ·
-sentence-transformers or an API model for embeddings · FastAPI + Streamlit · Docker Compose (runner, index,
-MinIO, Redis, api) · matplotlib for the convergence plots.
+**Corrected 20 Aug — this was the plan, and it is not what shipped.** The original list is kept below the
+line because the difference is worth a sentence on the limits slide: most of it turned out to be unnecessary.
+
+**What actually ships:** Python · NumPy (Newton and the analytic Jacobian are hand-written; no SciPy) ·
+plain numpy nearest-neighbour, no index library · FastAPI + one hand-written HTML page, no Streamlit ·
+Docker Compose with **two** services from one image · matplotlib for the figures · optional local model via
+Ollama for ingest only. **Four wheels total.** Full mapping, including what each layer becomes at scale:
+[`docs/architecture.md`](docs/architecture.md).
+
+*Original intent, superseded:* ~~Python · NumPy/SciPy (`solve_ivp`, `fsolve`/Newton; `casadi` if you go DAE) ·
+FAISS or sklearn NN or pgvector · sentence-transformers or an API model for embeddings · FastAPI + Streamlit ·
+Docker Compose (runner, index, MinIO, Redis, api) · matplotlib for the convergence plots.~~
+
+**Why it shrank, and say this if asked:** every one of those was dropped because the simplest thing that could
+work did work, and each dependency dropped is one fewer thing to explain and one fewer thing to break in a
+live demo. An index library over 395 rows would have been slower to justify than to write.
 
 **Keep a `results.json` from day one.** Every benchmark number in the deck must be regenerable by one command.

@@ -191,6 +191,13 @@
   .chart{margin-top:4px}
   .chart text{fill:var(--faint);font:10px var(--mono)}
   .evmissing{color:var(--warn);font:12px var(--mono);padding:10px 0}
+  .card.wide{grid-column:1/-1}
+  .rkgrid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .rkc .rkh{font:11px var(--mono);color:var(--faint);text-transform:uppercase;
+            letter-spacing:.7px;margin-bottom:9px}
+  .rkc .rkn{font:10.5px var(--mono);color:var(--faint);margin:-4px 0 7px 87px}
+  .rkc .rkf{margin-top:9px;font:11.5px/1.6 var(--mono);color:var(--dim)}
+  .rkc .rkf b{color:var(--ink)}
   /* the numbers above are only worth reading if the invariants under them hold */
   .inv{font:11.5px var(--mono);padding:8px 11px;margin-bottom:12px;border-radius:7px;
        border:1px solid var(--line);background:var(--panel)}
@@ -466,6 +473,43 @@ function drawEvidence(ev){
         the band &mdash; it refuses, correctly. <b>The band has to exceed the fleet's
         own scatter.</b> An exact match instead of a band refused all 200, including
         every same-machine transfer.</div></div>`);
+  }
+
+  if(S.ranking){
+    const rk = S.ranking;
+    // One card, both circuits. Bars are scaled against the worst arm so the
+    // bunching is the visible thing: every achievable ranker lands in the same
+    // place and the oracle does not.
+    const block = c => {
+      const worst = Math.max(...c.arms.map(a => a.total));
+      const best = Math.min(...c.arms.map(a => a.total));
+      return `<div class="rkc"><div class="rkh">${esc(c.circuit)} circuit &middot;
+          ${c.n} queries &middot; k=${c.k}</div>` +
+        c.arms.map(a => {
+          const cls = a.total === best ? 'best' : a.total === worst ? 'worst' : '';
+          return `<div class="bar ${cls}"><div class="bl">${esc(a.label)}</div>
+            <div><div class="bt" style="width:${(a.total / worst) * 100}%"></div></div>
+            <div class="bv">${a.total}</div></div>
+            <div class="rkn">${esc(a.note)}</div>`;
+        }).join('') +
+        `<div class="rkf">distance already picked the best candidate
+           <b>${c.distance_optimal}</b> of ${c.of_admitted} times &middot;
+           headroom for any ranker <b>${c.headroom_pct.toFixed(1)}%</b></div></div>`;
+    };
+    cards.push(`<div class="card wide"><h3>${esc(rk.title)}</h3>
+      <div class="cn">the oracle solves every candidate &mdash; it is the bound, not an arm</div>
+      <div class="rkgrid">${rk.circuits.map(block).join('')}</div>
+      <div class="lede">${rk.model_ran
+        ? `Every achievable ranker lands within a few percent of the others, and
+           <b>the models rank at or below the random floor</b> &mdash; a 7.6B model
+           does no better than a 3.4B one, so it is the task and not the size.
+           Ranking by physics is <b>identical</b> to distance on the fold circuit,
+           because the gate already spent that information deciding admission.
+           <b>A signal cannot be spent twice.</b> The 12&ndash;14% an oracle wins
+           is real, and nothing here can see it.`
+        : `The model arm has not been run on this machine &mdash;
+           <code>python agent_select.py --model granite4</code>. The arms shown are
+           deterministic.`}</div></div>`);
   }
 
   const miss = (ev.missing || []).length

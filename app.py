@@ -140,6 +140,8 @@ EVIDENCE_FILES = {
     "dimensionality": ROOT / "dimensionality_results.json",
     "wide": ROOT / "wide_sweep_results.json",
     "selftest": ROOT / "selftest_results.json",
+    "ranking": ROOT / "agent_select_results.json",
+    "ranking_model": ROOT / "agent_model_results.json",
 }
 
 
@@ -266,6 +268,43 @@ def evidence() -> dict:
                       "total": v["total_iterations"], "failures": v["failed"]}
                      for k, v in w["arms"].items()],
             "scan": w.get("tolerance_scan", []),
+        }
+
+    rk = _load("ranking")
+    if rk:
+        rm = _load("ranking_model")
+        by_circuit = {a["circuit"]: a for a in (rm or {}).get("arms", [])}
+        sections = []
+        for r in rk["results"]:
+            a, row = r["arms"], {"circuit": r["circuit"], "k": r["k"],
+                                 "n": r["n_queries"]}
+            # Ordered worst-first so the chart reads top to bottom the way the
+            # finding does: everything achievable is bunched, and the oracle is
+            # somewhere else entirely.
+            row["arms"] = [
+                {"label": "oracle", "total": a["oracle"]["total_iterations"],
+                 "note": "solves every candidate"},
+                {"label": "distance", "total": a["distance"]["total_iterations"],
+                 "note": "today"},
+                {"label": "physics", "total": r["physics"]["total_iterations"],
+                 "note": "by estimated regime"},
+                {"label": "random", "total": r["random"]["total_iterations"],
+                 "note": "no opinion"},
+            ]
+            m = by_circuit.get(r["circuit"])
+            if m:
+                row["arms"].append({"label": (rm or {}).get("model", "model"),
+                                    "total": m["total_iterations"],
+                                    "note": f"{m['n_scored']} queries, "
+                                            f"{m['parse_failures']} parse failures"})
+            row["headroom_pct"] = (100.0 * r["headroom_iterations"]
+                                   / max(a["distance"]["total_iterations"], 1))
+            row["distance_optimal"] = r["distance_already_optimal"]
+            row["of_admitted"] = r["queries_with_an_admitted_candidate"]
+            sections.append(row)
+        out["sections"]["ranking"] = {
+            "title": "Can anything rank the candidates?",
+            "model_ran": bool(rm), "circuits": sections,
         }
 
     st = _load("selftest")

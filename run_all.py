@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 import bench
+import agent_select
 import dimensionality
 import failure_zone
 import fold
@@ -35,6 +36,7 @@ FAILURE_ZONE_RESULTS = Path("failure_zone_results.json")
 DIMENSIONALITY_RESULTS = Path("dimensionality_results.json")
 DIMENSIONALITY_FIGURE = Path("figs/dimensionality.png")
 WIDE_SWEEP_RESULTS = Path("wide_sweep_results.json")
+AGENT_SELECT_RESULTS = Path("agent_select_results.json")
 
 
 def main(score_models: bool = False) -> int:
@@ -109,6 +111,17 @@ def main(score_models: bool = False) -> int:
     # Needs the base archive's failures.jsonl from Phase 1, so it runs after it.
     failure_zone.report(
         failure_zone.run(FAILURE_ZONE_RESULTS, n_archive=300, n_query=200))
+
+    print()
+    print("=" * 62)
+    print("PHASE 2d -- can anything rank the candidates better than distance?")
+    print("=" * 62)
+    # Ceiling, floor and the physics ranker only: all deterministic and fast.
+    # The model arm needs a GPU and minutes, so it stays opt-in behind
+    # `python agent_select.py --model ...`, like --score-models.
+    agent_select.report_ceiling(
+        agent_select.run_deterministic(ARCHIVE / "cases.jsonl", 200, 99, 300,
+                                       agent_select.K, AGENT_SELECT_RESULTS))
 
     print()
     print("=" * 62)

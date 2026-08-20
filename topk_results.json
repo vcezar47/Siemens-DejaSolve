@@ -1,0 +1,227 @@
+{
+  "generated_utc": "2026-08-20T12:03:09+00:00",
+  "depths": [
+    1,
+    2,
+    3,
+    5,
+    10,
+    25
+  ],
+  "results": [
+    {
+      "circuit": "base",
+      "n_queries": 200,
+      "depths": {
+        "1": {
+          "used_archive": 198,
+          "fell_back_to_nominal": 2,
+          "deepest_rank_used": 1,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "not_converged": 0,
+          "inadmissible": 0,
+          "answer_differs_from_k1": 0
+        },
+        "2": {
+          "used_archive": 198,
+          "fell_back_to_nominal": 2,
+          "deepest_rank_used": 1,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "not_converged": 0,
+          "inadmissible": 0,
+          "answer_differs_from_k1": 0
+        },
+        "3": {
+          "used_archive": 198,
+          "fell_back_to_nominal": 2,
+          "deepest_rank_used": 1,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "not_converged": 0,
+          "inadmissible": 0,
+          "answer_differs_from_k1": 0
+        },
+        "5": {
+          "used_archive": 198,
+          "fell_back_to_nominal": 2,
+          "deepest_rank_used": 1,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "not_converged": 0,
+          "inadmissible": 0,
+          "answer_differs_from_k1": 0
+        },
+        "10": {
+          "used_archive": 198,
+          "fell_back_to_nominal": 2,
+          "deepest_rank_used": 1,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "not_converged": 0,
+          "inadmissible": 0,
+          "answer_differs_from_k1": 0
+        },
+        "25": {
+          "used_archive": 198,
+          "fell_back_to_nominal": 2,
+          "deepest_rank_used": 1,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "not_converged": 0,
+          "inadmissible": 0,
+          "answer_differs_from_k1": 0
+        }
+      },
+      "escalating": {
+        "1": {
+          "used_archive": 198,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "inadmissible": 0
+        },
+        "2": {
+          "used_archive": 198,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "inadmissible": 0
+        },
+        "3": {
+          "used_archive": 198,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "inadmissible": 0
+        },
+        "5": {
+          "used_archive": 198,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "inadmissible": 0
+        },
+        "10": {
+          "used_archive": 198,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "inadmissible": 0
+        },
+        "25": {
+          "used_archive": 198,
+          "total_iterations": 984,
+          "mean_iterations": 4.92,
+          "inadmissible": 0
+        }
+      }
+    },
+    {
+      "circuit": "fold",
+      "n_queries": 200,
+      "depths": {
+        "1": {
+          "used_archive": 131,
+          "fell_back_to_nominal": 69,
+          "deepest_rank_used": 1,
+          "total_iterations": 1543,
+          "mean_iterations": 7.7537688442211055,
+          "not_converged": 1,
+          "inadmissible": 3,
+          "answer_differs_from_k1": 0
+        },
+        "2": {
+          "used_archive": 150,
+          "fell_back_to_nominal": 50,
+          "deepest_rank_used": 2,
+          "total_iterations": 1520,
+          "mean_iterations": 7.755102040816326,
+          "not_converged": 4,
+          "inadmissible": 3,
+          "answer_differs_from_k1": 2
+        },
+        "3": {
+          "used_archive": 160,
+          "fell_back_to_nominal": 40,
+          "deepest_rank_used": 3,
+          "total_iterations": 1502,
+          "mean_iterations": 7.782383419689119,
+          "not_converged": 7,
+          "inadmissible": 3,
+          "answer_differs_from_k1": 2
+        },
+        "5": {
+          "used_archive": 165,
+          "fell_back_to_nominal": 35,
+          "deepest_rank_used": 4,
+          "total_iterations": 1505,
+          "mean_iterations": 7.838541666666667,
+          "not_converged": 8,
+          "inadmissible": 3,
+          "answer_differs_from_k1": 2
+        },
+        "10": {
+          "used_archive": 172,
+          "fell_back_to_nominal": 28,
+          "deepest_rank_used": 7,
+          "total_iterations": 1506,
+          "mean_iterations": 7.884816753926701,
+          "not_converged": 9,
+          "inadmissible": 4,
+          "answer_differs_from_k1": 4
+        },
+        "25": {
+          "used_archive": 172,
+          "fell_back_to_nominal": 28,
+          "deepest_rank_used": 7,
+          "total_iterations": 1506,
+          "mean_iterations": 7.884816753926701,
+          "not_converged": 9,
+          "inadmissible": 4,
+          "answer_differs_from_k1": 4
+        }
+      },
+      "escalating": {
+        "1": {
+          "used_archive": 127,
+          "total_iterations": 1579,
+          "mean_iterations": 7.895,
+          "inadmissible": 0
+        },
+        "2": {
+          "used_archive": 146,
+          "total_iterations": 1620,
+          "mean_iterations": 8.1,
+          "inadmissible": 0
+        },
+        "3": {
+          "used_archive": 154,
+          "total_iterations": 1670,
+          "mean_iterations": 8.35,
+          "inadmissible": 0
+        },
+        "5": {
+          "used_archive": 160,
+          "total_iterations": 1692,
+          "mean_iterations": 8.46,
+          "inadmissible": 0
+        },
+        "10": {
+          "used_archive": 165,
+          "total_iterations": 1720,
+          "mean_iterations": 8.6,
+          "inadmissible": 0
+        },
+        "25": {
+          "used_archive": 166,
+          "total_iterations": 1722,
+          "mean_iterations": 8.61,
+          "inadmissible": 0
+        }
+      },
+      "archive": {
+        "n": 300,
+        "kept": 135,
+        "rejected_unstable": 1,
+        "failed": 164
+      }
+    }
+  ]
+}

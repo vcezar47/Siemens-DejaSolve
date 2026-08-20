@@ -1,0 +1,72 @@
+{
+  "generated_utc": "2026-08-20T12:43:21+00:00",
+  "k": 5,
+  "results": [
+    {
+      "circuit": "base",
+      "k": 5,
+      "n_queries": 200,
+      "queries_with_an_admitted_candidate": 198,
+      "distance_already_optimal": 124,
+      "headroom_iterations": 116,
+      "arms": {
+        "distance": {
+          "mean_iterations": 4.92,
+          "total_iterations": 984,
+          "inadmissible": 0
+        },
+        "oracle": {
+          "mean_iterations": 4.34,
+          "total_iterations": 868,
+          "inadmissible": 0
+        }
+      },
+      "random": {
+        "total_iterations": 1018,
+        "mean_iterations": 5.09,
+        "inadmissible": 0
+      },
+      "physics": {
+        "total_iterations": 996,
+        "mean_iterations": 4.98,
+        "inadmissible": 0
+      }
+    },
+    {
+      "circuit": "fold",
+      "k": 5,
+      "n_queries": 200,
+      "queries_with_an_admitted_candidate": 165,
+      "distance_already_optimal": 81,
+      "headroom_iterations": 228,
+      "arms": {
+        "distance": {
+          "mean_iterations": 7.945,
+          "total_iterations": 1589,
+          "inadmissible": 11
+        },
+        "oracle": {
+          "mean_iterations": 6.805,
+          "total_iterations": 1361,
+          "inadmissible": 5
+        }
+      },
+      "archive": {
+        "n": 300,
+        "kept": 135,
+        "rejected_unstable": 1,
+        "failed": 164
+      },
+      "random": {
+        "total_iterations": 1584,
+        "mean_iterations": 7.92,
+        "inadmissible": 13
+      },
+      "physics": {
+        "total_iterations": 1589,
+        "mean_iterations": 7.945,
+        "inadmissible": 11
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "generated_utc": "2026-08-20T11:25:59+00:00",
+  "hardware_rel_tol": 0.05,
+  "parameters": {
+    "swept": 7,
+    "hardware": 18,
+    "total": 25
+  },
+  "variants": 6,
+  "hardware_tolerance": 0.0,
+  "archive": {
+    "attempted": 400,
+    "kept": 385
+  },
+  "n_queries": 200,
+  "cross_machine": {
+    "nearest_neighbour_was_another_machine": 0,
+    "caught_by_the_hardware_rule": 0,
+    "missed": 0
+  },
+  "gate_verdicts": {
+    "ok": 197,
+    "coverage": 2,
+    "envelope": 1
+  },
+  "coverage_radius": {
+    "in_25d": 0.7297821332100095,
+    "in_7d_would_have_been": 0.5275543945594744
+  },
+  "arms": {
+    "cold": {
+      "converged": 190,
+      "failed": 10,
+      "total_iterations": 1636,
+      "mean_iterations": 8.610526315789473
+    },
+    "nominal": {
+      "converged": 200,
+      "failed": 0,
+      "total_iterations": 1416,
+      "mean_iterations": 7.08
+    },
+    "warm_naive": {
+      "converged": 200,
+      "failed": 0,
+      "total_iterations": 1042,
+      "mean_iterations": 5.21
+    },
+    "warm_gated": {
+      "converged": 200,
+      "failed": 0,
+      "total_iterations": 1047,
+      "mean_iterations": 5.235
+    }
+  },
+  "tolerance_scan": [
+    {
+      "tolerance": 0.0,
+      "admitted": 91,
+      "refused_hardware": 0,
+      "n": 100
+    },
+    {
+      "tolerance": 0.02,
+      "admitted": 90,
+      "refused_hardware": 0,
+      "n": 100
+    },
+    {
+      "tolerance": 0.05,
+      "admitted": 9,
+      "refused_hardware": 89,
+      "n": 100
+    }
+  ]
+}

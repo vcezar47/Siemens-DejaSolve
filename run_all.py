@@ -8,6 +8,7 @@ command that has to reproduce all of them.
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -18,7 +19,9 @@ import fold
 import ingest
 import make_logs
 import plot_convergence
+import selftest
 import surrogate
+import wide_sweep
 import sweep
 
 ARCHIVE = Path("archive")
@@ -31,9 +34,21 @@ SURROGATE_FOLD_RESULTS = Path("surrogate_fold_results.json")
 FAILURE_ZONE_RESULTS = Path("failure_zone_results.json")
 DIMENSIONALITY_RESULTS = Path("dimensionality_results.json")
 DIMENSIONALITY_FIGURE = Path("figs/dimensionality.png")
+WIDE_SWEEP_RESULTS = Path("wide_sweep_results.json")
 
 
 def main(score_models: bool = False) -> int:
+    print("=" * 62)
+    print("SELFTEST -- the invariants everything below rests on")
+    print("=" * 62)
+    # First, because every number in this file is downstream of the analytic
+    # Jacobian being the actual derivative. A wrong entry there would not crash;
+    # it would change iteration counts, which is the quantity being reported.
+    if selftest.main_checks() != 0:
+        print("selftest FAILED -- stopping before any number is regenerated")
+        return 1
+
+    print()
     print("=" * 62)
     print("PHASE 1 -- cold vs warm start on the base circuit")
     print("=" * 62)
@@ -63,6 +78,17 @@ def main(score_models: bool = False) -> int:
         dimensionality.run(ARCHIVE / "cases.jsonl", n_queries=200, seed=99,
                            out=DIMENSIONALITY_RESULTS,
                            fig_path=DIMENSIONALITY_FIGURE))
+
+    print()
+    print("=" * 62)
+    print("PHASE 1d -- 25 real parameters, and machines that actually differ")
+    print("=" * 62)
+    # The scatter scan is part of the result, not an optional extra: without it
+    # the file the page reads loses the table that carries the finding.
+    _wide = wide_sweep.run(n_variants=6, n_archive=400, n_query=200, out=None)
+    _wide["tolerance_scan"] = wide_sweep.tolerance_scan(6, 200, 100)
+    WIDE_SWEEP_RESULTS.write_text(json.dumps(_wide, indent=2), encoding="utf-8")
+    wide_sweep.report(_wide)
 
     print()
     print("=" * 62)

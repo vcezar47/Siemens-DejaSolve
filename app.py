@@ -138,6 +138,8 @@ EVIDENCE_FILES = {
     "fold": ROOT / "fold_results.json",
     "failure_zone": ROOT / "failure_zone_results.json",
     "dimensionality": ROOT / "dimensionality_results.json",
+    "wide": ROOT / "wide_sweep_results.json",
+    "selftest": ROOT / "selftest_results.json",
 }
 
 
@@ -249,6 +251,33 @@ def evidence() -> dict:
                         "admitted": r["gate_verdicts"].get("ok", 0),
                         "contrast": r["relative_contrast"]}
                        for r in dim["by_dimension"]],
+        }
+
+    w = _load("wide")
+    if w:
+        out["sections"]["wide"] = {
+            "title": "25 real parameters, six machine variants",
+            "n": w["n_queries"],
+            "parameters": w["parameters"],
+            "variants": w["variants"],
+            "band": w["hardware_rel_tol"],
+            "cross_machine": w["cross_machine"]["nearest_neighbour_was_another_machine"],
+            "arms": [{"label": k, "mean": v["mean_iterations"],
+                      "total": v["total_iterations"], "failures": v["failed"]}
+                     for k, v in w["arms"].items()],
+            "scan": w.get("tolerance_scan", []),
+        }
+
+    st = _load("selftest")
+    if st:
+        # Not a finding -- a statement that the numbers above are worth reading.
+        # A page that shows results without showing whether the invariants under
+        # them hold is asking to be trusted rather than checked.
+        out["selftest"] = {
+            "passed": st["passed"], "total": st["total"],
+            "jacobian_worst": max(st["jacobian_worst_rel_error"],
+                                  st["jacobian_worst_rel_error_asymmetric"]),
+            "defaults_exact": st["defaults_exact"],
         }
 
     out["missing"] = [k for k, v in EVIDENCE_FILES.items() if not v.exists()]

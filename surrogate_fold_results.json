@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-20T07:52:25+00:00",
+  "generated_utc": "2026-08-20T11:26:03+00:00",
   "circuit": {
     "D_mot_cm3_per_rev": 5.0,
     "note": "the Stribeck fold: three roots, the middle one unstable"

@@ -57,6 +57,58 @@ K_TORQUE = D_MOT / (20.0 * np.pi)
 K_DISP = D_MOT / 1000.0
 
 
+#: Circuit constants a case may *state* instead of inheriting. Everything here
+#: is a real physical property of real hardware -- a discharge coefficient, a
+#: breakaway torque, a cross-port leakage -- and every one of them was a module
+#: constant until an engineer pointed out that a real model carries hundreds of
+#: parameters rather than seven (§0b).
+#:
+#: With the seven swept parameters this takes a Case Card to **25 physical
+#: parameters**, and the two branches stop being forced to be identical
+#: hardware, which is the part that makes it more than a longer list: shaft a
+#: and shaft b can now be different motors with different friction.
+#:
+#: **Defaults are preserved exactly.** A case that states none of these solves
+#: bit-identically to the same case before they were promoted -- asserted by
+#: `selftest.py`, and by the phase-1 summary hash, which must not move.
+HARDWARE = {
+    # shared by the whole circuit
+    "cd": CD,
+    "R_leak": R_LEAK,
+    "A_relief_max": A_RELIEF_MAX,
+    "relief_band": RELIEF_BAND,
+    # per branch -- the two need not be the same hardware any more
+    "D_mot_a": D_MOT, "D_mot_b": D_MOT,
+    "A_ret_a": A_RET, "A_ret_b": A_RET,
+    "leak_mot_a": LEAK_MOT, "leak_mot_b": LEAK_MOT,
+    "t_coul_a": T_COUL, "t_coul_b": T_COUL,
+    "t_stat_a": T_STAT, "t_stat_b": T_STAT,
+    "w_strib_a": W_STRIB, "w_strib_b": W_STRIB,
+    "b_visc_a": B_VISC, "b_visc_b": B_VISC,
+}
+
+
+def hardware(p: dict) -> dict:
+    """Resolve every circuit constant for this case: stated, or the default.
+
+    ``D_mot`` stays a valid shorthand for "both motors", because `fold.py`
+    builds its variant circuit that way and every Phase 2 number was measured
+    through it. Removing the shorthand would silently re-point that experiment.
+    """
+    h = {k: float(p.get(k, v)) for k, v in HARDWARE.items()}
+    if "D_mot" in p:
+        h["D_mot_a"] = h["D_mot_b"] = float(p["D_mot"])
+    return h
+
+
+def shaft_hw(h: dict, s: str) -> dict:
+    """The per-branch constants for shaft `s`, keyed without the suffix."""
+    return {"D_mot": h[f"D_mot_{s}"], "A_ret": h[f"A_ret_{s}"],
+            "leak_mot": h[f"leak_mot_{s}"], "t_coul": h[f"t_coul_{s}"],
+            "t_stat": h[f"t_stat_{s}"], "w_strib": h[f"w_strib_{s}"],
+            "b_visc": h[f"b_visc_{s}"]}
+
+
 def motor_constants(p: dict) -> tuple[float, float]:
     """Torque and displacement constants for this case's motor.
 
@@ -126,28 +178,31 @@ def nominal_start(p: dict) -> np.ndarray:
     separates "warm start beats starting from nothing" from "warm start beats
     a good engineering guess", and only the second claim is interesting.
     """
-    kt, _ = motor_constants(p)
+    h = hardware(p)
     p1 = float(p["p_crack"])
     p3 = P_TANK
     p2 = P_TANK + 0.5 * (p1 - P_TANK)
-    t_avail = max(p2 - p3, 0.0) * kt - T_COUL
 
-    def speed(c_load: float) -> float:
+    def speed(s: str) -> float:
+        hs = shaft_hw(h, s)
+        kt = hs["D_mot"] / (20.0 * np.pi)
+        t_avail = max(p2 - p3, 0.0) * kt - hs["t_coul"]
+        c_load = p[f"c_load_{s}"]
         if t_avail <= 0.0:
             return 0.0
         if c_load <= 0.0:
             return W_NOMINAL_MAX
         return float(min(np.sqrt(t_avail / c_load), W_NOMINAL_MAX))
 
-    return np.array([p1, p2, p3, speed(p["c_load_a"]),
-                     p2, p3, speed(p["c_load_b"])], dtype=float)
+    return np.array([p1, p2, p3, speed("a"),
+                     p2, p3, speed("b")], dtype=float)
 
 
 # --- constitutive relations -------------------------------------------------
 
-def orifice_gain(area_mm2: float, rho: float) -> float:
+def orifice_gain(area_mm2: float, rho: float, cd: float = CD) -> float:
     """Coefficient k such that Q[L/min] = k * f_dp(dp[bar]) for a sharp orifice."""
-    return 6e4 * CD * area_mm2 * 1e-6 * np.sqrt(2e5 / rho)
+    return 6e4 * cd * area_mm2 * 1e-6 * np.sqrt(2e5 / rho)
 
 
 def f_dp(dp):
@@ -161,42 +216,53 @@ def df_dp(dp):
     return (0.5 * dp * dp + P_REG * P_REG) * q ** -1.25
 
 
-def relief_opening(p1: float, p_crack: float) -> float:
-    """Fraction of relief valve area open — C1-smooth ramp over RELIEF_BAND."""
-    s = (p1 - p_crack) / RELIEF_BAND
+def relief_opening(p1: float, p_crack: float,
+                   band: float = RELIEF_BAND) -> float:
+    """Fraction of relief valve area open — C1-smooth ramp over the band."""
+    s = (p1 - p_crack) / band
     s = min(max(s, 0.0), 1.0)
     return s * s * (3.0 - 2.0 * s)
 
 
-def d_relief_opening(p1: float, p_crack: float) -> float:
-    s = (p1 - p_crack) / RELIEF_BAND
+def d_relief_opening(p1: float, p_crack: float,
+                     band: float = RELIEF_BAND) -> float:
+    s = (p1 - p_crack) / band
     if s <= 0.0 or s >= 1.0:
         return 0.0
-    return 6.0 * s * (1.0 - s) / RELIEF_BAND
+    return 6.0 * s * (1.0 - s) / band
 
 
-def friction(w):
+# The friction constants are arguments with module defaults rather than reads
+# of the module: every existing caller keeps working untouched, and a case that
+# gives shaft a a different motor from shaft b gets the right curve on each.
+# W_REG stays global on purpose -- it is numerical regularisation, not hardware.
+
+def friction(w, t_coul: float = T_COUL, t_stat: float = T_STAT,
+             w_strib: float = W_STRIB):
     """Stribeck friction torque [Nm] on a shaft turning at w [rev/min]."""
-    return (T_COUL + (T_STAT - T_COUL) * np.exp(-(w / W_STRIB) ** 2)) * np.tanh(w / W_REG)
+    return (t_coul + (t_stat - t_coul) * np.exp(-(w / w_strib) ** 2)) * np.tanh(w / W_REG)
 
 
-def d_friction(w):
+def d_friction(w, t_coul: float = T_COUL, t_stat: float = T_STAT,
+               w_strib: float = W_STRIB):
     """d/dw of :func:`friction`. Negative over part of the range — that is the
     Stribeck dip, and it is why this problem has more than one root."""
-    env = T_COUL + (T_STAT - T_COUL) * np.exp(-(w / W_STRIB) ** 2)
-    d_env = (T_STAT - T_COUL) * np.exp(-(w / W_STRIB) ** 2) * (-2.0 * w / W_STRIB ** 2)
+    env = t_coul + (t_stat - t_coul) * np.exp(-(w / w_strib) ** 2)
+    d_env = (t_stat - t_coul) * np.exp(-(w / w_strib) ** 2) * (-2.0 * w / w_strib ** 2)
     t = np.tanh(w / W_REG)
     # sech^2 written as 1 - tanh^2 so it cannot overflow at large |w|
     return d_env * t + env * (1.0 - t * t) / W_REG
 
 
-def load_torque(w, c_load):
+def load_torque(w, c_load, t_coul: float = T_COUL, t_stat: float = T_STAT,
+                w_strib: float = W_STRIB, b_visc: float = B_VISC):
     """Total resisting torque: friction + viscous drag + quadratic load."""
-    return friction(w) + B_VISC * w + c_load * w * abs(w)
+    return friction(w, t_coul, t_stat, w_strib) + b_visc * w + c_load * w * abs(w)
 
 
-def d_load_torque(w, c_load):
-    return d_friction(w) + B_VISC + 2.0 * c_load * abs(w)
+def d_load_torque(w, c_load, t_coul: float = T_COUL, t_stat: float = T_STAT,
+                  w_strib: float = W_STRIB, b_visc: float = B_VISC):
+    return d_friction(w, t_coul, t_stat, w_strib) + b_visc + 2.0 * c_load * abs(w)
 
 
 # --- residual and Jacobian --------------------------------------------------
@@ -205,30 +271,39 @@ def residual(x, p: dict) -> np.ndarray:
     """Flow imbalance [L/min] at the 5 nodes, torque imbalance [Nm] at 2 shafts."""
     p1, p2a, p3a, wa, p2b, p3b, wb = x
     rho = p["rho"]
-    k_torque, k_disp = motor_constants(p)
-    g_va = orifice_gain(p["A_valve_a"], rho)
-    g_vb = orifice_gain(p["A_valve_b"], rho)
-    g_ret = orifice_gain(A_RET, rho)
-    g_rel = orifice_gain(A_RELIEF_MAX, rho)
+    h = hardware(p)
+    ha, hb = shaft_hw(h, "a"), shaft_hw(h, "b")
+    kt_a, kd_a = ha["D_mot"] / (20.0 * np.pi), ha["D_mot"] / 1000.0
+    kt_b, kd_b = hb["D_mot"] / (20.0 * np.pi), hb["D_mot"] / 1000.0
+    g_va = orifice_gain(p["A_valve_a"], rho, h["cd"])
+    g_vb = orifice_gain(p["A_valve_b"], rho, h["cd"])
+    g_ra = orifice_gain(ha["A_ret"], rho, h["cd"])
+    g_rb = orifice_gain(hb["A_ret"], rho, h["cd"])
+    g_rel = orifice_gain(h["A_relief_max"], rho, h["cd"])
 
-    q_pump = p["Q_nom"] - p1 / R_LEAK
-    q_rel = g_rel * relief_opening(p1, p["p_crack"]) * f_dp(p1 - P_TANK)
+    q_pump = p["Q_nom"] - p1 / h["R_leak"]
+    q_rel = (g_rel * relief_opening(p1, p["p_crack"], h["relief_band"])
+             * f_dp(p1 - P_TANK))
     q_va = g_va * f_dp(p1 - p2a)
     q_vb = g_vb * f_dp(p1 - p2b)
 
-    q_ma = k_disp * wa + LEAK_MOT * (p2a - p3a)
-    q_mb = k_disp * wb + LEAK_MOT * (p2b - p3b)
-    q_ra = g_ret * f_dp(p3a - P_TANK)
-    q_rb = g_ret * f_dp(p3b - P_TANK)
+    q_ma = kd_a * wa + ha["leak_mot"] * (p2a - p3a)
+    q_mb = kd_b * wb + hb["leak_mot"] * (p2b - p3b)
+    q_ra = g_ra * f_dp(p3a - P_TANK)
+    q_rb = g_rb * f_dp(p3b - P_TANK)
 
     return np.array([
         q_pump - q_va - q_vb - q_rel,                       # manifold node
         q_va - q_ma,                                        # motor a inlet
         q_ma - q_ra,                                        # motor a outlet
-        (p2a - p3a) * k_torque - load_torque(wa, p["c_load_a"]),   # shaft a
+        (p2a - p3a) * kt_a - load_torque(                   # shaft a
+            wa, p["c_load_a"], ha["t_coul"], ha["t_stat"],
+            ha["w_strib"], ha["b_visc"]),
         q_vb - q_mb,                                        # motor b inlet
         q_mb - q_rb,                                        # motor b outlet
-        (p2b - p3b) * k_torque - load_torque(wb, p["c_load_b"]),   # shaft b
+        (p2b - p3b) * kt_b - load_torque(                   # shaft b
+            wb, p["c_load_b"], hb["t_coul"], hb["t_stat"],
+            hb["w_strib"], hb["b_visc"]),
     ])
 
 
@@ -243,52 +318,61 @@ def jacobian(x, p: dict) -> np.ndarray:
     """
     p1, p2a, p3a, wa, p2b, p3b, wb = x
     rho = p["rho"]
-    k_torque, k_disp = motor_constants(p)
-    g_va = orifice_gain(p["A_valve_a"], rho)
-    g_vb = orifice_gain(p["A_valve_b"], rho)
-    g_ret = orifice_gain(A_RET, rho)
-    g_rel = orifice_gain(A_RELIEF_MAX, rho)
+    h = hardware(p)
+    ha, hb = shaft_hw(h, "a"), shaft_hw(h, "b")
+    kt_a, kd_a = ha["D_mot"] / (20.0 * np.pi), ha["D_mot"] / 1000.0
+    kt_b, kd_b = hb["D_mot"] / (20.0 * np.pi), hb["D_mot"] / 1000.0
+    g_va = orifice_gain(p["A_valve_a"], rho, h["cd"])
+    g_vb = orifice_gain(p["A_valve_b"], rho, h["cd"])
+    g_ra = orifice_gain(ha["A_ret"], rho, h["cd"])
+    g_rb = orifice_gain(hb["A_ret"], rho, h["cd"])
+    g_rel = orifice_gain(h["A_relief_max"], rho, h["cd"])
 
     d_va = g_va * df_dp(p1 - p2a)
     d_vb = g_vb * df_dp(p1 - p2b)
-    d_ra = g_ret * df_dp(p3a - P_TANK)
-    d_rb = g_ret * df_dp(p3b - P_TANK)
+    d_ra = g_ra * df_dp(p3a - P_TANK)
+    d_rb = g_rb * df_dp(p3b - P_TANK)
 
-    op = relief_opening(p1, p["p_crack"])
-    dop = d_relief_opening(p1, p["p_crack"])
+    band = h["relief_band"]
+    op = relief_opening(p1, p["p_crack"], band)
+    dop = d_relief_opening(p1, p["p_crack"], band)
     d_rel = g_rel * (dop * f_dp(p1 - P_TANK) + op * df_dp(p1 - P_TANK))
+
+    lk_a, lk_b = ha["leak_mot"], hb["leak_mot"]
 
     J = np.zeros((7, 7))
     # manifold: pump - valve_a - valve_b - relief
-    J[0, 0] = -1.0 / R_LEAK - d_va - d_vb - d_rel
+    J[0, 0] = -1.0 / h["R_leak"] - d_va - d_vb - d_rel
     J[0, 1] = d_va
     J[0, 4] = d_vb
     # motor a inlet: q_va - q_ma
     J[1, 0] = d_va
-    J[1, 1] = -d_va - LEAK_MOT
-    J[1, 2] = LEAK_MOT
-    J[1, 3] = -k_disp
+    J[1, 1] = -d_va - lk_a
+    J[1, 2] = lk_a
+    J[1, 3] = -kd_a
     # motor a outlet: q_ma - q_ra
-    J[2, 1] = LEAK_MOT
-    J[2, 2] = -LEAK_MOT - d_ra
-    J[2, 3] = k_disp
+    J[2, 1] = lk_a
+    J[2, 2] = -lk_a - d_ra
+    J[2, 3] = kd_a
     # shaft a torque balance
-    J[3, 1] = k_torque
-    J[3, 2] = -k_torque
-    J[3, 3] = -d_load_torque(wa, p["c_load_a"])
+    J[3, 1] = kt_a
+    J[3, 2] = -kt_a
+    J[3, 3] = -d_load_torque(wa, p["c_load_a"], ha["t_coul"], ha["t_stat"],
+                             ha["w_strib"], ha["b_visc"])
     # motor b inlet
     J[4, 0] = d_vb
-    J[4, 4] = -d_vb - LEAK_MOT
-    J[4, 5] = LEAK_MOT
-    J[4, 6] = -k_disp
+    J[4, 4] = -d_vb - lk_b
+    J[4, 5] = lk_b
+    J[4, 6] = -kd_b
     # motor b outlet
-    J[5, 4] = LEAK_MOT
-    J[5, 5] = -LEAK_MOT - d_rb
-    J[5, 6] = k_disp
+    J[5, 4] = lk_b
+    J[5, 5] = -lk_b - d_rb
+    J[5, 6] = kd_b
     # shaft b torque balance
-    J[6, 4] = k_torque
-    J[6, 5] = -k_torque
-    J[6, 6] = -d_load_torque(wb, p["c_load_b"])
+    J[6, 4] = kt_b
+    J[6, 5] = -kt_b
+    J[6, 6] = -d_load_torque(wb, p["c_load_b"], hb["t_coul"], hb["t_stat"],
+                             hb["w_strib"], hb["b_visc"])
     return J
 
 
@@ -441,7 +525,9 @@ def stability(x, p: dict) -> dict:
         "max_real_eig": max_real,
         "unstable_shafts": [
             name for name, i in (("a", 3), ("b", 6))
-            if d_load_torque(float(x[i]), p[f"c_load_{name}"]) < 0.0
+            if d_load_torque(float(x[i]), p[f"c_load_{name}"],
+                             **{k: shaft_hw(hardware(p), name)[k] for k in
+                                ("t_coul", "t_stat", "w_strib", "b_visc")}) < 0.0
         ],
     }
 

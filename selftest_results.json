@@ -1,0 +1,10 @@
+{
+  "generated_utc": "2026-08-20T11:25:48+00:00",
+  "cases": 60,
+  "tolerance": 1e-05,
+  "passed": 3,
+  "total": 3,
+  "jacobian_worst_rel_error": 1.4405076809509805e-08,
+  "jacobian_worst_rel_error_asymmetric": 1.5447232798054826e-08,
+  "defaults_exact": true
+}

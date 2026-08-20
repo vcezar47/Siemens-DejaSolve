@@ -1103,6 +1103,72 @@ second question.
 
 ---
 
+## 6i. Measured results — 25 real parameters, 20 Aug
+
+Full record: [`phases/phase-1d-wide-parameters.md`](phases/phase-1d-wide-parameters.md) ·
+`python selftest.py` · `python wide_sweep.py`.
+
+§6g widened the *index* with inert entries. This widens the **physics**: `model.HARDWARE` promotes 18 circuit
+constants to per-case parameters — discharge coefficient, pump leakage, relief band, and per branch the motor
+displacement, return restriction, leakage, Coulomb and breakaway torque, Stribeck velocity, viscous drag. With
+the 7 swept parameters that is **25 physical parameters**, and the two shafts are no longer forced to be the
+same motor.
+
+**Default-preserving, proved twice.** `selftest.py` measures implicit-vs-explicit defaults at **0.00e+00**,
+and the phase-1 summary hash is still **830da3e6a4480676** after the refactor. Nothing measured before today
+stopped being comparable.
+
+**`selftest.py` was written before the change, not after.** The refactor threads per-branch constants through a
+hand-derived analytic Jacobian; a transcription slip there would not crash, it would quietly change iteration
+counts. So: analytic against central differences, including on cases where the branches are built differently
+— worst relative error **1.5e-08**, and `run_all.py` refuses to regenerate anything if it fails.
+
+### The headline holds when the parameters are real
+
+`wide_sweep.py`, 6 machine variants with many operating points each — the archive shape §0b describes:
+
+| arm | mean iterations |
+|---|---|
+| cold | 8.61 |
+| nominal | 7.08 |
+| **warm — retrieval over all 25** | **5.21** |
+
+**26% fewer iterations than the nominal guess**, against 31% on the 7-parameter circuit.
+
+### The finding, and it belongs to Layer 1
+
+**0 of 200 nearest neighbours came from a different machine.** With hardware on the Case Card, those 18
+dimensions dominate the distance and retrieval groups by design without being told to. What stops a state
+crossing machines is *recording the hardware*, not the gate.
+
+### The bug that found — say this one out loud, it is the best thing here
+
+That null was suspicious: within a variant, every unit had bit-identical hardware. Real units do not. Adding
+manufacturing scatter broke the `hardware` rule instantly — and the rule had never been measured, because on
+the 7-parameter circuit every case was the same machine and it was unreachable.
+
+| per-unit scatter | exact match | per-constant 5% band | **aggregate 5% band** |
+|---|---|---|---|
+| 0% | 197 admitted | 197 | **197** |
+| 2% | **0 admitted** | 50 | **198** |
+| 5% | 0 | 0 | 17 |
+
+**An exact-match rule refuses every transfer the moment two units of one design are not identical.** A
+per-constant band does not save it either: with 18 constants, *"refuse if any one is out of band"* is a
+multiple-comparisons problem, and at 2% scatter it refused 150 of 200 same-machine transfers — the 76% that
+arithmetic predicts. **A per-parameter threshold degrades as the parameter count grows**, which is exactly the
+failure §6g finds in the coverage rule.
+
+The fix compares the **norm** rather than the worst draw, and comes with a stated limit rather than a tuned
+constant: at 5% scatter against a 5% band it refuses again, correctly, because two units differ by about
+√2 × the scatter and **the band has to exceed the fleet's**.
+
+> *"I promoted 18 constants to parameters. That made a rule reachable that had never been reachable before,
+> and it was wrong — it would have refused every transfer in any fleet with manufacturing tolerance. The
+> parameter count did not just make the model bigger; it made a latent bug visible."*
+
+---
+
 ## 7. 10-minute presentation — time budget
 
 *Re-budgeted 19 Aug: one slide added for the engineer interview (§0b), and the demo is 10s longer because

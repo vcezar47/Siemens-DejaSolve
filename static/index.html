@@ -191,6 +191,12 @@
   .chart{margin-top:4px}
   .chart text{fill:var(--faint);font:10px var(--mono)}
   .evmissing{color:var(--warn);font:12px var(--mono);padding:10px 0}
+  /* the numbers above are only worth reading if the invariants under them hold */
+  .inv{font:11.5px var(--mono);padding:8px 11px;margin-bottom:12px;border-radius:7px;
+       border:1px solid var(--line);background:var(--panel)}
+  .inv.ok{color:var(--ok);border-color:rgba(61,220,151,.35)}
+  .inv.bad{color:var(--refuse);border-color:var(--refuse)}
+  .inv b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -433,10 +439,47 @@ function drawEvidence(ev){
         <b>A distance threshold cannot detect the failure of a distance metric.</b></div></div>`);
   }
 
+  if(S.wide){
+    const w = S.wide;
+    const scan = w.scan && w.scan.length
+      ? `<table class="cmp"><thead><tr><th>per-unit scatter</th>
+           <th>admitted</th><th>refused as other hardware</th></tr></thead><tbody>` +
+        w.scan.map(r => `<tr class="${r.refused_hardware > r.admitted ? 'alarm' : ''}">
+            <td>${(r.tolerance * 100).toFixed(0)}%</td>
+            <td>${r.admitted}/${r.n}</td><td>${r.refused_hardware}</td></tr>`).join('') +
+        `</tbody></table>` : '';
+    cards.push(`<div class="card"><h3>${esc(w.title)}</h3>
+      <div class="cn">${w.parameters.swept} operating + ${w.parameters.hardware}
+        hardware parameters &middot; ${w.n} cases</div>
+      ${bars(w.arms.filter(a => a.label !== 'warm_gated')
+               .map(a => ({...a, label: a.label === 'warm_naive' ? 'warm' : a.label})),
+             {mid: 'nominal'})}
+      ${scan}
+      <div class="lede">Retrieval holds when the extra parameters are <b>real</b>:
+        <b>26%</b> under the nominal guess. And with hardware on the Case Card the
+        index separates machines by itself &mdash; <b>${w.cross_machine} of ${w.n}</b>
+        neighbours came from another machine.
+        <br><br>The table is the <b>hardware rule</b>, which no experiment could
+        reach until hardware varied. It compares the norm of the relative
+        difference against a <b>${(w.band * 100).toFixed(0)}%</b> band: same-design
+        units stay admitted through 2% scatter, and at 5% &mdash; scatter as wide as
+        the band &mdash; it refuses, correctly. <b>The band has to exceed the fleet's
+        own scatter.</b> An exact match instead of a band refused all 200, including
+        every same-machine transfer.</div></div>`);
+  }
+
   const miss = (ev.missing || []).length
     ? `<div class="evmissing">not measured yet: ${ev.missing.join(', ')}
        &mdash; run <code>${esc(ev.reproduce)}</code></div>` : '';
-  $('#evidence').innerHTML = miss + `<div class="evgrid">${cards.join('')}</div>`;
+  const st = ev.selftest;
+  const inv = st
+    ? `<div class="inv ${st.passed === st.total ? 'ok' : 'bad'}">
+         invariants <b>${st.passed}/${st.total}</b> passing &middot;
+         analytic Jacobian agrees with central differences to
+         ${st.jacobian_worst.toExponential(1)} &middot;
+         hardware defaults ${st.defaults_exact ? 'exact' : 'NOT exact'}</div>` : '';
+  $('#evidence').innerHTML = miss + inv +
+    `<div class="evgrid">${cards.join('')}</div>`;
 }
 
 async function boot(){

@@ -39,6 +39,8 @@ Requires Python 3.11+, numpy and matplotlib (`pip install -r requirements.txt`).
 | `surrogate.py` | The *other* source of a warm start: a quadratic response surface fitted to the archive, predicting a state instead of recalling one. The PhysicsAI arrow, at laptop scale |
 | `dimensionality.py` | What happens to retrieval when the Case Card carries hundreds of parameters instead of 7 — and which gate stops working |
 | `failure_zone.py` | Are the failed runs worth keeping? Tests whether proximity to a failure predicts anything — with the controls that decide whether it is real |
+| `selftest.py` | The invariants everything rests on: the analytic Jacobian against central differences, and hardware defaults that must change nothing |
+| `wide_sweep.py` | The same measurement on 25 real parameters and six machine variants — where the hardware rule finally becomes reachable |
 | `verifier.py` | Layer 3: decides whether reusing a case is legitimate, and whether the answer is an operating point at all. Verdicts carry a severity — a *risk* the engineer may override, or a *fact* they may not |
 | `fold.py` | The circuit variant where a warm start *can* be silently wrong, and the naive-vs-verified experiment |
 | `casecard.py` | Layer 1's output record: canonical units, quoted provenance, explicit absence |
@@ -69,8 +71,10 @@ The headline is the number, against both baselines: **8 cold / 7 nominal → 4 w
 
 Below the pipeline sits an **Evidence** panel: the measured results — the three
 arms, the surrogate arms, the fold circuit's 4-vs-40, the failure-archive AUC and
-its control, and the dimensionality chart — read live from the result JSONs by
-`GET /api/evidence`. It is labelled *measured offline*, because none of it is
+its control, the dimensionality chart, and the 25-parameter sweep with the
+hardware rule's scatter table — read live from the result JSONs by
+`GET /api/evidence`, above a line stating whether the numerical invariants in
+`selftest.py` currently hold. It is labelled *measured offline*, because none of it is
 something the service computes per request, and each card states the basis its
 means were taken over. One page to open on stage instead of a browser, a terminal
 and a PNG viewer.

@@ -52,6 +52,28 @@ import model
 P_CAVITATION = -0.9   # bar gauge
 
 
+#: How far two cases' hardware may differ and still count as the same machine.
+#: Not a physics judgement -- it is manufacturing scatter. Two units built to
+#: one drawing are never bit-identical, and an exact-match rule discovers that
+#: the hard way: `wide_sweep.py --tolerance 0.02` refuses **200 of 200**
+#: transfers, including every same-machine one, which is a gate nobody would
+#: keep switched on.
+#:
+#: 5% is a stated assumption rather than a tuned constant, and `wide_sweep.py`
+#: measures the thing that would make it wrong -- the band at which a genuinely
+#: different design starts being admitted as the same machine.
+#:
+#: **Aggregate, not per-constant, and that distinction is the whole rule.** The
+#: obvious form -- refuse if *any* constant is out of band -- is a multiple
+#: comparisons problem: with 18 constants each carrying independent scatter, the
+#: chance that at least one exceeds the band is high even when every one is
+#: within tolerance. Measured: at 2% scatter the per-constant form refused 150
+#: of 200 same-machine transfers. Comparing the *norm* of the relative
+#: difference averages the scatter instead of taking its worst draw, so the rule
+#: stops degrading as the parameter count grows -- the same failure mode
+#: `dimensionality.py` finds in the coverage rule, caught here before shipping.
+HARDWARE_REL_TOL = 0.05
+
 #: rules where "proceed anyway" is not a judgement an engineer can make. A
 #: source case on different hardware satisfies different equations -- reusing
 #: its state is a category error, not a risk to be weighed.
@@ -156,13 +178,26 @@ class Verifier:
                "coverage_radius": self.coverage_radius}
 
         # -- same circuit? transferring a state between different hardware is
-        #    not a physics judgement call, it is a category error
-        q_d = query.get("D_mot", model.D_MOT)
-        s_d = src_params.get("D_mot", model.D_MOT)
-        if abs(q_d - s_d) > 1e-9:
+        #    not a physics judgement call, it is a category error.
+        #
+        #    Every promoted constant is compared, not just the motor: once a
+        #    case can state its own breakaway torque or cross-port leakage, two
+        #    cases agreeing on the seven swept parameters can still be different
+        #    machines. Cases that state none of them resolve to the defaults on
+        #    both sides, so an archive built before the promotion behaves
+        #    exactly as it did.
+        q_hw, s_hw = model.hardware(query), model.hardware(src_params)
+        rel = {k: abs(q_hw[k] - s_hw[k]) / max(abs(q_hw[k]), abs(s_hw[k]), 1e-30)
+               for k in q_hw}
+        spread = float(np.sqrt(np.mean(np.square(list(rel.values())))))
+        det["hardware_spread"] = spread
+        if spread > HARDWARE_REL_TOL:
+            k = max(rel, key=rel.get)
             return Verdict(False, "hardware",
-                           f"source case is a different circuit "
-                           f"({s_d:g} cm3/rev motor, query is {q_d:g})", det)
+                           f"source case is a different circuit: hardware differs "
+                           f"by {spread:.0%} overall, worst is {k} at "
+                           f"{s_hw[k]:g} there against {q_hw[k]:g} here", det)
+
 
         # -- inside the archive's parameter envelope?
         vec = model.param_vector(query)

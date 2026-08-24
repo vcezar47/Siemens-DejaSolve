@@ -239,6 +239,18 @@ def run(archive_path: Path = ARCHIVE, results_path: Path = RESULTS,
             "source_of_truth": str(results_path),
         },
         "projection": {
+            # the transform itself, not just its output: without it the page can
+            # only redraw the cases this file already contains, and the whole
+            # point of the view is to place a case the archive has never seen --
+            # the one the operator just analysed -- into the same space.
+            "transform": {
+                "state_order": list(model.STATE_NAMES),
+                "mu": [float(v) for v in proj["mu"]],
+                "sd": [float(v) for v in proj["sd"]],
+                "centre": [float(v) for v in proj["centre"]],
+                "basis": [[float(w) for w in row] for row in proj["basis"]],
+                "recipe": "z = (state - mu) / sd;  xyz = (z - centre) @ basis.T",
+            },
             "variance_pct": [round(float(v) * 100, 2) for v in proj["variance"]],
             "top3_variance_pct": round(float(proj["variance"][:3].sum()) * 100, 2),
             "distance_fidelity_r": round(fidelity, 4),

@@ -387,14 +387,15 @@ def analyse(text: str, name: str, archive: Archive,
                 "a state from different hardware solves different equations -- "
                 "there is no judgement to make here, so no override is offered")
 
-    cold = model.solve(card.params)
+    cold = model.solve(card.params, record_path=True)
     # The flat cold start is the weakest baseline there is, so the demo quotes
     # the same comparison bench.py does: a nominal guess built from this card's
     # own parameters, no archive involved. If the archive only beats the flat
     # start, it has not earned the stage it is standing on.
-    nom = model.solve(card.params, x0=model.nominal_start(card.params))
+    nom = model.solve(card.params, x0=model.nominal_start(card.params),
+                      record_path=True)
     if accepted:
-        warm = model.solve(card.params, x0=archive.states[j])
+        warm = model.solve(card.params, x0=archive.states[j], record_path=True)
         chosen, label = warm, "warm"
     else:
         # A warning the engineer left standing should not cost them anything.
@@ -421,7 +422,24 @@ def analyse(text: str, name: str, archive: Archive,
             dn = np.abs(np.array(nom["x"]) - np.array(warm["x"]))
             solve["agreement_vs_nominal"] = float(dn.max())
             solve["saved_vs_nominal"] = nom["iterations"] - warm["iterations"]
+    # What follows is for the geometry view, and it is the same data the stages
+    # above already computed -- no extra solve, no second retrieval. Without it
+    # the page can only ever draw the fixture `viz.py` shipped, and the case the
+    # operator just analysed would sit in a panel that ignores it.
+    if chosen["converged"]:
+        solve["solution"] = {k: float(v)
+                             for k, v in zip(model.STATE_NAMES, chosen["x"])}
+        # the relief valve's state is part of the answer, not of the setup, so
+        # the drawing of this case cannot be derived from the Case Card alone
+        solve["regime"] = model.regime(chosen["x"], card.params)
+    solve["paths"] = {
+        name: [[float(v) for v in row] for row in arm["path"]]
+        for name, arm in (("cold", cold), ("nominal", nom), ("warm", warm))
+        if arm is not None
+    }
     trace["solve"] = solve
+    trace["retrieval"]["solution"] = {
+        k: float(v) for k, v in zip(model.STATE_NAMES, archive.states[j])}
 
     if not chosen["converged"]:
         stages.append(_stage("solve", "blocked",

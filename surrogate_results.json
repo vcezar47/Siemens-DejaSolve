@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-24T07:35:02+00:00",
+  "generated_utc": "2026-08-24T10:18:22+00:00",
   "archive_size": 395,
   "n_queries": 200,
   "seed": 99,
@@ -8,8 +8,8 @@
     "features": 36,
     "ridge": 1e-06,
     "train_rmse": 30.034719617506777,
-    "fit_ms": 2.521599999454338,
-    "median_predict_ms": 0.3146999997625244
+    "fit_ms": 4.52210000003106,
+    "median_predict_ms": 0.16460000006190967
   },
   "prediction_quality": {
     "solver_tolerance": 1e-08,

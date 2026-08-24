@@ -286,6 +286,9 @@
                 placeholder="Paste a solver log, an input deck, or an engineer's note — in any format, any language. Or drop a file here."></textarea>
       <div class="row">
         <button class="run" id="run">Analyse</button>
+        <button class="geobtn" id="loadfile">Load a file…</button>
+        <input type="file" id="fileinput" hidden
+               accept=".log,.txt,.dat,.bdf,text/plain">
         <select id="backend" title="ingest backend"></select>
         <span class="hint" id="hint"></span>
       </div>
@@ -310,6 +313,7 @@
       </div>
       <svg class="geoview" id="geoview" viewBox="0 0 520 372" role="img"
            aria-label="solved states of the archive, projected to three dimensions"></svg>
+      <div class="georow" id="liverow"></div>
       <div class="georow" id="georow"></div>
       <div class="geokey" id="geokey"></div>
       <div class="geocap" id="geocap"></div>
@@ -369,7 +373,7 @@ let SAMPLES = [];
 
 //: label for each backend id. `auto` is always offered and always works —
 //: it degrades to the parser rather than failing.
-const BACKEND_LABEL = {auto:'auto', hybrid:'hybrid (parser + local model)',
+const BACKEND_LABEL = {hybrid:'hybrid (parser + local model)',
                        rules:'rules only (instant)',
                        ollama:'Ollama only (local)'};
 
@@ -397,10 +401,16 @@ function renderHealth(h){
   // written out here, so a backend can never exist on one side only.
   // Unavailable ones stay visible with the reason in the label; hiding them
   // is how a demo ends up with an unexplained missing feature.
+  // `auto` is deliberately absent from this list, though it remains the default
+  // for the CLI and `POST /api/analyse`. A dropdown entry whose meaning changes
+  // with what happens to be running is the wrong thing to have on a stage: the
+  // page's whole argument is that it shows which component did what, and an
+  // option that silently resolves to hybrid or to rules hides exactly that.
+  // Choosing the backend by name means the demo can never be asked "so which
+  // one actually ran?" without the screen already answering.
   const sel = $('#backend');
   const keep = sel.value;                     // survive a refresh mid-demo
   const markup =
-    `<option class="on" value="auto">ingest: auto</option>` +
     Object.keys(B).map(k =>
       `<option class="${B[k].available ? 'on' : 'off'}" value="${k}"` +
       `${B[k].available ? '' : ' data-off="1"'}>ingest: ${BACKEND_LABEL[k]||k}` +
@@ -409,7 +419,10 @@ function renderHealth(h){
   // cursor, so only touch the DOM when the availability picture changed.
   if(sel.innerHTML !== markup){
     sel.innerHTML = markup;
-    if([...sel.options].some(o => o.value === keep)) sel.value = keep;
+    // keep the operator's choice across a poll; otherwise open on the best
+    // backend that is actually up, which is what `auto` used to decide silently
+    sel.value = [...sel.options].some(x => x.value === keep) ? keep
+              : (B.hybrid && B.hybrid.available ? 'hybrid' : 'rules');
   }
   explain();
 }
@@ -417,12 +430,9 @@ function renderHealth(h){
 function explain(){
   const sel = $('#backend');
   const B = HEALTH.backends || {};
-  const ready = Object.keys(B).filter(k => B[k].available);
   const o = sel.selectedOptions[0];
   const k = sel.value;
-  $('#hint').textContent = (k === 'auto')
-    ? `auto -> ${ready.includes('hybrid') ? 'hybrid' : 'rules'}`
-    : (B[k] ? B[k].detail : '');
+  $('#hint').textContent = B[k] ? B[k].detail : '';
   const off = !!(o && o.dataset.off);
   $('#hint').style.color = off ? 'var(--refuse)' : 'var(--ok)';
   sel.classList.toggle('off', off);
@@ -653,6 +663,95 @@ function drawEvidence(ev){
 //: cannot quote a number the benchmark does not.
 */
 let VIZ = null;
+/* --- the analysed case, placed in the same space -------------------------
+//: Everything above draws what `viz.py` measured offline. This connects it to
+//: what the operator just ran: the case they analysed is projected with the
+//: *published transform* -- the same mu/sd/basis the archive was projected
+//: with -- so a case the archive has never seen lands in the archive's own
+//: coordinates rather than in a second, incomparable picture.
+//:
+//: No geometry is computed here that the pipeline did not already compute.
+//: `POST /api/analyse` returns the solved state, the retrieved neighbour's
+//: state and the three Newton paths; this only multiplies them by a matrix.
+*/
+let LIVE = null;
+
+function projectState(sol){
+  const T = VIZ.projection.transform;
+  const z = T.state_order.map((k, i) => ((sol[k] - T.mu[i]) / T.sd[i]) - T.centre[i]);
+  return T.basis.map(row => row.reduce((a, w, i) => a + w * z[i], 0));
+}
+
+//: a live case is only placeable once it has actually been solved. A refusal --
+//: incomplete card, foreign domain, blocked transfer -- has no solved state, and
+//: inventing a position for it would be the one dishonesty this whole view is
+//: built to avoid. Those return null and the views keep showing the fixture.
+function liveFromTrace(t){
+  const sol = t && t.solve && t.solve.solution;
+  const ret = t && t.retrieval;
+  if(!sol || !ret || !ret.solution) return null;
+  return {
+    id: (t.artifact || 'your run'),
+    params: t.card.params,
+    solution: sol,
+    xyz: projectState(sol),
+    relief_open: !!(t.solve.regime && t.solve.regime.relief_open),
+    neighbour: {
+      id: ret.case_id,
+      params: ret.params,
+      solution: ret.solution,
+      xyz: projectState(ret.solution),
+      relief_open: !!(ret.regime && ret.regime.relief_open),
+    },
+    distance: ret.distance,
+    paths: t.solve.paths || {},
+    iterations: {cold: t.solve.cold_iterations, nominal: t.solve.nominal_iterations,
+                 warm: t.solve.warm_iterations},
+    agreement: t.solve.agreement,
+  };
+}
+
+function adoptTrace(t){
+  const live = liveFromTrace(t);
+  if(!live) return;                      // a refusal leaves the fixture in place
+  LIVE = live;
+  MACH.right = null;
+  GEO.sel = null;
+  document.querySelectorAll('.tile').forEach(x => x.classList.remove('on'));
+  GEO.bounds = geoBounds();              // the live paths may reach further out
+  $('#liverow').innerHTML =
+    `<button class="geobtn" id="livereset">Show the shipped example</button>
+     <span style="color:var(--ok);font-size:11.5px">showing <b>${esc(live.id)}</b>
+       &mdash; the artifact you just analysed, and the case retrieval chose for it</span>`;
+  $('#livereset').onclick = () => {
+    LIVE = null; GEO.bounds = geoBounds(); $('#liverow').innerHTML = '';
+    renderControls(); renderView(); renderMachPanel();
+  };
+  renderControls(); renderView(); renderMachPanel();
+}
+
+//: from here down, the views ask these two for their subject instead of
+//: reaching into VIZ directly, so one branch decides "live or fixture" and the
+//: three panels can never disagree about which case they are showing.
+function subjectPair(){
+  return LIVE ? {query: LIVE, neighbour: LIVE.neighbour,
+                 distance: LIVE.distance, live: true}
+              : {query: VIZ.pair.query, neighbour: VIZ.pair.neighbour,
+                 distance: VIZ.pair.setup_distance, live: false};
+}
+function subjectRace(){
+  if(!LIVE || !LIVE.paths || !LIVE.paths.cold) return VIZ.race;
+  const out = {};
+  for(const k of ['cold','nominal','warm']){
+    const p = LIVE.paths[k];
+    if(!p) continue;
+    out[k] = {iterations: p.length - 1,
+              path_xyz: p.map(row => projectState(
+                Object.fromEntries(VIZ.projection.transform.state_order
+                  .map((n, i) => [n, row[i]]))))};
+  }
+  return out;
+}
 const GEO = {mode:'archive', yaw:0.62, pitch:0.34, step:0, spin:true,
              sel:null, bounds:null, raf:null, playing:false};
 
@@ -689,7 +788,7 @@ function rot3(p){
 //: — sizing from per-axis extents instead makes the cloud breathe as it spins.
 function geoBounds(){
   const pts = VIZ.archive.map(a => a.xyz).concat(
-    Object.values(VIZ.race).flatMap(r => r.path_xyz));
+    Object.values(subjectRace()).flatMap(r => r.path_xyz));
   let m = 0;
   for(const p of pts) m = Math.max(m, Math.hypot(p[0], p[1], p[2]));
   return m || 1;
@@ -750,11 +849,19 @@ function renderView(){
       on ? 1 : (dim ? 0.16 : 0.62),
       on ? 'stroke="#00b3b3" stroke-width="1.5"' : ''));
   }
+  //: the analysed case is drawn on top of the cloud in every mode -- it is the
+  //: subject, and a subject that vanishes when you change tab is not one.
+  if(LIVE && GEO.mode !== 'race'){
+    layers.push(dot(LIVE.neighbour.xyz, 5.5, '#00b3b3', 1,
+                    'stroke="#0e1416" stroke-width="1.5"'));
+    layers.push(dot(LIVE.xyz, 6, '#3ddc97', 1, 'stroke="#0e1416" stroke-width="1.5"'));
+  }
   layers.sort((u,v) => u.z - v.z);
   let svg = layers.map(l => l.svg).join('');
 
   if(GEO.mode === 'pair'){
-    const q = screen(VIZ.pair.query.xyz), n = screen(VIZ.pair.neighbour.xyz);
+    const P = subjectPair();
+    const q = screen(P.query.xyz), n = screen(P.neighbour.xyz);
     svg += `<line x1="${q[0].toFixed(1)}" y1="${q[1].toFixed(1)}"
                   x2="${n[0].toFixed(1)}" y2="${n[1].toFixed(1)}"
                   stroke="#3ddc97" stroke-width="1.4" stroke-dasharray="4 3"/>`;
@@ -763,14 +870,15 @@ function renderView(){
             <circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="6"
               fill="#3ddc97" stroke="#0e1416" stroke-width="1.5"/>
             <text x="${(n[0]+9).toFixed(1)}" y="${(n[1]+4).toFixed(1)}" fill="#8fa3a9"
-              font-size="10.5" font-family="ui-monospace,monospace">${esc(VIZ.pair.neighbour.id)}</text>
+              font-size="10.5" font-family="ui-monospace,monospace">${esc(P.neighbour.id)}</text>
             <text x="${(q[0]+9).toFixed(1)}" y="${(q[1]+4).toFixed(1)}" fill="#e6eef0"
-              font-size="10.5" font-family="ui-monospace,monospace">${esc(VIZ.pair.query.id)}</text>`;
+              font-size="10.5" font-family="ui-monospace,monospace">${esc(P.query.id)}</text>`;
   }
 
   if(GEO.mode === 'race'){
+    const R = subjectRace();
     for(const k of ['cold','nominal','warm'])
-      svg += polyline(VIZ.race[k].path_xyz, ARM[k].c, GEO.step);
+      if(R[k]) svg += polyline(R[k].path_xyz, ARM[k].c, GEO.step);
   }
 
   $('#geoview').innerHTML = svg + triad();
@@ -779,8 +887,8 @@ function renderView(){
 function renderControls(){
   const m = GEO.mode;
   if(m === 'race'){
-    const maxStep = Math.max(...['cold','nominal','warm']
-      .map(k => VIZ.race[k].path_xyz.length - 1));
+    const R = subjectRace();
+    const maxStep = Math.max(...Object.values(R).map(r => r.path_xyz.length - 1));
     $('#georow').innerHTML =
       `<button class="geobtn" id="geoplay">${GEO.playing ? 'Pause' : 'Play'}</button>
        <button class="geobtn" id="georeset">Reset</button>
@@ -791,9 +899,9 @@ function renderControls(){
       if(GEO.playing && GEO.step >= maxStep) GEO.step = 0; renderControls(); };
     $('#georeset').onclick = () => { GEO.step = 0; GEO.playing = false;
       renderControls(); renderView(); };
-    $('#geokey').innerHTML = ['cold','nominal','warm'].map(k =>
+    $('#geokey').innerHTML = ['cold','nominal','warm'].filter(k => R[k]).map(k =>
       `<span><i style="background:${ARM[k].c}"></i>${esc(ARM[k].label)} &mdash;
-        <b style="color:var(--ink)">${VIZ.race[k].iterations}</b> iterations</span>`).join('');
+        <b style="color:var(--ink)">${R[k].iterations}</b> iterations</span>`).join('');
   }else{
     $('#georow').innerHTML =
       `<button class="geobtn" id="geospin">${GEO.spin ? 'Stop' : 'Spin'}</button>
@@ -822,6 +930,15 @@ const CAPTION = {
       rather than one measured on screen.`;
   },
   pair: () => {
+    const P = subjectPair();
+    const g = pairGap(P);
+    if(P.live) return `<b>${esc(P.query.id)}</b> is the artifact you just analysed &mdash;
+      a run this archive has never seen. Its nearest neighbour on the seven setup
+      parameters is <b>${esc(P.neighbour.id)}</b>, at a true distance of
+      <b>${(+P.distance).toFixed(3)}</b>. Their solved states differ by
+      <b>${g.dp.toFixed(1)} bar</b> and <b>${Math.round(g.dw)} rev/min</b>. This is the
+      same retrieval the pipeline above ran &mdash; the picture is not a re-enactment
+      of it, it is the result of it.`;
     const p = VIZ.pair;
     return `<b>${esc(p.query.id)}</b> is a case the archive has never seen. Its nearest
       neighbour on the seven setup parameters is <b>${esc(p.neighbour.id)}</b>, at a true
@@ -832,6 +949,14 @@ const CAPTION = {
       has to be solved and verified.`;
   },
   race: () => {
+    const P = subjectPair(), R = subjectRace();
+    if(P.live) return `The artifact you just analysed, solved three ways. Same residual,
+      same Jacobian, same tolerance &mdash; <b>the only thing that differs is where the
+      solver starts.</b> Cold takes <b>${R.cold.iterations}</b> iterations, an engineer's
+      nominal guess <b>${R.nominal ? R.nominal.iterations : '&mdash;'}</b>, and starting
+      from <b>${esc(P.neighbour.id)}</b>'s state
+      <b>${R.warm ? R.warm.iterations : '&mdash;'}</b>. These are the iterate paths the
+      pipeline actually walked for your run, not a stored example.`;
     const r = VIZ.race, g = r.warm.agreement_vs_cold;
     return `The same query, the same residual, the same Jacobian, the same tolerance.
       <b>The only thing that differs is where the solver starts.</b> Cold begins with every
@@ -887,8 +1012,9 @@ function schematic(c, w){
 }
 
 function renderTiles(){
-  PSCALE = Math.max(...VIZ.tiles.concat([VIZ.pair.neighbour])
-    .map(t => t.solution.p1), VIZ.pair.query.solution.p1);
+  const P0 = subjectPair();
+  PSCALE = Math.max(...VIZ.tiles.concat([P0.neighbour])
+    .map(t => t.solution.p1), P0.query.solution.p1);
   $('#sheetcn').innerHTML =
     `${VIZ.config.n_tiles} of ${VIZ.config.archive_size}, chosen to span the cloud &middot;
      pipe colour is solved pressure, ring fill is solved shaft speed`;
@@ -931,8 +1057,8 @@ function geoTick(){
   if(GEO.playing){
     GEO._t = (GEO._t || 0) + 1;
     if(GEO._t % 28 === 0){
-      const maxStep = Math.max(...['cold','nominal','warm']
-        .map(k => VIZ.race[k].path_xyz.length - 1));
+      const maxStep = Math.max(...Object.values(subjectRace())
+        .map(r => r.path_xyz.length - 1));
       if(GEO.step < maxStep){ GEO.step++; dirty = true; renderControls(); }
       else { GEO.playing = false; renderControls(); }
     }
@@ -1244,25 +1370,27 @@ function renderMachine(el, c, tms, label){
        font-family="ui-monospace,monospace">shafts ${Math.round(s.w_a)} / ${Math.round(s.w_b)} rev/min</text>`;
 }
 
-function machDiff(other){
-  const q = VIZ.pair.query.solution, n = other.solution;
-  const dp = Math.max(...['p1','p2a','p3a','p2b','p3b'].map(k => Math.abs(q[k]-n[k])));
-  const dw = Math.max(...['w_a','w_b'].map(k => Math.abs(q[k]-n[k])));
-  return {dp, dw};
+function stateGap(q, n){
+  return {dp: Math.max(...['p1','p2a','p3a','p2b','p3b'].map(k => Math.abs(q[k]-n[k]))),
+          dw: Math.max(...['w_a','w_b'].map(k => Math.abs(q[k]-n[k])))};
 }
+function pairGap(P){ return stateGap(P.query.solution, P.neighbour.solution); }
+function machDiff(other){ return stateGap(subjectPair().query.solution, other.solution); }
 
 function renderMachPanel(){
-  const right = MACH.right || VIZ.pair.neighbour;
-  const picked = MACH.right && MACH.right.id !== VIZ.pair.neighbour.id;
-  const d = machDiff(right), best = machDiff(VIZ.pair.neighbour);
+  const P = subjectPair();
+  const right = MACH.right || P.neighbour;
+  const picked = MACH.right && MACH.right.id !== P.neighbour.id;
+  const d = machDiff(right), best = machDiff(P.neighbour);
   $('#machdiff').innerHTML =
     `<div>largest pressure difference<b>${d.dp.toFixed(1)} bar</b>across five nodes</div>
      <div>largest speed difference<b>${Math.round(d.dw)} rev/min</b>across two shafts</div>` +
     (picked
       ? `<div>versus the retrieved case<b>${best.dp.toFixed(1)} bar</b>which is
            ${(d.dp / (best.dp || 1)).toFixed(1)}&times; closer</div>`
-      : `<div>then solved in<b>${VIZ.race.warm.iterations} iterations</b>from
-           ${VIZ.race.cold.iterations} cold</div>`);
+      : (() => { const R = subjectRace();
+          return `<div>then solved in<b>${R.warm ? R.warm.iterations : '&mdash;'} iterations</b>from
+                    ${R.cold.iterations} cold</div>`; })());
   //: the point of letting a tile be picked is that picking badly is visible.
   //: A hand-chosen case is a control, and saying how much worse it is turns the
   //: comparison from an illustration into a measurement the room can check.
@@ -1272,8 +1400,8 @@ function renderMachPanel(){
        <b>${d.dp.toFixed(1)} bar</b> away against the retrieved case's
        <b>${best.dp.toFixed(1)} bar</b>: this is what the archive looks like when you
        start from the wrong neighbour. Press <i>Show the retrieved pair</i> to go back.`
-    : `<b>${esc(VIZ.pair.neighbour.id)}</b> is the case retrieval actually chose for
-       <b>${esc(VIZ.pair.query.id)}</b>, out of ${VIZ.config.archive_size}. Click any
+    : `<b>${esc(P.neighbour.id)}</b> is the case retrieval actually chose for
+       <b>${esc(P.query.id)}</b>, out of ${VIZ.config.archive_size}. Click any
        tile above to compare against a different one instead &mdash; the gap it opens
        is the thing retrieval is for.`;
 }
@@ -1281,9 +1409,10 @@ function renderMachPanel(){
 function machTick(){
   const t = performance.now() - MACH.t0;
   if(MACH.spin) MACH.yaw += 0.0022;
-  renderMachine($('#machL'), VIZ.pair.query, t, VIZ.pair.query.id + '  (the new run)');
-  renderMachine($('#machR'), MACH.right || VIZ.pair.neighbour, t,
-                (MACH.right || VIZ.pair.neighbour).id + '  (from the archive)');
+  const P = subjectPair();
+  renderMachine($('#machL'), P.query, t, P.query.id + '  (the new run)');
+  renderMachine($('#machR'), MACH.right || P.neighbour, t,
+                (MACH.right || P.neighbour).id + '  (from the archive)');
   MACH.raf = requestAnimationFrame(machTick);
 }
 
@@ -1361,14 +1490,32 @@ async function boot(){
 const ta = $('#text');
 ta.addEventListener('dragover', e => { e.preventDefault(); ta.style.borderColor = 'var(--teal)'; });
 ta.addEventListener('dragleave', () => ta.style.borderColor = '');
+//: one loader for both ways in. Dropping a file always worked; nothing on
+//: screen said so, and an affordance nobody can see is not one — hence the
+//: button beside Analyse, which opens the same picker and lands in the same
+//: place. Reading happens in the browser: the file's text is posted like any
+//: pasted artifact, so there is no upload endpoint and nothing touches disk.
+function loadFile(f){
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    ta.value = r.result;
+    ta.dataset.name = f.name;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+    $('#hint').textContent = `loaded ${f.name} (${(f.size/1024).toFixed(1)} kB)`;
+  };
+  r.onerror = () => { $('#out').innerHTML =
+    `<div class="err">could not read ${esc(f.name)}</div>`; };
+  r.readAsText(f);
+}
+
 ta.addEventListener('drop', e => {
   e.preventDefault(); ta.style.borderColor = '';
-  const f = e.dataTransfer.files[0]; if(!f) return;
-  const r = new FileReader();
-  r.onload = () => { ta.value = r.result; ta.dataset.name = f.name;
-                     document.querySelectorAll('.chip').forEach(c => c.classList.remove('on')); };
-  r.readAsText(f);
+  loadFile(e.dataTransfer.files[0]);
 });
+
+$('#loadfile').onclick = () => $('#fileinput').click();
+$('#fileinput').onchange = e => { loadFile(e.target.files[0]); e.target.value = ''; };
 
 //: the request that produced what is on screen. An override has to re-analyse
 //: *the same artifact*, not whatever the textarea happens to hold by then.
@@ -1394,7 +1541,10 @@ async function analyse(req){
       $('#out').innerHTML = `<div class="err">HTTP ${res.status} &mdash; ${esc(detail)}</div>`;
     } else {
       LAST_REQ = req;
-      draw(await res.json());
+      const trace = await res.json();
+      draw(trace);
+      // the geometry below is about this run now, not about the shipped fixture
+      try{ if(VIZ) adoptTrace(trace); }catch(e){ /* a view must never break the pipeline */ }
     }
   }catch(e){
     $('#out').innerHTML = `<div class="err">${esc(e.message)}</div>`;

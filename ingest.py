@@ -145,8 +145,10 @@ EXTRACTION_SCHEMA = {
         },
         "missing": {
             "type": "array",
-            "description": "Parameters the artifact does not state. A qualitative "
-                           "phrase such as 'the standard fan curves' is NOT a value.",
+            "description": "Parameters the artifact states no number for. A "
+                           "qualitative phrase such as 'the standard fan curves' "
+                           "is NOT a value; a number described in words "
+                           "('roughly 2 mm2') IS one.",
             "items": {"type": "string", "enum": list(model.PARAM_NAMES)},
         },
         "notes": {
@@ -173,6 +175,12 @@ Rules:
 estimate, infer from context, or carry a value over from a similar case. A \
 qualitative description of a load ("the standard fan curves", "sarcina e mica") \
 is not a coefficient -- that parameter is missing.
+- But a stated number is still a value when it is hedged or wrapped in \
+description. "roughly 2 mm2", "about 55 lpm", "left wide at 11 mm2", "call it \
+890", "pe la 70 l/min" all state their parameter -- extract the number and quote \
+the phrase. A parameter is missing only when no number is given for it at all: \
+words like "barely", "roughly" or "deliberately restrictive" beside a figure \
+describe that figure, they do not withdraw it.
 - `provenance` must quote the artifact verbatim, not paraphrase it.
 - A corrupted or placeholder value (####, NaN, ---) is missing, not zero."""
 

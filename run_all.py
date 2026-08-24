@@ -22,6 +22,7 @@ import make_logs
 import plot_convergence
 import selftest
 import surrogate
+import viz
 import wide_sweep
 import sweep
 
@@ -37,6 +38,7 @@ DIMENSIONALITY_RESULTS = Path("dimensionality_results.json")
 DIMENSIONALITY_FIGURE = Path("figs/dimensionality.png")
 WIDE_SWEEP_RESULTS = Path("wide_sweep_results.json")
 AGENT_SELECT_RESULTS = Path("agent_select_results.json")
+VIZ_RESULTS = Path("viz_results.json")
 
 
 def main(score_models: bool = False) -> int:
@@ -58,6 +60,17 @@ def main(score_models: bool = False) -> int:
     bench.run_bench(ARCHIVE / "cases.jsonl", n_queries=200, seed=99, out=RESULTS)
     import json
     plot_convergence.draw(json.loads(RESULTS.read_text(encoding="utf-8")), FIGURE)
+
+    print()
+    print("=" * 62)
+    print("PHASE 1 (viz) -- the geometry behind the number")
+    print("=" * 62)
+    # Reads results.json rather than re-deriving anything: it re-solves the one
+    # exemplar case to record its Newton iterates and refuses to write a file
+    # if either the retrieved neighbour or the iteration counts disagree with
+    # the benchmark. A picture that drifts from the table is worse than no
+    # picture, so it fails loudly instead.
+    viz.report(viz.run(ARCHIVE / "cases.jsonl", RESULTS, VIZ_RESULTS))
 
     print()
     print("=" * 62)

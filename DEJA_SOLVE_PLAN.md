@@ -229,11 +229,13 @@ new scope. Simcenter 3D goes on next steps. The three gates go on slide 2. Neith
 
 ### Backlog — wanted, not scheduled
 
-- **3D visualisation (requested 20 Aug).** Something visual and three-dimensional, beyond the domain gate's
-  refusal of `part-bracket.log`. Not scoped yet, and worth being clear-eyed when it is: rendering a mesh is
-  presentation, whereas *transferring a field between meshes* is the adapter §4 lists as the first
-  next-steps item. Decide which of the two is being asked for before starting — one is an afternoon and the
-  other is the real engineering.
+- ~~**3D visualisation (requested 20 Aug).**~~ **Built 24 Aug — §6l,
+  [record](phases/phase-1e-geometry.md).** The fork above was the right one to force, and the answer was
+  *neither*: not a mesh, and not the adapter. The archive is drawn in **solution space**, where a 3D
+  projection is honest (97.5% of variance, distance fidelity r=0.999) rather than in parameter space, where
+  it is not (49.5%, r=0.667) — and the circuit itself is drawn as a 3D **schematic** whose colours, bores,
+  valve state and shaft speeds are all solved quantities. No mesh is rendered and no field is mapped, so
+  §6h's boundary is untouched; the adapter remains the first next-steps item.
 
 ### Still unanswered — and deliberately left that way (decided 19 Aug)
 

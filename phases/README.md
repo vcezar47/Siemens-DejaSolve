@@ -14,6 +14,7 @@ happened and the plan is what was intended.
 | 1b · Surrogate arm | ✅ built 20 Aug — the *predicted* warm start, measured | [phase-1b-surrogate.md](phase-1b-surrogate.md) |
 | 1c · Dimensionality | ✅ built 20 Aug — retrieval at 1000 parameters, and what the gate misses | [phase-1c-dimensionality.md](phase-1c-dimensionality.md) |
 | 1d · Wide parameters | ✅ built 20 Aug — 25 physical parameters; a latent bug in the hardware rule | [phase-1d-wide-parameters.md](phase-1d-wide-parameters.md) |
+| 1e · Geometry | ✅ built 24 Aug — the archive seen, and the circuit drawn in 3D | [phase-1e-geometry.md](phase-1e-geometry.md) |
 | 2 · Verifier | ✅ gate met 17 Aug · contract amended 19 Aug (warn/block) | [phase-2-verifier.md](phase-2-verifier.md) |
 | 2b · Failure archive | ✅ built 20 Aug — measured, and declined as a gate rule | [phase-2b-failure-archive.md](phase-2b-failure-archive.md) |
 | 2c · Top-k retrieval | ✅ built 20 Aug — measured, and declined; k=1 is the optimum | [phase-2c-topk.md](phase-2c-topk.md) |

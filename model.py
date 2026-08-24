@@ -409,7 +409,8 @@ def jacobian_fd(x, p: dict, F0, step: float = FD_STEP) -> np.ndarray:
 
 
 def solve(p: dict, x0=None, tol: float = TOL, max_iter: int = MAX_ITER,
-          jac_mode: str = "analytic", fd_step: float = FD_STEP) -> dict:
+          jac_mode: str = "analytic", fd_step: float = FD_STEP,
+          record_path: bool = False) -> dict:
     """Damped Newton with backtracking line search on the steady-state system.
 
     The *only* thing that ever differs between a cold and a warm run is ``x0``.
@@ -420,11 +421,18 @@ def solve(p: dict, x0=None, tol: float = TOL, max_iter: int = MAX_ITER,
     ``jac_mode`` selects an exact analytic Jacobian or a finite-difference one.
     Analytic is the conservative choice for this project: it is the best case
     for the cold-start baseline, so any advantage measured against it is real.
+
+    ``record_path`` additionally returns every Newton iterate, not just the
+    residual at each one. It is off by default and the key is absent when it is
+    off, so the benchmark's output is byte-identical with and without this
+    argument -- the visualisation reads the iterates, and nothing that produces
+    a reported number is allowed to change shape in order to feed a picture.
     """
     x = np.array(COLD_START if x0 is None else x0, dtype=float)
     F = residual(x, p)
     r = float(np.max(np.abs(F)))
     history = [r]
+    path = [x.tolist()] if record_path else None
     iters = 0
     status = "converged"
 
@@ -457,12 +465,14 @@ def solve(p: dict, x0=None, tol: float = TOL, max_iter: int = MAX_ITER,
         x, F, r = x_new, F_new, r_new
         iters += 1
         history.append(r)
+        if path is not None:
+            path.append(x.tolist())
 
         if not np.all(np.isfinite(x)) or np.max(np.abs(x)) > DIVERGED_AT:
             status = "diverged"
             break
 
-    return {
+    out = {
         "converged": status == "converged",
         "status": status,
         "iterations": iters,
@@ -470,6 +480,9 @@ def solve(p: dict, x0=None, tol: float = TOL, max_iter: int = MAX_ITER,
         "x": np.asarray(x).tolist(),
         "history": history,
     }
+    if path is not None:
+        out["path"] = path
+    return out
 
 
 # --- case bookkeeping -------------------------------------------------------

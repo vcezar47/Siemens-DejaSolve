@@ -204,6 +204,70 @@
   .inv.ok{color:var(--ok);border-color:rgba(61,220,151,.35)}
   .inv.bad{color:var(--refuse);border-color:var(--refuse)}
   .inv b{color:var(--ink)}
+/* --- the geometry view ------------------------------------------------- */
+.geo{max-width:1180px;margin:26px auto 0;padding:0 18px}
+.geo h2{font-size:15px;letter-spacing:.08em;text-transform:uppercase;
+        color:var(--dim);margin:0 0 4px;font-weight:600}
+.geosub{color:var(--faint);font-size:12px;margin-bottom:12px;line-height:1.5}
+.geowrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);
+         gap:14px;align-items:start}
+@media(max-width:900px){.geowrap{grid-template-columns:1fr}}
+.geostage{background:var(--panel);border:1px solid var(--line);border-radius:8px;
+          padding:10px 12px 12px;position:relative}
+.geotabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.geotab{background:var(--panel-2);border:1px solid var(--line);color:var(--dim);
+        font:inherit;font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
+.geotab.on{border-color:var(--teal);color:var(--ink);background:#0d2b2b}
+.geotab:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.geoview{width:100%;display:block;touch-action:none;cursor:grab;user-select:none}
+.geoview.drag{cursor:grabbing}
+.geocap{color:var(--faint);font-size:11.5px;line-height:1.55;margin-top:8px;
+        min-height:52px}
+.geocap b{color:var(--ink);font-weight:600}
+.geokey{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--dim);
+        margin-top:6px}
+.geokey span{display:inline-flex;align-items:center;gap:5px}
+.geokey i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.georow{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.geobtn{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+        font:inherit;font-size:12px;padding:4px 12px;border-radius:5px;cursor:pointer}
+.geobtn:hover{border-color:var(--teal)}
+.geobtn[disabled]{opacity:.45;cursor:default}
+.geosheet{background:var(--panel);border:1px solid var(--line);border-radius:8px;
+          padding:10px 12px 12px}
+.geosheet h3{margin:0 0 2px;font-size:13px;color:var(--ink);font-weight:600}
+.geosheet .cn{color:var(--faint);font-size:11.5px;margin-bottom:9px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px}
+.tile{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;
+      padding:0;cursor:pointer;overflow:hidden;display:block;width:100%}
+.tile:hover{border-color:var(--teal-dim)}
+.tile.on{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal-dim)}
+.tile svg{display:block;width:100%}
+.tile .tl{font-size:9.5px;color:var(--faint);padding:1px 4px 3px;
+          display:flex;justify-content:space-between;font-family:var(--mono)}
+.tile.on .tl{color:var(--dim)}
+.geopair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px}
+.geopair figure{margin:0;background:var(--panel-2);border:1px solid var(--line);
+                border-radius:5px;overflow:hidden}
+.geopair figcaption{font-size:10.5px;color:var(--faint);padding:2px 6px 4px;
+                    font-family:var(--mono)}
+.geonums{display:flex;gap:14px;flex-wrap:wrap;margin-top:9px;font-size:11.5px}
+.geonums div{color:var(--faint)}
+.geonums b{display:block;color:var(--ink);font-size:15px;font-family:var(--mono);
+           font-weight:600;line-height:1.35}
+.geomissing{color:var(--faint);font-size:12px;padding:10px 0}
+
+/* --- the machine ------------------------------------------------------- */
+.mach{max-width:1180px;margin:22px auto 0;padding:0 18px}
+.mach h2{font-size:15px;letter-spacing:.08em;text-transform:uppercase;
+         color:var(--dim);margin:0 0 4px;font-weight:600}
+.machsub{color:var(--faint);font-size:12px;margin-bottom:10px;line-height:1.55}
+.machsub b{color:var(--dim)}
+.machviews{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:760px){.machviews{grid-template-columns:1fr}}
+.machview{width:100%;display:block;background:var(--panel);touch-action:none;
+          border:1px solid var(--line);border-radius:8px;cursor:grab;user-select:none}
+.machview:active{cursor:grabbing}
 </style>
 </head>
 <body>
@@ -233,6 +297,58 @@
     <div id="out"><div class="empty">Pick an artifact and press Analyse.</div></div>
   </section>
 </main>
+
+<section class="geo" id="geo">
+  <h2>The geometry</h2>
+  <div class="geosub" id="geosub">loading&hellip;</div>
+  <div class="geowrap">
+    <div class="geostage">
+      <div class="geotabs" id="geotabs">
+        <button class="geotab on" data-mode="archive">1 &middot; The archive</button>
+        <button class="geotab" data-mode="pair">2 &middot; The matched pair</button>
+        <button class="geotab" data-mode="race">3 &middot; Cold vs warm</button>
+      </div>
+      <svg class="geoview" id="geoview" viewBox="0 0 520 372" role="img"
+           aria-label="solved states of the archive, projected to three dimensions"></svg>
+      <div class="georow" id="georow"></div>
+      <div class="geokey" id="geokey"></div>
+      <div class="geocap" id="geocap"></div>
+    </div>
+    <div class="geosheet">
+      <h3>The archive, case by case</h3>
+      <div class="cn" id="sheetcn"></div>
+      <div class="tiles" id="tiles"></div>
+      <div class="geonums" id="geonums"></div>
+    </div>
+  </div>
+</section>
+
+<section class="mach" id="mach">
+  <h2>The machine</h2>
+  <div class="machsub" id="machsub">
+    The circuit being solved &mdash; reservoir, pump, manifold block, relief valve,
+    two feed lines through their orifices, two motors. <b>The layout is illustrative:
+    the model is lumped, so it has no geometry and nothing here was meshed or
+    simulated in space.</b> What is solved is what you see &mdash; pipe colour is the
+    solved pressure at that node, the orifice bore is the valve&rsquo;s real flow area,
+    the relief valve stands open only when the solved regime says it does, and each
+    shaft turns at its own solved speed (slowed to watch; the ratio is solved).
+  </div>
+  <div class="georow" style="margin-bottom:8px">
+    <button class="geobtn" id="machspin">Stop</button>
+    <button class="geobtn" id="machpair">Show the retrieved pair</button>
+    <span style="color:var(--faint);font-size:11.5px">drag either view to rotate
+      &middot; click a tile above to compare against that case instead</span>
+  </div>
+  <div class="machviews">
+    <svg class="machview" id="machL" viewBox="0 0 400 300" role="img"
+         aria-label="the query case, drawn as a hydraulic circuit"></svg>
+    <svg class="machview" id="machR" viewBox="0 0 400 300" role="img"
+         aria-label="the retrieved archive case, drawn as a hydraulic circuit"></svg>
+  </div>
+  <div class="geonums" id="machdiff"></div>
+  <div class="geocap" id="machnote"></div>
+</section>
 
 <section class="ev">
   <h2>Evidence</h2>
@@ -526,6 +642,677 @@ function drawEvidence(ev){
     `<div class="evgrid">${cards.join('')}</div>`;
 }
 
+/* --- the geometry view --------------------------------------------------
+//: Three beats on one viewport: where the archive's solved states sit, which
+//: one was retrieved for a query, and what the solver then does from each
+//: starting guess. Hand-drawn SVG for the same reason as lineChart above —
+//: one file, no CDN, and a conference room with no internet.
+//:
+//: Everything drawn here comes from viz_results.json, which `viz.py` refuses
+//: to write if its iteration counts disagree with results.json. The picture
+//: cannot quote a number the benchmark does not.
+*/
+let VIZ = null;
+const GEO = {mode:'archive', yaw:0.62, pitch:0.34, step:0, spin:true,
+             sel:null, bounds:null, raf:null, playing:false};
+
+//: pressure ramp, dark-cool to hot. Not decoration: p1 is the manifold and p3
+//: is the return line, so a tile that reads dark on the right is a case where
+//: most of the pump's pressure was spent, which is what the eye should catch.
+const RAMP = [[0,[22,65,63]],[0.33,[10,107,107]],[0.6,[0,179,179]],
+              [0.8,[255,180,84]],[1,[255,107,94]]];
+function ramp(t){
+  t = Math.max(0, Math.min(1, t));
+  for(let i=1;i<RAMP.length;i++){
+    if(t <= RAMP[i][0]){
+      const [a,ca]=RAMP[i-1], [b,cb]=RAMP[i], u=(t-a)/(b-a||1);
+      return `rgb(${ca.map((v,k)=>Math.round(v+(cb[k]-v)*u)).join(',')})`;
+    }
+  }
+  return `rgb(${RAMP[RAMP.length-1][1].join(',')})`;
+}
+
+//: orthographic yaw-then-pitch. Orthographic rather than perspective because
+//: this is a map of a space, not a photograph of an object — a perspective
+//: divide would make equal distances look unequal, which is the one thing a
+//: picture about distance must not do.
+function rot3(p){
+  const cy=Math.cos(GEO.yaw), sy=Math.sin(GEO.yaw);
+  const cp=Math.cos(GEO.pitch), sp=Math.sin(GEO.pitch);
+  const x=p[0], y=p[1], z=p[2];
+  const x1 = x*cy + z*sy, z1 = z*cy - x*sy;
+  return [x1, y*cp - z1*sp, y*sp + z1*cp];
+}
+
+//: the largest distance from the centre, not the largest coordinate. Rotation
+//: preserves length, so a scale set from the radius fits at every viewing angle
+//: — sizing from per-axis extents instead makes the cloud breathe as it spins.
+function geoBounds(){
+  const pts = VIZ.archive.map(a => a.xyz).concat(
+    Object.values(VIZ.race).flatMap(r => r.path_xyz));
+  let m = 0;
+  for(const p of pts) m = Math.max(m, Math.hypot(p[0], p[1], p[2]));
+  return m || 1;
+}
+
+const VW = 520, VH = 372, VCX = 250, VCY = 180;
+function screen(p){
+  const r = rot3(p), s = 166 / GEO.bounds;
+  return [VCX + r[0]*s, VCY - r[1]*s, r[2]];
+}
+
+//: a triad rather than boxed axes: the three directions are principal
+//: components, so their *orientation* is meaningful and their origin is not.
+function triad(){
+  const o = [455, 322], L = 30;
+  return VIZ.projection.axes.map((ax, i) => {
+    const v = [0,0,0]; v[i] = 1;
+    const r = rot3(v);
+    const x = o[0] + r[0]*L, y = o[1] - r[1]*L;
+    return `<line x1="${o[0]}" y1="${o[1]}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"
+                  stroke="#3a4a50" stroke-width="1.2"/>
+            <text x="${x.toFixed(1)}" y="${(y-3).toFixed(1)}" fill="#5d7076"
+                  font-size="9" text-anchor="middle">${ax.variance_pct.toFixed(1)}%</text>`;
+  }).join('');
+}
+
+function dot(p, r, fill, op, extra){
+  const s = screen(p);
+  return {z:s[2], svg:`<circle cx="${s[0].toFixed(1)}" cy="${s[1].toFixed(1)}"
+    r="${r}" fill="${fill}" opacity="${op}" ${extra||''}/>`};
+}
+
+function polyline(path, colour, upto){
+  const pts = path.slice(0, upto == null ? path.length : upto+1).map(screen);
+  if(!pts.length) return '';
+  const d = pts.map((p,i) => `${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const dots = pts.map((p,i) =>
+    `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}"
+       r="${i===pts.length-1?4.2:2.4}" fill="${colour}"
+       stroke="${i===pts.length-1?'#0e1416':'none'}" stroke-width="1"/>`).join('');
+  return `<path d="${d}" fill="none" stroke="${colour}" stroke-width="1.8"
+                opacity="0.95" stroke-linejoin="round"/>${dots}`;
+}
+
+const ARM = {cold:{c:'#8fa3a9', label:'cold — every unknown at zero'},
+             nominal:{c:'#ffb454', label:'nominal — an engineer’s guess'},
+             warm:{c:'#3ddc97', label:'warm — the retrieved state'}};
+
+function renderView(){
+  if(!VIZ) return;
+  const layers = [];
+  const dim = GEO.mode !== 'archive';
+
+  for(const a of VIZ.archive){
+    const on = GEO.sel === a.id;
+    layers.push(dot(a.xyz, on ? 5 : 2.6,
+      on ? '#e6eef0' : (a.relief_open ? '#ffb454' : '#00b3b3'),
+      on ? 1 : (dim ? 0.16 : 0.62),
+      on ? 'stroke="#00b3b3" stroke-width="1.5"' : ''));
+  }
+  layers.sort((u,v) => u.z - v.z);
+  let svg = layers.map(l => l.svg).join('');
+
+  if(GEO.mode === 'pair'){
+    const q = screen(VIZ.pair.query.xyz), n = screen(VIZ.pair.neighbour.xyz);
+    svg += `<line x1="${q[0].toFixed(1)}" y1="${q[1].toFixed(1)}"
+                  x2="${n[0].toFixed(1)}" y2="${n[1].toFixed(1)}"
+                  stroke="#3ddc97" stroke-width="1.4" stroke-dasharray="4 3"/>`;
+    svg += `<circle cx="${n[0].toFixed(1)}" cy="${n[1].toFixed(1)}" r="6"
+              fill="#00b3b3" stroke="#0e1416" stroke-width="1.5"/>
+            <circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="6"
+              fill="#3ddc97" stroke="#0e1416" stroke-width="1.5"/>
+            <text x="${(n[0]+9).toFixed(1)}" y="${(n[1]+4).toFixed(1)}" fill="#8fa3a9"
+              font-size="10.5" font-family="ui-monospace,monospace">${esc(VIZ.pair.neighbour.id)}</text>
+            <text x="${(q[0]+9).toFixed(1)}" y="${(q[1]+4).toFixed(1)}" fill="#e6eef0"
+              font-size="10.5" font-family="ui-monospace,monospace">${esc(VIZ.pair.query.id)}</text>`;
+  }
+
+  if(GEO.mode === 'race'){
+    for(const k of ['cold','nominal','warm'])
+      svg += polyline(VIZ.race[k].path_xyz, ARM[k].c, GEO.step);
+  }
+
+  $('#geoview').innerHTML = svg + triad();
+}
+
+function renderControls(){
+  const m = GEO.mode;
+  if(m === 'race'){
+    const maxStep = Math.max(...['cold','nominal','warm']
+      .map(k => VIZ.race[k].path_xyz.length - 1));
+    $('#georow').innerHTML =
+      `<button class="geobtn" id="geoplay">${GEO.playing ? 'Pause' : 'Play'}</button>
+       <button class="geobtn" id="georeset">Reset</button>
+       <span style="color:var(--faint);font-size:11.5px">
+         iteration <b style="color:var(--ink);font-family:var(--mono)">${Math.min(GEO.step,maxStep)}</b>
+         of ${maxStep}</span>`;
+    $('#geoplay').onclick = () => { GEO.playing = !GEO.playing;
+      if(GEO.playing && GEO.step >= maxStep) GEO.step = 0; renderControls(); };
+    $('#georeset').onclick = () => { GEO.step = 0; GEO.playing = false;
+      renderControls(); renderView(); };
+    $('#geokey').innerHTML = ['cold','nominal','warm'].map(k =>
+      `<span><i style="background:${ARM[k].c}"></i>${esc(ARM[k].label)} &mdash;
+        <b style="color:var(--ink)">${VIZ.race[k].iterations}</b> iterations</span>`).join('');
+  }else{
+    $('#georow').innerHTML =
+      `<button class="geobtn" id="geospin">${GEO.spin ? 'Stop' : 'Spin'}</button>
+       <span style="color:var(--faint);font-size:11.5px">drag to rotate</span>`;
+    $('#geospin').onclick = () => { GEO.spin = !GEO.spin; renderControls(); };
+    $('#geokey').innerHTML =
+      `<span><i style="background:#00b3b3"></i>relief valve closed</span>
+       <span><i style="background:#ffb454"></i>relief valve open</span>` +
+      (m === 'pair' ? `<span><i style="background:#3ddc97"></i>the query</span>` : '');
+  }
+  $('#geocap').innerHTML = CAPTION[m]();
+}
+
+const CAPTION = {
+  archive: () => {
+    const p = VIZ.projection, q = VIZ.parameter_space;
+    return `${VIZ.config.archive_size} solved cases, placed by <b>where their answer
+      landed</b> &mdash; five pressures and two shaft speeds, projected onto three
+      principal axes carrying <b>${p.top3_variance_pct}%</b> of the variance
+      (distance fidelity r&nbsp;=&nbsp;${p.distance_fidelity_r}). The states fall on a
+      thin sheet: the seven unknowns are coupled by the circuit, so the answers are
+      effectively two-dimensional even though the inputs are not. <b>Retrieval does
+      not search this space</b> &mdash; it searches the seven parameters, which have no
+      such structure (three axes carry only ${q.top3_variance_pct}%, r&nbsp;=&nbsp;${q.distance_fidelity_r}),
+      which is why every distance quoted here is a true seven-parameter distance
+      rather than one measured on screen.`;
+  },
+  pair: () => {
+    const p = VIZ.pair;
+    return `<b>${esc(p.query.id)}</b> is a case the archive has never seen. Its nearest
+      neighbour on the seven setup parameters is <b>${esc(p.neighbour.id)}</b>, at a true
+      distance of <b>${p.setup_distance.toFixed(3)}</b> in the normalised parameter space.
+      Their solved states differ by <b>${p.state_gap_bar.toFixed(1)} bar</b> and
+      <b>${Math.round(p.state_gap_rpm)} rev/min</b> &mdash; close, and not the answer. That
+      gap is the whole proposition: near enough to start from, far enough that it still
+      has to be solved and verified.`;
+  },
+  race: () => {
+    const r = VIZ.race, g = r.warm.agreement_vs_cold;
+    return `The same query, the same residual, the same Jacobian, the same tolerance.
+      <b>The only thing that differs is where the solver starts.</b> Cold begins with every
+      unknown at zero, far off the sheet, and takes <b>${r.cold.iterations}</b> iterations;
+      an engineer's nominal guess takes <b>${r.nominal.iterations}</b>; starting from the
+      retrieved neighbour's state takes <b>${r.warm.iterations}</b>. All three land in the
+      same place &mdash; warm and cold agree to
+      <b>${(+g.max_dp_bar).toExponential(1)} bar</b> and
+      <b>${(+g.max_dw_rpm).toExponential(1)} rev/min</b>. A faster route to the same answer,
+      not a different answer.`;
+  },
+};
+
+/* --- the contact sheet ------------------------------------------------- */
+//: a schematic, not a rendering. The circuit this solves is a lumped hydraulic
+//: network — there is no geometry in the model, so drawing geometry would be
+//: inventing it. An Amesim-shaped sketch is both honest and the vocabulary the
+//: audience already reads: pipe colour is solved pressure, ring fill is solved
+//: shaft speed, and every number in it came out of the solver.
+let PSCALE = 1;
+function schematic(c, w){
+  const s = c.solution, p = c.params;
+  const col = v => ramp(v / PSCALE);
+  const branch = (Y, p2, p3, w_, area) => {
+    const spd = Math.min(1, Math.abs(w_) / 2600);
+    const circ = 2 * Math.PI * 7.5;
+    return `
+      <line x1="30" y1="${Y}" x2="43" y2="${Y}" stroke="${col(s.p1)}" stroke-width="2.6"/>
+      <path d="M43 ${Y-5} L47 ${Y-1.6} M43 ${Y+5} L47 ${Y+1.6}" stroke="#5d7076"
+            stroke-width="1.5" fill="none"/>
+      <line x1="47" y1="${Y}" x2="64" y2="${Y}" stroke="${col(p2)}" stroke-width="2.6"/>
+      <circle cx="72" cy="${Y}" r="7.5" fill="#121b1e" stroke="#3a4a50" stroke-width="1.2"/>
+      <circle cx="72" cy="${Y}" r="7.5" fill="none" stroke="#3ddc97" stroke-width="2"
+              stroke-dasharray="${(circ*spd).toFixed(1)} ${circ.toFixed(1)}"
+              transform="rotate(-90 72 ${Y})" opacity="0.9"/>
+      <line x1="80" y1="${Y}" x2="97" y2="${Y}" stroke="${col(p3)}" stroke-width="2.6"/>
+      <path d="M97 ${Y} L104 ${Y} M100 ${Y+4} L108 ${Y+4}" stroke="#3a4a50"
+            stroke-width="1.4" fill="none"/>`;
+  };
+  const reliefOn = c.relief_open;
+  return `<svg viewBox="0 0 116 84" width="${w||'100%'}" role="img">
+    <circle cx="11" cy="42" r="6.5" fill="#121b1e" stroke="#3a4a50" stroke-width="1.2"/>
+    <path d="M8 42 L14 42 M11 39 L11 45" stroke="#5d7076" stroke-width="1.2"/>
+    <line x1="17.5" y1="42" x2="30" y2="42" stroke="${col(s.p1)}" stroke-width="2.6"/>
+    <line x1="30" y1="18" x2="30" y2="66" stroke="${col(s.p1)}" stroke-width="3.4"/>
+    <line x1="30" y1="66" x2="30" y2="72" stroke="${reliefOn ? '#ffb454' : '#243237'}"
+          stroke-width="2.2"/>
+    <rect x="26" y="72" width="8" height="6" rx="1"
+          fill="${reliefOn ? '#ffb454' : '#1a2529'}" stroke="#3a4a50" stroke-width="1"/>
+    ${branch(18, s.p2a, s.p3a, s.w_a, p.A_valve_a)}
+    ${branch(66, s.p2b, s.p3b, s.w_b, p.A_valve_b)}
+  </svg>`;
+}
+
+function renderTiles(){
+  PSCALE = Math.max(...VIZ.tiles.concat([VIZ.pair.neighbour])
+    .map(t => t.solution.p1), VIZ.pair.query.solution.p1);
+  $('#sheetcn').innerHTML =
+    `${VIZ.config.n_tiles} of ${VIZ.config.archive_size}, chosen to span the cloud &middot;
+     pipe colour is solved pressure, ring fill is solved shaft speed`;
+  $('#tiles').innerHTML = VIZ.tiles.map(t =>
+    `<button class="tile" data-id="${esc(t.id)}" title="${esc(t.id)}">
+       ${schematic(t)}
+       <div class="tl"><span>${esc(t.id.replace('sweep-',''))}</span>
+         <span>${Math.round(t.solution.p1)}&#8202;bar</span></div>
+     </button>`).join('');
+  $('#tiles').onclick = e => {
+    const b = e.target.closest('button'); if(!b) return;
+    const id = b.dataset.id;
+    GEO.sel = (GEO.sel === id) ? null : id;
+    document.querySelectorAll('.tile').forEach(t =>
+      t.classList.toggle('on', t.dataset.id === GEO.sel));
+    if(GEO.sel){ MACH.right = VIZ.tiles.find(t => t.id === GEO.sel) || null; }
+    renderMachPanel();
+    if(GEO.sel && GEO.mode !== 'archive') setMode('archive');
+    else renderView();
+  };
+  const p = VIZ.pair, r = VIZ.race;
+  $('#geonums').innerHTML = `
+    <div>setup distance<b>${p.setup_distance.toFixed(3)}</b>true, 7 parameters</div>
+    <div>state gap<b>${p.state_gap_bar.toFixed(1)} bar</b>${Math.round(p.state_gap_rpm)} rev/min</div>
+    <div>iterations<b>${r.cold.iterations} &rarr; ${r.warm.iterations}</b>cold &rarr; warm</div>
+    <div>agreement<b>${(+r.warm.agreement_vs_cold.max_dp_bar).toExponential(1)}</b>bar</div>`;
+}
+
+function setMode(m){
+  GEO.mode = m; GEO.playing = false;
+  if(m === 'race') GEO.step = 0;
+  document.querySelectorAll('.geotab').forEach(t =>
+    t.classList.toggle('on', t.dataset.mode === m));
+  renderControls(); renderView();
+}
+
+function geoTick(){
+  let dirty = false;
+  if(GEO.spin && GEO.mode !== 'race'){ GEO.yaw += 0.0032; dirty = true; }
+  if(GEO.playing){
+    GEO._t = (GEO._t || 0) + 1;
+    if(GEO._t % 28 === 0){
+      const maxStep = Math.max(...['cold','nominal','warm']
+        .map(k => VIZ.race[k].path_xyz.length - 1));
+      if(GEO.step < maxStep){ GEO.step++; dirty = true; renderControls(); }
+      else { GEO.playing = false; renderControls(); }
+    }
+  }
+  if(dirty) renderView();
+  GEO.raf = requestAnimationFrame(geoTick);
+}
+
+function geoDrag(){
+  const el = $('#geoview');
+  let last = null;
+  el.addEventListener('pointerdown', e => {
+    last = [e.clientX, e.clientY]; GEO.spin = false;
+    el.classList.add('drag'); el.setPointerCapture(e.pointerId); renderControls();
+  });
+  el.addEventListener('pointermove', e => {
+    if(!last) return;
+    GEO.yaw += (e.clientX - last[0]) * 0.008;
+    GEO.pitch = Math.max(-1.35, Math.min(1.35, GEO.pitch + (e.clientY - last[1]) * 0.008));
+    last = [e.clientX, e.clientY]; renderView();
+  });
+  const up = () => { last = null; el.classList.remove('drag'); };
+  el.addEventListener('pointerup', up);
+  el.addEventListener('pointercancel', up);
+}
+
+async function geoBoot(){
+  const res = await fetch('/api/viz');
+  if(!res.ok) throw new Error('viz unavailable');
+  VIZ = await res.json();
+  GEO.bounds = geoBounds();
+  const p = VIZ.projection;
+  $('#geosub').innerHTML =
+    `Where the solved states actually sit &mdash; and why a neighbour's answer is a good
+     place to start. Measured offline by <code>python run_all.py</code>; the axes are
+     principal components of ${VIZ.config.archive_size} solved states, carrying
+     ${p.top3_variance_pct}% of the variance between them.`;
+  $('#geotabs').onclick = e => {
+    const b = e.target.closest('button'); if(b) setMode(b.dataset.mode);
+  };
+  renderTiles(); renderControls(); renderView(); geoDrag();
+  GEO.raf = requestAnimationFrame(geoTick);
+  machBoot();
+}
+
+/* --- the machine ---------------------------------------------------------
+//: A 3D view of the circuit being solved: reservoir, pump, manifold block,
+//: relief valve, two feed lines through their orifices, two motors, two
+//: returns. Hand-built primitives projected with the same orthographic
+//: rotation as the cloud above — still one file and no CDN.
+//:
+//: **Say what this is before anyone asks.** The model is lumped: it has seven
+//: unknowns and no geometry, so the *layout* here is illustrative and nothing
+//: about pipe length or routing was simulated. What is solved is what drives
+//: it — pipe colour is the solved pressure at that node, the orifice bore is
+//: the valve's real flow area, the relief valve stands open only when the
+//: solved regime says it does, and each motor turns at its own solved speed.
+//: Drawing a mesh would have claimed the thing §6h is careful never to claim;
+//: drawing the circuit claims exactly what the solver actually computed.
+*/
+const MACH = {yaw:0.72, pitch:0.26, t0:performance.now(), raf:null, right:null,
+              spin:true};
+
+//: bore in model units. Diameter, not area, scales with sqrt(A) — an orifice
+//: twice the flow area is sqrt(2) wider, and drawing it twice as wide would
+//: misstate the one parameter this picture puts on screen.
+const BORE_MAIN = 0.40, A_REF = 10.0;
+const bore = a => 0.13 + 0.30 * Math.sqrt(Math.max(a, 0) / A_REF);
+
+function machineParts(c){
+  const s = c.solution, p = c.params, parts = [];
+  const P = v => ramp(v / PSCALE);
+  const RES_Y = -6.4;
+
+  // reservoir and the suction line up to the pump
+  parts.push({t:'box', c:[-0.6, RES_Y - 0.7, 0], s:[15.6, 1.5, 4.6], col:'#1b2a2e'});
+  parts.push({t:'pipe', pts:[[-11, RES_Y - 0.4, 0], [-11, -1.0, 0]],
+              r:BORE_MAIN, col:'#2c3f45'});
+  // pump, and the supply line into the manifold
+  parts.push({t:'motor', c:[-11, 0, 0], len:1.5, r:1.15, col:'#2b3b41', w:0, axis:'y'});
+  parts.push({t:'pipe', pts:[[-11, 0.9, 0], [-11, 1.6, 0], [-8.4, 1.6, 0],
+                             [-8.4, 0, 0], [-7.9, 0, 0]], r:BORE_MAIN, col:P(s.p1)});
+  // the manifold block itself is at p1
+  parts.push({t:'box', c:[-7.0, 0, 0], s:[1.9, 6.4, 3.4], col:P(s.p1), edge:true});
+
+  // relief valve: a stub down to tank, open only when the solved regime says so
+  parts.push({t:'pipe', pts:[[-7.0, -3.2, 0], [-7.0, -4.4, 0]],
+              r:0.26, col:c.relief_open ? '#ffb454' : '#2c3f45'});
+  parts.push({t:'box', c:[-7.0, -4.9, 0], s:[1.2, 1.0, 1.2],
+              col:c.relief_open ? '#ffb454' : '#22333a', edge:true});
+  parts.push({t:'pipe', pts:[[-7.0, -5.4, 0], [-7.0, RES_Y - 0.2, 0]],
+              r:0.22, col:c.relief_open ? '#ffb454' : '#2c3f45'});
+
+  const branch = (Y, Z, p2, p3, w, area) => {
+    // manifold -> orifice
+    parts.push({t:'pipe', pts:[[-6.0, Y, 0], [-4.4, Y, Z], [-2.2, Y, Z]],
+                r:BORE_MAIN, col:P(s.p1)});
+    // the orifice: a short narrow run, bore set by the valve's real flow area
+    parts.push({t:'pipe', pts:[[-2.2, Y, Z], [-1.2, Y, Z]], r:bore(area),
+                col:'#7d9198'});
+    // orifice -> motor  (p2)
+    parts.push({t:'pipe', pts:[[-1.2, Y, Z], [1.4, Y, Z]], r:BORE_MAIN, col:P(p2)});
+    parts.push({t:'motor', c:[2.9, Y, Z], len:1.6, r:1.5, col:'#26363c',
+                w:w, axis:'x'});
+    // motor -> return  (p3)
+    parts.push({t:'pipe', pts:[[4.4, Y, Z], [6.6, Y, Z], [7.4, Y, Z * 0.45],
+                               [7.4, RES_Y - 0.2, Z * 0.45]],
+                r:BORE_MAIN, col:P(p3)});
+  };
+  branch( 2.1,  2.5, s.p2a, s.p3a, s.w_a, p.A_valve_a);
+  branch(-2.1, -2.5, s.p2b, s.p3b, s.w_b, p.A_valve_b);
+  return parts;
+}
+
+function rotM(p){
+  const cy=Math.cos(MACH.yaw), sy=Math.sin(MACH.yaw);
+  const cp=Math.cos(MACH.pitch), sp=Math.sin(MACH.pitch);
+  const x=p[0], y=p[1], z=p[2];
+  const x1 = x*cy + z*sy, z1 = z*cy - x*sy;
+  return [x1, y*cp - z1*sp, y*sp + z1*cp];
+}
+const MW = 400, MH = 300, MS = 14.2;
+//: the circuit is not built around the origin -- the reservoir sits well below
+//: it -- so the model is centred before it is rotated. Rotating first would
+//: swing the whole assembly around a point outside itself.
+const MODEL_C = [-1.4, -2.3, 0];
+//: and a mild perspective divide. The cloud above is deliberately orthographic
+//: because it is a map and equal distances there must look equal; this is a
+//: picture of an object, where a near end that reads larger than the far end is
+//: most of what makes it look solid. CAM_D is in model units — large enough to
+//: keep the assembly from fish-eyeing, small enough to be felt.
+const CAM_D = 30;
+function scr(p){
+  const r = rotM([p[0]-MODEL_C[0], p[1]-MODEL_C[1], p[2]-MODEL_C[2]]);
+  const f = CAM_D / Math.max(6, CAM_D - r[2]);
+  return [MW/2 + r[0]*MS*f, MH/2 - r[1]*MS*f, r[2], f];
+}
+
+function shade(hex, f){
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex);
+  let c;
+  if(m) c = [0,2,4].map(i => parseInt(m[1].substr(i,2),16));
+  else { const n = /rgb\((\d+),(\d+),(\d+)\)/.exec(hex); if(!n) return hex;
+         c = [+n[1],+n[2],+n[3]]; }
+  return `rgb(${c.map(v => Math.max(0, Math.min(255, Math.round(v*f)))).join(',')})`;
+}
+
+//: gradients are collected per frame rather than declared once: their direction
+//: is perpendicular to each pipe *on screen*, so it changes as the assembly
+//: turns. DEFS is reset by renderMachine before anything is drawn.
+let DEFS = [], DEFN = 0;
+function tubeGrad(a, b, r){
+  let nx = -(b[1]-a[1]), ny = (b[0]-a[0]);
+  const L = Math.hypot(nx, ny) || 1; nx /= L; ny /= L;
+  // keep the lit side up-and-left whichever way the segment happens to run
+  if(nx - ny < 0){ nx = -nx; ny = -ny; }
+  const cx = (a[0]+b[0])/2, cy = (a[1]+b[1])/2;
+  return [cx - nx*r, cy - ny*r, cx + nx*r, cy + ny*r];
+}
+//: four stops, not two: a tube is dark at the silhouette, bright just inside
+//: the lit edge, mid across the body and dark again at the far silhouette.
+//: Two stops give a wedge, which is what made these read as flat ribbons.
+function pipePaint(col, a, b, r){
+  const [x1,y1,x2,y2] = tubeGrad(a, b, r);
+  const id = `g${DEFN++}`;
+  DEFS.push(`<linearGradient id="${id}" gradientUnits="userSpaceOnUse"
+      x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}">
+      <stop offset="0" stop-color="${shade(col,0.34)}"/>
+      <stop offset="0.30" stop-color="${shade(col,1.30)}"/>
+      <stop offset="0.62" stop-color="${col}"/>
+      <stop offset="1" stop-color="${shade(col,0.30)}"/></linearGradient>`);
+  return `url(#${id})`;
+}
+function ballPaint(col){
+  const id = `b${DEFN++}`;
+  DEFS.push(`<radialGradient id="${id}" cx="0.35" cy="0.3" r="0.75">
+      <stop offset="0" stop-color="${shade(col,1.35)}"/>
+      <stop offset="0.55" stop-color="${col}"/>
+      <stop offset="1" stop-color="${shade(col,0.36)}"/></radialGradient>`);
+  return `url(#${id})`;
+}
+
+//: every segment is sorted on its own depth, and every bend gets a ball joint.
+//: Sorting a whole run by its mean depth was the other reason this looked flat:
+//: a line that travels from the back of the assembly to the front cannot be
+//: entirely in front of, or entirely behind, the block it passes.
+function drawPipe(pr, out){
+  const pts = pr.pts.map(scr);
+  for(let i=0;i<pts.length-1;i++){
+    const a = pts[i], b = pts[i+1];
+    const f = (a[3]+b[3])/2, w = pr.r*2*MS*f;
+    const d = `M${a[0].toFixed(1)},${a[1].toFixed(1)} L${b[0].toFixed(1)},${b[1].toFixed(1)}`;
+    const paint = pipePaint(pr.col, a, b, w/2);
+    out.push({z:(a[2]+b[2])/2, svg:
+      `<path d="${d}" fill="none" stroke-linecap="butt"
+         stroke="${shade(pr.col,0.22)}" stroke-width="${(w+2.2).toFixed(1)}"/>
+       <path d="${d}" fill="none" stroke-linecap="butt"
+         stroke="${paint}" stroke-width="${w.toFixed(1)}"/>`});
+  }
+  // ball joints at the bends and at both open ends, so runs meet as fittings
+  for(let i=0;i<pts.length;i++){
+    const p = pts[i], rad = pr.r*MS*p[3]*1.04;
+    out.push({z:p[2]+0.01, svg:
+      `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${rad.toFixed(1)}"
+         fill="${ballPaint(pr.col)}" stroke="${shade(pr.col,0.22)}" stroke-width="0.8"/>`});
+  }
+}
+
+const BOX_FACES = [[0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6],[0,3,7,4],[1,2,6,5]];
+function drawBox(b, out){
+  const [w,h,d] = b.s, hx=w/2, hy=h/2, hz=d/2;
+  const v = [[-hx,-hy,hz],[hx,-hy,hz],[hx,hy,hz],[-hx,hy,hz],
+             [-hx,-hy,-hz],[hx,-hy,-hz],[hx,hy,-hz],[-hx,hy,-hz]]
+            .map(p => scr([p[0]+b.c[0], p[1]+b.c[1], p[2]+b.c[2]]));
+  BOX_FACES.forEach(f => {
+    const pts = f.map(i => v[i]);
+    let a = 0;
+    for(let i=0;i<pts.length;i++){ const q = pts[(i+1)%pts.length];
+      a += pts[i][0]*q[1] - q[0]*pts[i][1]; }
+    if(a >= 0) return;                       // looking at its back face
+    // brightness from how far forward the face sits, so opposite faces differ
+    const lit = 0.52 + 0.34 * Math.max(0, Math.min(1,
+      (pts.reduce((s,p) => s+p[2], 0)/4 + 6) / 12));
+    out.push({z: pts.reduce((s,p) => s+p[2], 0)/4, svg:
+      `<polygon points="${pts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}"
+         fill="${shade(b.col, lit)}"
+         stroke="${b.edge ? shade(b.col,1.15) : shade(b.col,0.42)}" stroke-width="1"
+         stroke-linejoin="round"/>`});
+  });
+}
+
+//: the shaft mark turns at the solved speed, slowed by a fixed factor so it
+//: reads as rotation rather than blur: the archive's fastest shaft is 1793
+//: rev/min, which lands just under two turns a second here. The factor is the
+//: same for both motors, so the *ratio* between them is untouched — and that
+//: ratio is a solved quantity, not a chosen one.
+const RPM_SLOW = 0.0004;
+//: an end cap is a circle in 3D, so it is drawn as a circle in 3D and projected.
+//: Stamping a screen-space circle on the end of the barrel was the third thing
+//: giving this away — a real cylinder's cap narrows to a slit edge-on.
+function capPoly(c, r, u, v, n){
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = i/n*2*Math.PI, cs = Math.cos(t), sn = Math.sin(t);
+    pts.push(scr([c[0]+r*(u[0]*cs+v[0]*sn), c[1]+r*(u[1]*cs+v[1]*sn),
+                  c[2]+r*(u[2]*cs+v[2]*sn)]));
+  }
+  return pts;
+}
+function drawMotor(m, tms, out){
+  const ax = m.axis === 'x' ? [1,0,0] : [0,1,0];
+  const u  = m.axis === 'x' ? [0,1,0] : [1,0,0], v2 = [0,0,1];
+  const a = [m.c[0]-ax[0]*m.len/2, m.c[1]-ax[1]*m.len/2, m.c[2]];
+  const b = [m.c[0]+ax[0]*m.len/2, m.c[1]+ax[1]*m.len/2, m.c[2]];
+  const pa = scr(a), pb = scr(b);
+  const f = (pa[3]+pb[3])/2, w = m.r*2*MS*f;
+  const d = `M${pa[0].toFixed(1)},${pa[1].toFixed(1)} L${pb[0].toFixed(1)},${pb[1].toFixed(1)}`;
+  out.push({z:(pa[2]+pb[2])/2, svg:
+    `<path d="${d}" fill="none" stroke-linecap="butt"
+       stroke="${shade(m.col,0.3)}" stroke-width="${(w+2.4).toFixed(1)}"/>
+     <path d="${d}" fill="none" stroke-linecap="butt"
+       stroke="${pipePaint(m.col, pa, pb, w/2)}" stroke-width="${w.toFixed(1)}"/>`});
+  for(const [c, br] of [[a, 0.72], [b, 1.0]]){
+    const poly = capPoly(c, m.r, u, v2, 26);
+    out.push({z: poly.reduce((s,p) => s+p[2], 0)/poly.length + 0.02, svg:
+      `<polygon points="${poly.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}"
+         fill="${shade(m.col, br*1.25)}" stroke="${shade(m.col,0.4)}" stroke-width="1"/>`});
+  }
+  if(m.w){
+    const th = tms * RPM_SLOW * m.w / 60;
+    const tip = [0,1,2].map(i => b[i] + (u[i]*Math.cos(th) + v2[i]*Math.sin(th)) * m.r*0.7);
+    const pt = scr(tip), pc = scr(b);
+    out.push({z: Math.max(pt[2], pc[2]) + 0.05, svg:
+      `<line x1="${pc[0].toFixed(1)}" y1="${pc[1].toFixed(1)}"
+         x2="${pt[0].toFixed(1)}" y2="${pt[1].toFixed(1)}"
+         stroke="#3ddc97" stroke-width="${(2.6*f).toFixed(1)}" stroke-linecap="round"/>
+       <circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}"
+         r="${(1.9*f).toFixed(1)}" fill="#3ddc97"/>`});
+  }
+}
+
+//: a contact shadow on the reservoir lid. Cheap, and it is what stops the
+//: assembly reading as floating in front of a backdrop.
+function drawShadow(out){
+  const poly = capPoly([-1.0, -5.62, 0], 1, [7.6,0,0], [0,0,3.4], 26);
+  out.push({z:-99, svg:
+    `<polygon points="${poly.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}"
+       fill="#070c0d" opacity="0.55"/>`});
+}
+
+function renderMachine(el, c, tms, label){
+  if(!c) return;
+  DEFS = []; DEFN = 0;
+  const out = [];
+  drawShadow(out);
+  for(const p of machineParts(c)){
+    if(p.t === 'pipe') drawPipe(p, out);
+    else if(p.t === 'box') drawBox(p, out);
+    else drawMotor(p, tms, out);
+  }
+  out.sort((u,v) => u.z - v.z);
+  const s = c.solution;
+  el.innerHTML = `<defs>${DEFS.join('')}</defs>` + out.map(d => d.svg).join('') +
+    `<text x="10" y="18" fill="#8fa3a9" font-size="11.5"
+       font-family="ui-monospace,monospace">${esc(label)}</text>
+     <text x="10" y="${MH-24}" fill="#5d7076" font-size="10.5"
+       font-family="ui-monospace,monospace">manifold ${Math.round(s.p1)} bar &middot; relief ${c.relief_open ? 'open' : 'closed'}</text>
+     <text x="10" y="${MH-10}" fill="#5d7076" font-size="10.5"
+       font-family="ui-monospace,monospace">shafts ${Math.round(s.w_a)} / ${Math.round(s.w_b)} rev/min</text>`;
+}
+
+function machDiff(other){
+  const q = VIZ.pair.query.solution, n = other.solution;
+  const dp = Math.max(...['p1','p2a','p3a','p2b','p3b'].map(k => Math.abs(q[k]-n[k])));
+  const dw = Math.max(...['w_a','w_b'].map(k => Math.abs(q[k]-n[k])));
+  return {dp, dw};
+}
+
+function renderMachPanel(){
+  const right = MACH.right || VIZ.pair.neighbour;
+  const picked = MACH.right && MACH.right.id !== VIZ.pair.neighbour.id;
+  const d = machDiff(right), best = machDiff(VIZ.pair.neighbour);
+  $('#machdiff').innerHTML =
+    `<div>largest pressure difference<b>${d.dp.toFixed(1)} bar</b>across five nodes</div>
+     <div>largest speed difference<b>${Math.round(d.dw)} rev/min</b>across two shafts</div>` +
+    (picked
+      ? `<div>versus the retrieved case<b>${best.dp.toFixed(1)} bar</b>which is
+           ${(d.dp / (best.dp || 1)).toFixed(1)}&times; closer</div>`
+      : `<div>then solved in<b>${VIZ.race.warm.iterations} iterations</b>from
+           ${VIZ.race.cold.iterations} cold</div>`);
+  //: the point of letting a tile be picked is that picking badly is visible.
+  //: A hand-chosen case is a control, and saying how much worse it is turns the
+  //: comparison from an illustration into a measurement the room can check.
+  $('#machnote').innerHTML = picked
+    ? `Comparing against <b>${esc(MACH.right.id)}</b>, picked by hand from the sheet
+       &mdash; <b>not</b> the case retrieval chose. Its state is
+       <b>${d.dp.toFixed(1)} bar</b> away against the retrieved case's
+       <b>${best.dp.toFixed(1)} bar</b>: this is what the archive looks like when you
+       start from the wrong neighbour. Press <i>Show the retrieved pair</i> to go back.`
+    : `<b>${esc(VIZ.pair.neighbour.id)}</b> is the case retrieval actually chose for
+       <b>${esc(VIZ.pair.query.id)}</b>, out of ${VIZ.config.archive_size}. Click any
+       tile above to compare against a different one instead &mdash; the gap it opens
+       is the thing retrieval is for.`;
+}
+
+function machTick(){
+  const t = performance.now() - MACH.t0;
+  if(MACH.spin) MACH.yaw += 0.0022;
+  renderMachine($('#machL'), VIZ.pair.query, t, VIZ.pair.query.id + '  (the new run)');
+  renderMachine($('#machR'), MACH.right || VIZ.pair.neighbour, t,
+                (MACH.right || VIZ.pair.neighbour).id + '  (from the archive)');
+  MACH.raf = requestAnimationFrame(machTick);
+}
+
+function machDrag(){
+  for(const id of ['#machL','#machR']){
+    const el = $(id); let last = null;
+    el.addEventListener('pointerdown', e => {
+      last = [e.clientX, e.clientY]; MACH.spin = false;
+      el.setPointerCapture(e.pointerId); $('#machspin').textContent = 'Spin';
+    });
+    el.addEventListener('pointermove', e => {
+      if(!last) return;
+      MACH.yaw += (e.clientX - last[0]) * 0.008;
+      MACH.pitch = Math.max(-1.2, Math.min(1.2, MACH.pitch + (e.clientY - last[1]) * 0.008));
+      last = [e.clientX, e.clientY];
+    });
+    const up = () => { last = null; };
+    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  }
+}
+
+function machBoot(){
+  $('#machspin').onclick = () => { MACH.spin = !MACH.spin;
+    $('#machspin').textContent = MACH.spin ? 'Stop' : 'Spin'; };
+  $('#machpair').onclick = () => { MACH.right = null; renderMachPanel(); };
+  renderMachPanel(); machDrag();
+  MACH.raf = requestAnimationFrame(machTick);
+}
+
 async function boot(){
   try{
     renderHealth(await (await fetch('/api/health')).json());
@@ -543,6 +1330,16 @@ async function boot(){
     fetch('/api/evidence').then(r => r.json()).then(drawEvidence)
       .catch(() => { $('#evidence').innerHTML =
         '<div class="evmissing">evidence unavailable</div>'; });
+
+    // Same rule as the evidence panel: a view is not allowed to take the
+    // pipeline down with it. A fresh clone that has not run the reproducer
+    // says so here rather than throwing.
+    geoBoot().catch(() => {
+      $('#geo').innerHTML =
+        '<div class="geomissing">geometry unavailable &mdash; run '
+        + '<code>python run_all.py</code> to generate viz_results.json</div>';
+      $('#mach').remove();   // it reads the same file; do not leave two empty frames
+    });
 
     SAMPLES = await (await fetch('/api/samples')).json();
     $('#samples').innerHTML = SAMPLES.map((s,i) =>

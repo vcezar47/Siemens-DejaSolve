@@ -142,6 +142,7 @@ EVIDENCE_FILES = {
     "selftest": ROOT / "selftest_results.json",
     "ranking": ROOT / "agent_select_results.json",
     "ranking_model": ROOT / "agent_model_results.json",
+    "viz": ROOT / "viz_results.json",
 }
 
 
@@ -321,6 +322,27 @@ def evidence() -> dict:
 
     out["missing"] = [k for k, v in EVIDENCE_FILES.items() if not v.exists()]
     return out
+
+
+@api.get("/api/viz")
+def viz() -> JSONResponse:
+    """The projected archive, the contact sheet, the matched pair and the race.
+
+    Served as its own endpoint rather than folded into `/api/evidence` because
+    it is an order of magnitude larger — 395 projected cases plus every Newton
+    iterate of three solver runs — and the evidence panel should not pay for a
+    view the room may never open.
+
+    Like everything under `/api/evidence`, this was measured offline by
+    `python run_all.py`; the service reads a file and does no geometry per
+    request. `viz.py` refuses to write the file at all if its iteration counts
+    or its retrieved neighbour disagree with `results.json`, so the picture
+    cannot drift away from the table it illustrates.
+    """
+    payload = _load("viz")
+    if payload is None:
+        raise HTTPException(503, "viz_results.json missing -- run `python run_all.py`")
+    return JSONResponse(payload)
 
 
 @api.post("/api/analyse")

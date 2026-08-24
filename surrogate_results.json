@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-20T12:43:06+00:00",
+  "generated_utc": "2026-08-24T07:35:02+00:00",
   "archive_size": 395,
   "n_queries": 200,
   "seed": 99,
@@ -7,15 +7,15 @@
     "kind": "quadratic response surface (ridge least squares)",
     "features": 36,
     "ridge": 1e-06,
-    "train_rmse": 30.034719617506774,
-    "fit_ms": 1.9712210014404263,
-    "median_predict_ms": 0.1479794991610106
+    "train_rmse": 30.034719617506777,
+    "fit_ms": 2.521599999454338,
+    "median_predict_ms": 0.3146999997625244
   },
   "prediction_quality": {
     "solver_tolerance": 1e-08,
-    "median_residual_inf": 8.257858948604461,
-    "min_residual_inf": 0.8534930171069348,
-    "max_residual_inf": 229.50020607930722,
+    "median_residual_inf": 8.257858948604182,
+    "min_residual_inf": 0.853493017106338,
+    "max_residual_inf": 229.50020607930685,
     "n_below_solver_tolerance": 0
   },
   "admissibility": {
@@ -66,7 +66,7 @@
     {
       "case_id": "query-0000",
       "prediction": {
-        "residual_inf": 13.693799066577707,
+        "residual_inf": 13.693799066576284,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -94,23 +94,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 3.724522912307293e-10
+        "residual_inf": 3.724451858033717e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 3.724522912307293e-10
+        "residual_inf": 3.724451858033717e-10
       },
       "agreement": {
-        "max_dp_bar": 1.7767831650417065e-10,
+        "max_dp_bar": 1.7767121107681305e-10,
         "max_dw_rpm": 1.1424390322645195e-09
       }
     },
     {
       "case_id": "query-0001",
       "prediction": {
-        "residual_inf": 202.0787028661407,
+        "residual_inf": 202.0787028661438,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -138,23 +138,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 8,
-        "residual_inf": 1.0658141036401503e-13
+        "residual_inf": 1.1368683772161603e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
-        "residual_inf": 1.0658141036401503e-13
+        "residual_inf": 1.1368683772161603e-13
       },
       "agreement": {
-        "max_dp_bar": 1.468407617721823e-09,
+        "max_dp_bar": 1.4683934068671078e-09,
         "max_dw_rpm": 1.500063717685407e-08
       }
     },
     {
       "case_id": "query-0002",
       "prediction": {
-        "residual_inf": 2.5711036063823443,
+        "residual_inf": 2.5711036063793458,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -182,23 +182,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 4.4997960912951385e-10
+        "residual_inf": 4.4998671455687145e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 4.4997960912951385e-10
+        "residual_inf": 4.4998671455687145e-10
       },
       "agreement": {
-        "max_dp_bar": 6.995009016463882e-10,
+        "max_dp_bar": 6.995080070737458e-10,
         "max_dw_rpm": 2.0913830667268485e-09
       }
     },
     {
       "case_id": "query-0003",
       "prediction": {
-        "residual_inf": 96.32060421208789,
+        "residual_inf": 96.32060421208092,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -5.6 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -242,7 +242,7 @@
     {
       "case_id": "query-0004",
       "prediction": {
-        "residual_inf": 6.032749282600207,
+        "residual_inf": 6.03274928260004,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -264,29 +264,29 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 3.1796787425264483e-12
+        "residual_inf": 3.183231456205249e-12
       },
       "predicted": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.4210854715202004e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.4210854715202004e-14
       },
       "agreement": {
-        "max_dp_bar": 5.3069157956997515e-09,
+        "max_dp_bar": 5.306908690272394e-09,
         "max_dw_rpm": 4.6104560169624165e-09
       }
     },
     {
       "case_id": "query-0005",
       "prediction": {
-        "residual_inf": 8.423334918627798,
+        "residual_inf": 8.42333491862735,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -314,23 +314,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.4868995751603507e-14
+        "residual_inf": 2.842170943040401e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.4868995751603507e-14
+        "residual_inf": 2.842170943040401e-14
       },
       "agreement": {
-        "max_dp_bar": 2.4868995751603507e-14,
-        "max_dw_rpm": 2.2737367544323206e-13
+        "max_dp_bar": 2.042810365310288e-14,
+        "max_dw_rpm": 0.0
       }
     },
     {
       "case_id": "query-0006",
       "prediction": {
-        "residual_inf": 16.533695181895133,
+        "residual_inf": 16.533695181897606,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -358,23 +358,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.530953224777477e-11
+        "residual_inf": 2.532374310248997e-11
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.530953224777477e-11
+        "residual_inf": 2.532374310248997e-11
       },
       "agreement": {
-        "max_dp_bar": 2.0087043139938032e-11,
-        "max_dw_rpm": 4.738467396236956e-10
+        "max_dp_bar": 2.007993771258043e-11,
+        "max_dw_rpm": 4.740741132991388e-10
       }
     },
     {
       "case_id": "query-0007",
       "prediction": {
-        "residual_inf": 2.471707892198765,
+        "residual_inf": 2.471707892199312,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -402,23 +402,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 5.739771324897447e-09
+        "residual_inf": 5.739767772183768e-09
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 5.739771324897447e-09
+        "residual_inf": 5.739767772183768e-09
       },
       "agreement": {
-        "max_dp_bar": 5.807050840189731e-09,
-        "max_dw_rpm": 5.5706550483591855e-09
+        "max_dp_bar": 5.807052616546571e-09,
+        "max_dw_rpm": 5.570541361521464e-09
       }
     },
     {
       "case_id": "query-0008",
       "prediction": {
-        "residual_inf": 62.674345934662206,
+        "residual_inf": 62.67434593471222,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -462,7 +462,7 @@
     {
       "case_id": "query-0009",
       "prediction": {
-        "residual_inf": 18.707538242286468,
+        "residual_inf": 18.707538242286923,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -506,7 +506,7 @@
     {
       "case_id": "query-0010",
       "prediction": {
-        "residual_inf": 212.6969679223191,
+        "residual_inf": 212.69696792232105,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -550,7 +550,7 @@
     {
       "case_id": "query-0011",
       "prediction": {
-        "residual_inf": 7.527882258690248,
+        "residual_inf": 7.527882258690312,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -594,7 +594,7 @@
     {
       "case_id": "query-0012",
       "prediction": {
-        "residual_inf": 1.4549037472889061,
+        "residual_inf": 1.4549037472891797,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -622,23 +622,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 3.552713678800501e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 3.552713678800501e-15
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
-        "max_dw_rpm": 0.0
+        "max_dw_rpm": 5.684341886080802e-14
       }
     },
     {
       "case_id": "query-0013",
       "prediction": {
-        "residual_inf": 8.17791979482545,
+        "residual_inf": 8.17791979482493,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -682,7 +682,7 @@
     {
       "case_id": "query-0014",
       "prediction": {
-        "residual_inf": 6.053684025824232,
+        "residual_inf": 6.053684025823699,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -710,19 +710,19 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 9.945608780981274e-10
+        "residual_inf": 9.945750889528426e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 9.945608780981274e-10
+        "residual_inf": 9.945750889528426e-10
       }
     },
     {
       "case_id": "query-0015",
       "prediction": {
-        "residual_inf": 8.255923678191742,
+        "residual_inf": 8.255923678190396,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -760,13 +760,13 @@
       },
       "agreement": {
         "max_dp_bar": 1.0467715583217796e-09,
-        "max_dw_rpm": 2.723709258134477e-09
+        "max_dw_rpm": 2.7238229449721985e-09
       }
     },
     {
       "case_id": "query-0016",
       "prediction": {
-        "residual_inf": 4.6459624411400995,
+        "residual_inf": 4.6459624411385825,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -794,23 +794,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 4.988073953882122e-09
+        "residual_inf": 4.988070401168443e-09
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 4.988073953882122e-09
+        "residual_inf": 4.988070401168443e-09
       },
       "agreement": {
         "max_dp_bar": 7.570129412215465e-09,
-        "max_dw_rpm": 2.7303030947223306e-09
+        "max_dw_rpm": 2.730189407884609e-09
       }
     },
     {
       "case_id": "query-0017",
       "prediction": {
-        "residual_inf": 4.689332559322729,
+        "residual_inf": 4.689332559322388,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -854,7 +854,7 @@
     {
       "case_id": "query-0018",
       "prediction": {
-        "residual_inf": 2.553078484514103,
+        "residual_inf": 2.553078484513307,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -892,13 +892,13 @@
       },
       "agreement": {
         "max_dp_bar": 2.7284841053187847e-12,
-        "max_dw_rpm": 5.6843418860808015e-12
+        "max_dw_rpm": 5.4569682106375694e-12
       }
     },
     {
       "case_id": "query-0019",
       "prediction": {
-        "residual_inf": 5.313972125122579,
+        "residual_inf": 5.313972125121339,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -914,7 +914,7 @@
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.0658141036401503e-14
       },
       "warm": {
         "converged": true,
@@ -926,13 +926,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 6.071854130595966e-09
+        "residual_inf": 6.0718470251686085e-09
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 6.071854130595966e-09
+        "residual_inf": 6.0718470251686085e-09
       },
       "agreement": {
         "max_dp_bar": 5.578300488195964e-09,
@@ -942,7 +942,7 @@
     {
       "case_id": "query-0020",
       "prediction": {
-        "residual_inf": 209.61029148971926,
+        "residual_inf": 209.6102914897216,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -979,14 +979,14 @@
         "residual_inf": 2.3447910280083306e-13
       },
       "agreement": {
-        "max_dp_bar": 8.881784197001252e-16,
+        "max_dp_bar": 7.105427357601002e-15,
         "max_dw_rpm": 1.1368683772161603e-13
       }
     },
     {
       "case_id": "query-0021",
       "prediction": {
-        "residual_inf": 12.192522099608652,
+        "residual_inf": 12.192522099609768,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1026,7 +1026,7 @@
     {
       "case_id": "query-0022",
       "prediction": {
-        "residual_inf": 5.187831724974856,
+        "residual_inf": 5.187831724975304,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1054,23 +1054,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 2.717754910008807e-10
+        "residual_inf": 2.717541747188079e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 2.717754910008807e-10
+        "residual_inf": 2.717541747188079e-10
       },
       "agreement": {
-        "max_dp_bar": 4.475850801100023e-10,
+        "max_dp_bar": 4.475566584005719e-10,
         "max_dw_rpm": 8.260485628852621e-10
       }
     },
     {
       "case_id": "query-0023",
       "prediction": {
-        "residual_inf": 3.492837546234375,
+        "residual_inf": 3.492837546233714,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1114,7 +1114,7 @@
     {
       "case_id": "query-0024",
       "prediction": {
-        "residual_inf": 8.370271982217666,
+        "residual_inf": 8.370271982218043,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1142,23 +1142,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.1316282072803006e-14
+        "residual_inf": 7.105427357601002e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.1316282072803006e-14
+        "residual_inf": 7.105427357601002e-15
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
-        "max_dw_rpm": 2.2737367544323206e-13
+        "max_dw_rpm": 0.0
       }
     },
     {
       "case_id": "query-0025",
       "prediction": {
-        "residual_inf": 15.542307905576347,
+        "residual_inf": 15.542307905576386,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -3.7 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -1195,14 +1195,14 @@
         "residual_inf": 1.7763568394002505e-15
       },
       "agreement": {
-        "max_dp_bar": 8.349776425831124e-11,
+        "max_dp_bar": 8.34978752806137e-11,
         "max_dw_rpm": 5.834976946061943e-11
       }
     },
     {
       "case_id": "query-0026",
       "prediction": {
-        "residual_inf": 15.472867011927349,
+        "residual_inf": 15.472867011926867,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -2.5 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -1246,7 +1246,7 @@
     {
       "case_id": "query-0027",
       "prediction": {
-        "residual_inf": 4.950815267520715,
+        "residual_inf": 4.9508152675192765,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1290,7 +1290,7 @@
     {
       "case_id": "query-0028",
       "prediction": {
-        "residual_inf": 16.007187897116065,
+        "residual_inf": 16.007187897116356,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -2.2 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -1318,7 +1318,7 @@
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 3.8647174349648594e-09
+        "residual_inf": 3.864719211321699e-09
       },
       "verified": {
         "converged": true,
@@ -1327,14 +1327,14 @@
         "residual_inf": 2.1316282072803006e-14
       },
       "agreement": {
-        "max_dp_bar": 1.2562622053735595e-09,
+        "max_dp_bar": 1.2562626494627693e-09,
         "max_dw_rpm": 7.429434845107608e-10
       }
     },
     {
       "case_id": "query-0029",
       "prediction": {
-        "residual_inf": 5.26948951603643,
+        "residual_inf": 5.269489516034362,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1362,23 +1362,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 7.845812888263026e-10
+        "residual_inf": 7.845954996810178e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 7.845812888263026e-10
+        "residual_inf": 7.845954996810178e-10
       },
       "agreement": {
-        "max_dp_bar": 1.1408189948269865e-09,
-        "max_dw_rpm": 3.161858330713585e-09
+        "max_dp_bar": 1.1408332056817017e-09,
+        "max_dw_rpm": 3.1619720175513066e-09
       }
     },
     {
       "case_id": "query-0030",
       "prediction": {
-        "residual_inf": 6.508074882606717,
+        "residual_inf": 6.508074882606417,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1406,13 +1406,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 3.552713678800501e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 3.552713678800501e-15
       },
       "agreement": {
         "max_dp_bar": 6.679101716144942e-12,
@@ -1422,7 +1422,7 @@
     {
       "case_id": "query-0031",
       "prediction": {
-        "residual_inf": 172.31973349614765,
+        "residual_inf": 172.3197334961496,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1466,7 +1466,7 @@
     {
       "case_id": "query-0032",
       "prediction": {
-        "residual_inf": 1.809280856696816,
+        "residual_inf": 1.809280856696212,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1494,23 +1494,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 1.2221335055073723e-12
+        "residual_inf": 1.2150280781497713e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 1.2221335055073723e-12
+        "residual_inf": 1.2150280781497713e-12
       },
       "agreement": {
-        "max_dp_bar": 1.9610979506978765e-12,
+        "max_dp_bar": 1.943334382303874e-12,
         "max_dw_rpm": 2.5011104298755527e-12
       }
     },
     {
       "case_id": "query-0033",
       "prediction": {
-        "residual_inf": 48.160834513884915,
+        "residual_inf": 48.160834513867755,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1538,23 +1538,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 1.0658141036401503e-14
+        "residual_inf": 3.197442310920451e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 1.0658141036401503e-14
+        "residual_inf": 3.197442310920451e-14
       },
       "agreement": {
-        "max_dp_bar": 2.1569377395280753e-09,
-        "max_dw_rpm": 5.6138560466934e-10
+        "max_dp_bar": 2.1569306341007177e-09,
+        "max_dw_rpm": 5.614992915070616e-10
       }
     },
     {
       "case_id": "query-0034",
       "prediction": {
-        "residual_inf": 2.065653861610212,
+        "residual_inf": 2.0656538616104,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1582,23 +1582,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 3.8546943414985435e-13
+        "residual_inf": 3.836930773104541e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 3.8546943414985435e-13
+        "residual_inf": 3.836930773104541e-13
       },
       "agreement": {
-        "max_dp_bar": 2.6319639800931327e-09,
+        "max_dp_bar": 2.6319355583837023e-09,
         "max_dw_rpm": 9.208633855450898e-10
       }
     },
     {
       "case_id": "query-0035",
       "prediction": {
-        "residual_inf": 67.5909630545649,
+        "residual_inf": 67.59096305456431,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1636,13 +1636,13 @@
       },
       "agreement": {
         "max_dp_bar": 4.562394906315603e-11,
-        "max_dw_rpm": 2.7398527890909463e-11
+        "max_dw_rpm": 2.7341684472048655e-11
       }
     },
     {
       "case_id": "query-0036",
       "prediction": {
-        "residual_inf": 5.220575483000893,
+        "residual_inf": 5.220575483002108,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1670,23 +1670,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 9.77117053935217e-10
+        "residual_inf": 9.771099485078594e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 9.77117053935217e-10
+        "residual_inf": 9.771099485078594e-10
       },
       "agreement": {
-        "max_dp_bar": 1.3681216159966425e-09,
+        "max_dp_bar": 1.368114510569285e-09,
         "max_dw_rpm": 9.392806532559916e-10
       }
     },
     {
       "case_id": "query-0037",
       "prediction": {
-        "residual_inf": 4.543130767422376,
+        "residual_inf": 4.5431307674224115,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1730,7 +1730,7 @@
     {
       "case_id": "query-0038",
       "prediction": {
-        "residual_inf": 11.024440608842323,
+        "residual_inf": 11.024440608842145,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1768,13 +1768,13 @@
       },
       "agreement": {
         "max_dp_bar": 1.001566829472722e-09,
-        "max_dw_rpm": 1.5483010429306887e-09
+        "max_dw_rpm": 1.5484147297684103e-09
       }
     },
     {
       "case_id": "query-0039",
       "prediction": {
-        "residual_inf": 5.331689832550488,
+        "residual_inf": 5.331689832549358,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1818,7 +1818,7 @@
     {
       "case_id": "query-0040",
       "prediction": {
-        "residual_inf": 10.666576343930338,
+        "residual_inf": 10.666576343930295,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1856,13 +1856,13 @@
       },
       "agreement": {
         "max_dp_bar": 2.8479973934736336e-10,
-        "max_dw_rpm": 3.9676706364843994e-10
+        "max_dw_rpm": 3.9688075048616156e-10
       }
     },
     {
       "case_id": "query-0041",
       "prediction": {
-        "residual_inf": 6.447405334306858,
+        "residual_inf": 6.447405334306183,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1906,7 +1906,7 @@
     {
       "case_id": "query-0042",
       "prediction": {
-        "residual_inf": 8.25979421901718,
+        "residual_inf": 8.25979421901797,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1934,23 +1934,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 7.650363897937495e-09
+        "residual_inf": 7.650385214219568e-09
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 7.650363897937495e-09
+        "residual_inf": 7.650385214219568e-09
       },
       "agreement": {
-        "max_dp_bar": 6.512607342301635e-09,
+        "max_dp_bar": 6.51262155315635e-09,
         "max_dw_rpm": 1.431544660590589e-08
       }
     },
     {
       "case_id": "query-0043",
       "prediction": {
-        "residual_inf": 9.384413797849835,
+        "residual_inf": 9.384413797848197,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -1978,23 +1978,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.2737367544323206e-13
+        "residual_inf": 2.2026824808563106e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.2737367544323206e-13
+        "residual_inf": 2.2026824808563106e-13
       },
       "agreement": {
-        "max_dp_bar": 1.5631940186722204e-13,
+        "max_dp_bar": 1.4210854715202004e-13,
         "max_dw_rpm": 6.821210263296962e-13
       }
     },
     {
       "case_id": "query-0044",
       "prediction": {
-        "residual_inf": 6.912136057453772,
+        "residual_inf": 6.91213605745417,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2038,7 +2038,7 @@
     {
       "case_id": "query-0045",
       "prediction": {
-        "residual_inf": 82.32626718150507,
+        "residual_inf": 82.32626718150435,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -4.3 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -2076,13 +2076,13 @@
       },
       "agreement": {
         "max_dp_bar": 2.3011281768958725e-09,
-        "max_dw_rpm": 1.1110500963695813e-08
+        "max_dw_rpm": 1.1110557807114674e-08
       }
     },
     {
       "case_id": "query-0046",
       "prediction": {
-        "residual_inf": 95.83631683499388,
+        "residual_inf": 95.83631683499577,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2110,13 +2110,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 9.947598300641403e-14
+        "residual_inf": 1.1368683772161603e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 9.947598300641403e-14
+        "residual_inf": 1.1368683772161603e-13
       },
       "agreement": {
         "max_dp_bar": 4.291678123991005e-12,
@@ -2126,7 +2126,7 @@
     {
       "case_id": "query-0047",
       "prediction": {
-        "residual_inf": 54.31524529213194,
+        "residual_inf": 54.31524529212943,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2154,23 +2154,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 3.552713678800501e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 3.552713678800501e-15
       },
       "agreement": {
         "max_dp_bar": 1.2043699371133698e-12,
-        "max_dw_rpm": 4.092726157978177e-12
+        "max_dw_rpm": 3.979039320256561e-12
       }
     },
     {
       "case_id": "query-0048",
       "prediction": {
-        "residual_inf": 125.99603616521495,
+        "residual_inf": 125.99603616520898,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -65.3 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -2198,7 +2198,7 @@
         "converged": true,
         "status": "converged",
         "iterations": 8,
-        "residual_inf": 2.5785240609366156e-10
+        "residual_inf": 2.5785595880734036e-10
       },
       "verified": {
         "converged": true,
@@ -2207,14 +2207,14 @@
         "residual_inf": 2.147615418834903e-12
       },
       "agreement": {
-        "max_dp_bar": 8.120082384266425e-11,
-        "max_dw_rpm": 7.493099474231713e-10
+        "max_dp_bar": 8.119727112898545e-11,
+        "max_dw_rpm": 7.493667908420321e-10
       }
     },
     {
       "case_id": "query-0049",
       "prediction": {
-        "residual_inf": 14.249444950918157,
+        "residual_inf": 14.249444950908437,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2242,13 +2242,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 9.592326932761353e-14
+        "residual_inf": 8.881784197001252e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 9.592326932761353e-14
+        "residual_inf": 8.881784197001252e-14
       },
       "agreement": {
         "max_dp_bar": 7.105427357601002e-15,
@@ -2258,7 +2258,7 @@
     {
       "case_id": "query-0050",
       "prediction": {
-        "residual_inf": 8.376164088082461,
+        "residual_inf": 8.376164088083712,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2286,23 +2286,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 8.17252043816552e-09
+        "residual_inf": 8.172534649020236e-09
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 8.17252043816552e-09
+        "residual_inf": 8.172534649020236e-09
       },
       "agreement": {
-        "max_dp_bar": 9.561091474097339e-09,
+        "max_dp_bar": 9.561119895806769e-09,
         "max_dw_rpm": 2.8868726076325402e-08
       }
     },
     {
       "case_id": "query-0051",
       "prediction": {
-        "residual_inf": 104.91344396387822,
+        "residual_inf": 104.91344396387666,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -27.5 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -2330,7 +2330,7 @@
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.4210854715202004e-14
       },
       "verified": {
         "converged": true,
@@ -2339,14 +2339,14 @@
         "residual_inf": 1.7763568394002505e-14
       },
       "agreement": {
-        "max_dp_bar": 3.3587355119379936e-11,
+        "max_dp_bar": 3.3580249692022335e-11,
         "max_dw_rpm": 2.467004378559068e-11
       }
     },
     {
       "case_id": "query-0052",
       "prediction": {
-        "residual_inf": 4.298707525755262,
+        "residual_inf": 4.298707525755503,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2390,7 +2390,7 @@
     {
       "case_id": "query-0053",
       "prediction": {
-        "residual_inf": 6.623202934947582,
+        "residual_inf": 6.623202934946889,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2418,23 +2418,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 3.552713678800501e-15
+        "residual_inf": 7.105427357601002e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 3.552713678800501e-15
+        "residual_inf": 7.105427357601002e-15
       },
       "agreement": {
-        "max_dp_bar": 1.1097966989837005e-09,
+        "max_dp_bar": 1.1097824881289853e-09,
         "max_dw_rpm": 3.8551206671399996e-10
       }
     },
     {
       "case_id": "query-0054",
       "prediction": {
-        "residual_inf": 8.182282531004905,
+        "residual_inf": 8.18228253100493,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2462,23 +2462,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 2.9460878181453154e-12
+        "residual_inf": 2.9389823907877144e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 2.9460878181453154e-12
+        "residual_inf": 2.9389823907877144e-12
       },
       "agreement": {
         "max_dp_bar": 2.4300561562995426e-11,
-        "max_dw_rpm": 5.7411853049416095e-11
+        "max_dw_rpm": 5.729816621169448e-11
       }
     },
     {
       "case_id": "query-0055",
       "prediction": {
-        "residual_inf": 6.198511665964416,
+        "residual_inf": 6.19851166594599,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2522,7 +2522,7 @@
     {
       "case_id": "query-0056",
       "prediction": {
-        "residual_inf": 13.2868543462509,
+        "residual_inf": 13.286854346251133,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2566,7 +2566,7 @@
     {
       "case_id": "query-0057",
       "prediction": {
-        "residual_inf": 4.3682505712030775,
+        "residual_inf": 4.368250571202729,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2594,23 +2594,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 5.24948973179562e-11
+        "residual_inf": 5.2480686463241e-11
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 5.24948973179562e-11
+        "residual_inf": 5.2480686463241e-11
       },
       "agreement": {
-        "max_dp_bar": 1.396642801410053e-10,
+        "max_dp_bar": 1.396358584315749e-10,
         "max_dw_rpm": 2.88082446786575e-10
       }
     },
     {
       "case_id": "query-0058",
       "prediction": {
-        "residual_inf": 5.801723262257319,
+        "residual_inf": 5.801723262256985,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2654,7 +2654,7 @@
     {
       "case_id": "query-0059",
       "prediction": {
-        "residual_inf": 3.075279478654849,
+        "residual_inf": 3.0752794786531297,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2682,23 +2682,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 5.255884616417461e-11
+        "residual_inf": 5.254463530945941e-11
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 5.255884616417461e-11
+        "residual_inf": 5.254463530945941e-11
       },
       "agreement": {
         "max_dp_bar": 1.2777562119481445e-08,
-        "max_dw_rpm": 1.3439716894936282e-08
+        "max_dw_rpm": 1.343960320809856e-08
       }
     },
     {
       "case_id": "query-0060",
       "prediction": {
-        "residual_inf": 7.989970573925049,
+        "residual_inf": 7.989970573923209,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2742,7 +2742,7 @@
     {
       "case_id": "query-0061",
       "prediction": {
-        "residual_inf": 10.33705473420099,
+        "residual_inf": 10.337054734200372,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2786,7 +2786,7 @@
     {
       "case_id": "query-0062",
       "prediction": {
-        "residual_inf": 6.692201544940506,
+        "residual_inf": 6.692201544940566,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2830,7 +2830,7 @@
     {
       "case_id": "query-0063",
       "prediction": {
-        "residual_inf": 2.4739991360457303,
+        "residual_inf": 2.473999136046505,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2858,13 +2858,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 1.9255708139098715e-12
+        "residual_inf": 1.929123527588672e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 1.9255708139098715e-12
+        "residual_inf": 1.929123527588672e-12
       },
       "agreement": {
         "max_dp_bar": 6.565414878423326e-12,
@@ -2874,7 +2874,7 @@
     {
       "case_id": "query-0064",
       "prediction": {
-        "residual_inf": 2.8602465033880513,
+        "residual_inf": 2.8602465033885736,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2918,7 +2918,7 @@
     {
       "case_id": "query-0065",
       "prediction": {
-        "residual_inf": 7.3704003246390855,
+        "residual_inf": 7.37040032463819,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2946,13 +2946,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 4.598476266437501e-09
+        "residual_inf": 4.5984691610101436e-09
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 4.598476266437501e-09
+        "residual_inf": 4.5984691610101436e-09
       },
       "agreement": {
         "max_dp_bar": 6.8458803070825525e-09,
@@ -2962,7 +2962,7 @@
     {
       "case_id": "query-0066",
       "prediction": {
-        "residual_inf": 1.5553475951059852,
+        "residual_inf": 1.5553475951086,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -2990,23 +2990,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 2.4776625195954693e-11
+        "residual_inf": 2.4783730623312294e-11
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 2.4776625195954693e-11
+        "residual_inf": 2.4783730623312294e-11
       },
       "agreement": {
-        "max_dp_bar": 1.2445298125385307e-08,
+        "max_dp_bar": 1.2445283914530592e-08,
         "max_dw_rpm": 1.0538542483118363e-08
       }
     },
     {
       "case_id": "query-0067",
       "prediction": {
-        "residual_inf": 17.334479358992134,
+        "residual_inf": 17.334479358991636,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3034,23 +3034,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 5.510258915819577e-12
+        "residual_inf": 5.512035272658977e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 5.510258915819577e-12
+        "residual_inf": 5.512035272658977e-12
       },
       "agreement": {
         "max_dp_bar": 5.113349743623985e-10,
-        "max_dw_rpm": 6.198774826771114e-10
+        "max_dw_rpm": 6.199343260959722e-10
       }
     },
     {
       "case_id": "query-0068",
       "prediction": {
-        "residual_inf": 11.337194581212344,
+        "residual_inf": 11.337194581212984,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3088,13 +3088,13 @@
       },
       "agreement": {
         "max_dp_bar": 3.5723246583074797e-10,
-        "max_dw_rpm": 1.4135821402305737e-09
+        "max_dw_rpm": 1.4133547665551305e-09
       }
     },
     {
       "case_id": "query-0069",
       "prediction": {
-        "residual_inf": 3.4194071307279295,
+        "residual_inf": 3.4194071307286507,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3131,14 +3131,14 @@
         "residual_inf": 2.081186778468691e-09
       },
       "agreement": {
-        "max_dp_bar": 3.235548717839265e-09,
+        "max_dp_bar": 3.2355451651255862e-09,
         "max_dw_rpm": 7.962626114021987e-09
       }
     },
     {
       "case_id": "query-0070",
       "prediction": {
-        "residual_inf": 18.886654033552684,
+        "residual_inf": 18.88665403355242,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3182,7 +3182,7 @@
     {
       "case_id": "query-0071",
       "prediction": {
-        "residual_inf": 2.89812548745612,
+        "residual_inf": 2.898125487455232,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3220,13 +3220,13 @@
       },
       "agreement": {
         "max_dp_bar": 1.6407852854172233e-10,
-        "max_dw_rpm": 3.4788172342814505e-10
+        "max_dw_rpm": 3.476543497527018e-10
       }
     },
     {
       "case_id": "query-0072",
       "prediction": {
-        "residual_inf": 3.4740256595047967,
+        "residual_inf": 3.4740256595054326,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3270,7 +3270,7 @@
     {
       "case_id": "query-0073",
       "prediction": {
-        "residual_inf": 23.66351556411867,
+        "residual_inf": 23.663515564118853,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3314,7 +3314,7 @@
     {
       "case_id": "query-0074",
       "prediction": {
-        "residual_inf": 3.439208378323311,
+        "residual_inf": 3.43920837832232,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3352,13 +3352,13 @@
       },
       "agreement": {
         "max_dp_bar": 3.3717952874212642e-09,
-        "max_dw_rpm": 8.850065569276921e-09
+        "max_dw_rpm": 8.8499518824392e-09
       }
     },
     {
       "case_id": "query-0075",
       "prediction": {
-        "residual_inf": 4.263642582211073,
+        "residual_inf": 4.263642582210519,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3386,23 +3386,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.0658141036401503e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.0658141036401503e-14
       },
       "agreement": {
         "max_dp_bar": 3.1034232961246744e-09,
-        "max_dw_rpm": 2.337856130907312e-09
+        "max_dw_rpm": 2.3379698177450337e-09
       }
     },
     {
       "case_id": "query-0076",
       "prediction": {
-        "residual_inf": 15.219871849866976,
+        "residual_inf": 15.219871849857034,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3446,7 +3446,7 @@
     {
       "case_id": "query-0077",
       "prediction": {
-        "residual_inf": 8.664574995673426,
+        "residual_inf": 8.664574995679445,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3474,23 +3474,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 4.519051799434237e-12
+        "residual_inf": 4.519939977853937e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 4.519051799434237e-12
+        "residual_inf": 4.519939977853937e-12
       },
       "agreement": {
-        "max_dp_bar": 4.772147121911985e-10,
+        "max_dp_bar": 4.772289230459137e-10,
         "max_dw_rpm": 4.2314240999985486e-10
       }
     },
     {
       "case_id": "query-0078",
       "prediction": {
-        "residual_inf": 156.25998796422476,
+        "residual_inf": 156.25998796422647,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -3.9 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -3534,7 +3534,7 @@
     {
       "case_id": "query-0079",
       "prediction": {
-        "residual_inf": 5.21093302530786,
+        "residual_inf": 5.210933025307863,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3578,7 +3578,7 @@
     {
       "case_id": "query-0080",
       "prediction": {
-        "residual_inf": 14.742629350540184,
+        "residual_inf": 14.742629350539403,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3622,7 +3622,7 @@
     {
       "case_id": "query-0081",
       "prediction": {
-        "residual_inf": 2.036711509667782,
+        "residual_inf": 2.0367115096654587,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3650,23 +3650,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 3.979039320256561e-13
+        "residual_inf": 4.050093593832571e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 3.979039320256561e-13
+        "residual_inf": 4.050093593832571e-13
       },
       "agreement": {
         "max_dp_bar": 3.979039320256561e-13,
-        "max_dw_rpm": 1.0231815394945443e-12
+        "max_dw_rpm": 9.094947017729282e-13
       }
     },
     {
       "case_id": "query-0082",
       "prediction": {
-        "residual_inf": 130.39501645907478,
+        "residual_inf": 130.39501645910687,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3710,7 +3710,7 @@
     {
       "case_id": "query-0083",
       "prediction": {
-        "residual_inf": 10.536178413731971,
+        "residual_inf": 10.536178413733033,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3738,23 +3738,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-14
+        "residual_inf": 7.460698725481052e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-14
+        "residual_inf": 7.460698725481052e-14
       },
       "agreement": {
         "max_dp_bar": 1.0869158018067537e-08,
-        "max_dw_rpm": 1.0647568160493392e-08
+        "max_dw_rpm": 1.0647454473655671e-08
       }
     },
     {
       "case_id": "query-0084",
       "prediction": {
-        "residual_inf": 1.0178700116955497,
+        "residual_inf": 1.0178700116951802,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3782,23 +3782,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 6.856737400084967e-13
+        "residual_inf": 6.892264536872972e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 6.856737400084967e-13
+        "residual_inf": 6.892264536872972e-13
       },
       "agreement": {
-        "max_dp_bar": 1.0302869668521453e-12,
-        "max_dw_rpm": 4.547473508864641e-13
+        "max_dp_bar": 1.0373923942097463e-12,
+        "max_dw_rpm": 5.684341886080801e-13
       }
     },
     {
       "case_id": "query-0085",
       "prediction": {
-        "residual_inf": 2.472028803702486,
+        "residual_inf": 2.4720288037021305,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3826,23 +3826,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 6.411937647499144e-11
+        "residual_inf": 6.411227104763384e-11
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 6.411937647499144e-11
+        "residual_inf": 6.411227104763384e-11
       },
       "agreement": {
-        "max_dp_bar": 1.1999645721516572e-10,
-        "max_dw_rpm": 1.8462742445990443e-10
+        "max_dp_bar": 1.2000356264252332e-10,
+        "max_dw_rpm": 1.844000507844612e-10
       }
     },
     {
       "case_id": "query-0086",
       "prediction": {
-        "residual_inf": 2.1080544425689,
+        "residual_inf": 2.1080544425673367,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3886,7 +3886,7 @@
     {
       "case_id": "query-0087",
       "prediction": {
-        "residual_inf": 50.245730544835894,
+        "residual_inf": 50.245730544821484,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3914,13 +3914,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 5.3290705182007514e-14
+        "residual_inf": 4.973799150320701e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 5.3290705182007514e-14
+        "residual_inf": 4.973799150320701e-14
       },
       "agreement": {
         "max_dp_bar": 3.552713678800501e-14,
@@ -3930,7 +3930,7 @@
     {
       "case_id": "query-0088",
       "prediction": {
-        "residual_inf": 18.177527120043774,
+        "residual_inf": 18.177527120044736,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -3967,14 +3967,14 @@
         "residual_inf": 1.2967404927621828e-13
       },
       "agreement": {
-        "max_dp_bar": 3.552713678800501e-15,
+        "max_dp_bar": 7.105427357601002e-15,
         "max_dw_rpm": 5.684341886080802e-14
       }
     },
     {
       "case_id": "query-0089",
       "prediction": {
-        "residual_inf": 3.1220502105519152,
+        "residual_inf": 3.1220502105522705,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4002,23 +4002,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 6.746603276042151e-11
+        "residual_inf": 6.746958547410031e-11
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 6.746603276042151e-11
+        "residual_inf": 6.746958547410031e-11
       },
       "agreement": {
         "max_dp_bar": 6.093614501878619e-11,
-        "max_dw_rpm": 3.7630343285854906e-11
+        "max_dw_rpm": 3.774403012357652e-11
       }
     },
     {
       "case_id": "query-0090",
       "prediction": {
-        "residual_inf": 229.50020607930722,
+        "residual_inf": 229.50020607930685,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -1.5 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -4055,14 +4055,14 @@
         "residual_inf": 7.105427357601002e-12
       },
       "agreement": {
-        "max_dp_bar": 2.1316282072803006e-14,
+        "max_dp_bar": 1.4210854715202004e-14,
         "max_dw_rpm": 2.2737367544323206e-13
       }
     },
     {
       "case_id": "query-0091",
       "prediction": {
-        "residual_inf": 11.313159752217384,
+        "residual_inf": 11.313159752216094,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4090,23 +4090,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 8.581295674048306e-10
+        "residual_inf": 8.581331201185094e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 8.581295674048306e-10
+        "residual_inf": 8.581331201185094e-10
       },
       "agreement": {
-        "max_dp_bar": 3.5205260928705684e-10,
+        "max_dp_bar": 3.5205971471441444e-10,
         "max_dw_rpm": 2.2115500541985966e-09
       }
     },
     {
       "case_id": "query-0092",
       "prediction": {
-        "residual_inf": 5.529683047773645,
+        "residual_inf": 5.5296830477742915,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4150,7 +4150,7 @@
     {
       "case_id": "query-0093",
       "prediction": {
-        "residual_inf": 4.089392214838611,
+        "residual_inf": 4.089392214837229,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4194,7 +4194,7 @@
     {
       "case_id": "query-0094",
       "prediction": {
-        "residual_inf": 11.240792267565395,
+        "residual_inf": 11.240792267563805,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4238,7 +4238,7 @@
     {
       "case_id": "query-0095",
       "prediction": {
-        "residual_inf": 4.70838955930779,
+        "residual_inf": 4.708389559306671,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4266,23 +4266,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 2.515704977668065e-09
+        "residual_inf": 2.5157191885227803e-09
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 2.515704977668065e-09
+        "residual_inf": 2.5157191885227803e-09
       },
       "agreement": {
-        "max_dp_bar": 5.1847877102773055e-09,
+        "max_dp_bar": 5.184801921132021e-09,
         "max_dw_rpm": 3.9593714973307215e-09
       }
     },
     {
       "case_id": "query-0096",
       "prediction": {
-        "residual_inf": 9.300595315262367,
+        "residual_inf": 9.300595315263312,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4319,14 +4319,14 @@
         "residual_inf": 7.105427357601002e-15
       },
       "agreement": {
-        "max_dp_bar": 1.4338127130031353e-08,
+        "max_dp_bar": 1.4338112919176638e-08,
         "max_dw_rpm": 2.7496525945025496e-08
       }
     },
     {
       "case_id": "query-0097",
       "prediction": {
-        "residual_inf": 14.983479513907291,
+        "residual_inf": 14.983479513908268,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4342,7 +4342,7 @@
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 3.197442310920451e-14
+        "residual_inf": 2.4868995751603507e-14
       },
       "warm": {
         "converged": true,
@@ -4364,13 +4364,13 @@
       },
       "agreement": {
         "max_dp_bar": 1.7371448279845936e-08,
-        "max_dw_rpm": 1.7729007595335133e-08
+        "max_dw_rpm": 1.7729234969010577e-08
       }
     },
     {
       "case_id": "query-0098",
       "prediction": {
-        "residual_inf": 10.250458672493686,
+        "residual_inf": 10.250458672493608,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4414,7 +4414,7 @@
     {
       "case_id": "query-0099",
       "prediction": {
-        "residual_inf": 227.54589968713202,
+        "residual_inf": 227.54589968713228,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4458,7 +4458,7 @@
     {
       "case_id": "query-0100",
       "prediction": {
-        "residual_inf": 5.9715374489078314,
+        "residual_inf": 5.971537448905817,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4486,23 +4486,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.0658141036401503e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.0658141036401503e-14
       },
       "agreement": {
         "max_dp_bar": 9.06210573248245e-09,
-        "max_dw_rpm": 1.4803163139731623e-08
+        "max_dw_rpm": 1.4803276826569345e-08
       }
     },
     {
       "case_id": "query-0101",
       "prediction": {
-        "residual_inf": 20.788971934008977,
+        "residual_inf": 20.788971934036745,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4539,14 +4539,14 @@
         "residual_inf": 8.206768598029157e-13
       },
       "agreement": {
-        "max_dp_bar": 3.8902214782865485e-13,
+        "max_dp_bar": 3.8813396940895473e-13,
         "max_dw_rpm": 5.684341886080801e-13
       }
     },
     {
       "case_id": "query-0102",
       "prediction": {
-        "residual_inf": 4.830135338372521,
+        "residual_inf": 4.830135338372813,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4574,23 +4574,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.0658141036401503e-14
+        "residual_inf": 7.105427357601002e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.0658141036401503e-14
+        "residual_inf": 7.105427357601002e-15
       },
       "agreement": {
-        "max_dp_bar": 1.4210854715202004e-14,
+        "max_dp_bar": 2.842170943040401e-14,
         "max_dw_rpm": 1.1368683772161603e-13
       }
     },
     {
       "case_id": "query-0103",
       "prediction": {
-        "residual_inf": 71.98413954585592,
+        "residual_inf": 71.98413954585098,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -7.5 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -4618,7 +4618,7 @@
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 4.748837767465375e-09
+        "residual_inf": 4.7488413201790536e-09
       },
       "verified": {
         "converged": true,
@@ -4627,14 +4627,14 @@
         "residual_inf": 5.329070518200751e-15
       },
       "agreement": {
-        "max_dp_bar": 1.78222236968395e-09,
+        "max_dp_bar": 1.7822259223976289e-09,
         "max_dw_rpm": 3.6677647585747764e-09
       }
     },
     {
       "case_id": "query-0104",
       "prediction": {
-        "residual_inf": 1.8905878754048864,
+        "residual_inf": 1.8905878754045915,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4678,7 +4678,7 @@
     {
       "case_id": "query-0105",
       "prediction": {
-        "residual_inf": 28.488737598180105,
+        "residual_inf": 28.488737598189534,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4706,13 +4706,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 9.745093620949774e-12
+        "residual_inf": 9.730882766234572e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 9.745093620949774e-12
+        "residual_inf": 9.730882766234572e-12
       },
       "agreement": {
         "max_dp_bar": 7.389644451905042e-13,
@@ -4722,7 +4722,7 @@
     {
       "case_id": "query-0106",
       "prediction": {
-        "residual_inf": 12.909535001308655,
+        "residual_inf": 12.909535001308036,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4760,13 +4760,13 @@
       },
       "agreement": {
         "max_dp_bar": 1.3884672966923972e-08,
-        "max_dw_rpm": 2.921615305240266e-08
+        "max_dw_rpm": 2.921603936556494e-08
       }
     },
     {
       "case_id": "query-0107",
       "prediction": {
-        "residual_inf": 7.0391735067390755,
+        "residual_inf": 7.039173506739907,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4810,7 +4810,7 @@
     {
       "case_id": "query-0108",
       "prediction": {
-        "residual_inf": 8.609083363447315,
+        "residual_inf": 8.609083363447326,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4838,13 +4838,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 3.552713678800501e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 3.552713678800501e-15
       },
       "agreement": {
         "max_dp_bar": 7.105427357601002e-15,
@@ -4854,7 +4854,7 @@
     {
       "case_id": "query-0109",
       "prediction": {
-        "residual_inf": 5.528308265395996,
+        "residual_inf": 5.528308265396589,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4870,7 +4870,7 @@
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.4210854715202004e-14
       },
       "warm": {
         "converged": true,
@@ -4891,14 +4891,14 @@
         "residual_inf": 7.105427357601002e-15
       },
       "agreement": {
-        "max_dp_bar": 1.4278356275099213e-08,
+        "max_dp_bar": 1.4278342064244498e-08,
         "max_dw_rpm": 1.741648247843841e-08
       }
     },
     {
       "case_id": "query-0110",
       "prediction": {
-        "residual_inf": 6.642350740373498,
+        "residual_inf": 6.6423507403730895,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4942,7 +4942,7 @@
     {
       "case_id": "query-0111",
       "prediction": {
-        "residual_inf": 17.694779477509158,
+        "residual_inf": 17.694779477509368,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -4979,14 +4979,14 @@
         "residual_inf": 6.750155989720952e-14
       },
       "agreement": {
-        "max_dp_bar": 7.105427357601002e-15,
-        "max_dw_rpm": 1.1368683772161603e-13
+        "max_dp_bar": 3.552713678800501e-15,
+        "max_dw_rpm": 0.0
       }
     },
     {
       "case_id": "query-0112",
       "prediction": {
-        "residual_inf": 5.403158671223572,
+        "residual_inf": 5.403158671224574,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5014,23 +5014,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.4210854715202004e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 7.105427357601002e-15
+        "residual_inf": 1.4210854715202004e-14
       },
       "agreement": {
         "max_dp_bar": 1.4583733332074189e-08,
-        "max_dw_rpm": 1.9237631931900978e-08
+        "max_dw_rpm": 1.9237518245063256e-08
       }
     },
     {
       "case_id": "query-0113",
       "prediction": {
-        "residual_inf": 6.15453987872187,
+        "residual_inf": 6.154539878722652,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5058,23 +5058,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.4210854715202004e-14
+        "residual_inf": 3.552713678800501e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.4210854715202004e-14
+        "residual_inf": 3.552713678800501e-15
       },
       "agreement": {
-        "max_dp_bar": 6.7931154035250074e-09,
+        "max_dp_bar": 6.793129614379723e-09,
         "max_dw_rpm": 1.0533085514907725e-08
       }
     },
     {
       "case_id": "query-0114",
       "prediction": {
-        "residual_inf": 2.211047777448851,
+        "residual_inf": 2.21104777744954,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5096,29 +5096,29 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.1316282072803006e-14
+        "residual_inf": 1.4210854715202004e-14
       },
       "predicted": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 5.616840326183592e-12
+        "residual_inf": 5.623945753541193e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 5.616840326183592e-12
+        "residual_inf": 5.623945753541193e-12
       },
       "agreement": {
-        "max_dp_bar": 1.3230305739853065e-11,
-        "max_dw_rpm": 2.7284841053187847e-11
+        "max_dp_bar": 1.3244516594568267e-11,
+        "max_dw_rpm": 2.717115421546623e-11
       }
     },
     {
       "case_id": "query-0115",
       "prediction": {
-        "residual_inf": 5.210693053131287,
+        "residual_inf": 5.210693053130846,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5162,7 +5162,7 @@
     {
       "case_id": "query-0116",
       "prediction": {
-        "residual_inf": 80.39144205098304,
+        "residual_inf": 80.39144205097644,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5190,13 +5190,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 3.552713678800501e-15
+        "residual_inf": 7.105427357601002e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 3.552713678800501e-15
+        "residual_inf": 7.105427357601002e-15
       },
       "agreement": {
         "max_dp_bar": 3.0610181056545116e-11,
@@ -5206,7 +5206,7 @@
     {
       "case_id": "query-0117",
       "prediction": {
-        "residual_inf": 142.21056843640457,
+        "residual_inf": 142.21056843635287,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -3.4 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -5243,14 +5243,14 @@
         "residual_inf": 7.744915819785092e-13
       },
       "agreement": {
-        "max_dp_bar": 3.552713678800501e-15,
-        "max_dw_rpm": 4.547473508864641e-13
+        "max_dp_bar": 7.105427357601002e-15,
+        "max_dw_rpm": 2.2737367544323206e-13
       }
     },
     {
       "case_id": "query-0118",
       "prediction": {
-        "residual_inf": 7.277055157740627,
+        "residual_inf": 7.277055157738495,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5294,7 +5294,7 @@
     {
       "case_id": "query-0119",
       "prediction": {
-        "residual_inf": 1.480734221539194,
+        "residual_inf": 1.4807342215388744,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5322,23 +5322,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 1.1723955140041653e-13
+        "residual_inf": 1.3500311979441904e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 1.1723955140041653e-13
+        "residual_inf": 1.3500311979441904e-13
       },
       "agreement": {
-        "max_dp_bar": 2.984279490192421e-13,
+        "max_dp_bar": 3.126388037344441e-13,
         "max_dw_rpm": 5.684341886080801e-13
       }
     },
     {
       "case_id": "query-0120",
       "prediction": {
-        "residual_inf": 4.716791668012775,
+        "residual_inf": 4.7167916680116875,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5376,13 +5376,13 @@
       },
       "agreement": {
         "max_dp_bar": 3.255991032347083e-10,
-        "max_dw_rpm": 7.377138899755664e-10
+        "max_dw_rpm": 7.376002031378448e-10
       }
     },
     {
       "case_id": "query-0121",
       "prediction": {
-        "residual_inf": 16.7991450171606,
+        "residual_inf": 16.79914501716054,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5426,7 +5426,7 @@
     {
       "case_id": "query-0122",
       "prediction": {
-        "residual_inf": 110.76926527186642,
+        "residual_inf": 110.76926527189669,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5470,7 +5470,7 @@
     {
       "case_id": "query-0123",
       "prediction": {
-        "residual_inf": 7.843793750819586,
+        "residual_inf": 7.843793750819419,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5514,7 +5514,7 @@
     {
       "case_id": "query-0124",
       "prediction": {
-        "residual_inf": 11.574774040973608,
+        "residual_inf": 11.574774040973345,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5542,23 +5542,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.1316282072803006e-14
+        "residual_inf": 2.4868995751603507e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.1316282072803006e-14
+        "residual_inf": 2.4868995751603507e-14
       },
       "agreement": {
-        "max_dp_bar": 2.842170943040401e-14,
+        "max_dp_bar": 4.263256414560601e-14,
         "max_dw_rpm": 0.0
       }
     },
     {
       "case_id": "query-0125",
       "prediction": {
-        "residual_inf": 3.7958255963700545,
+        "residual_inf": 3.795825596371447,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5586,23 +5586,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 9.237055564881302e-14
+        "residual_inf": 9.414691248821327e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 9.237055564881302e-14
+        "residual_inf": 9.414691248821327e-14
       },
       "agreement": {
-        "max_dp_bar": 1.844853159127524e-10,
-        "max_dw_rpm": 3.121840563835576e-10
+        "max_dp_bar": 1.8449242134011001e-10,
+        "max_dw_rpm": 3.12070369545836e-10
       }
     },
     {
       "case_id": "query-0126",
       "prediction": {
-        "residual_inf": 14.623269430697748,
+        "residual_inf": 14.62326943069673,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5646,7 +5646,7 @@
     {
       "case_id": "query-0127",
       "prediction": {
-        "residual_inf": 3.1913732625986135,
+        "residual_inf": 3.1913732625984075,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5683,14 +5683,14 @@
         "residual_inf": 4.3849368580595183e-10
       },
       "agreement": {
-        "max_dp_bar": 5.219632726038981e-09,
+        "max_dp_bar": 5.219646936893696e-09,
         "max_dw_rpm": 2.929709808086045e-09
       }
     },
     {
       "case_id": "query-0128",
       "prediction": {
-        "residual_inf": 2.3221413102406796,
+        "residual_inf": 2.3221413102406228,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5727,14 +5727,14 @@
         "residual_inf": 2.600733850499637e-09
       },
       "agreement": {
-        "max_dp_bar": 1.2234488977469482e-09,
-        "max_dw_rpm": 1.2543068805825897e-09
+        "max_dp_bar": 1.2234480095685285e-09,
+        "max_dw_rpm": 1.2543637240014505e-09
       }
     },
     {
       "case_id": "query-0129",
       "prediction": {
-        "residual_inf": 3.2342746095751735,
+        "residual_inf": 3.234274609574001,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5778,7 +5778,7 @@
     {
       "case_id": "query-0130",
       "prediction": {
-        "residual_inf": 180.31828755716978,
+        "residual_inf": 180.31828755716924,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5800,7 +5800,7 @@
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 2.7760851395441932e-09
+        "residual_inf": 2.776083363187354e-09
       },
       "predicted": {
         "converged": true,
@@ -5822,7 +5822,7 @@
     {
       "case_id": "query-0131",
       "prediction": {
-        "residual_inf": 10.784864429765456,
+        "residual_inf": 10.784864429764422,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5859,14 +5859,14 @@
         "residual_inf": 3.197442310920451e-14
       },
       "agreement": {
-        "max_dp_bar": 3.552713678800501e-15,
-        "max_dw_rpm": 5.684341886080802e-14
+        "max_dp_bar": 2.842170943040401e-14,
+        "max_dw_rpm": 2.2737367544323206e-13
       }
     },
     {
       "case_id": "query-0132",
       "prediction": {
-        "residual_inf": 5.42807658140174,
+        "residual_inf": 5.428076581401214,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5894,23 +5894,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 8.964278208623e-10
+        "residual_inf": 8.964207154349424e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 8.964278208623e-10
+        "residual_inf": 8.964207154349424e-10
       },
       "agreement": {
-        "max_dp_bar": 1.633935653444496e-09,
+        "max_dp_bar": 1.6339072317350656e-09,
         "max_dw_rpm": 3.1732270144857466e-09
       }
     },
     {
       "case_id": "query-0133",
       "prediction": {
-        "residual_inf": 7.384954306782536,
+        "residual_inf": 7.384954306782554,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5954,7 +5954,7 @@
     {
       "case_id": "query-0134",
       "prediction": {
-        "residual_inf": 9.321506562120177,
+        "residual_inf": 9.321506562120575,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -5982,23 +5982,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.0658141036401503e-14
+        "residual_inf": 3.552713678800501e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.0658141036401503e-14
+        "residual_inf": 3.552713678800501e-15
       },
       "agreement": {
-        "max_dp_bar": 1.0454712651153386e-08,
-        "max_dw_rpm": 3.2511024983250536e-09
+        "max_dp_bar": 1.0454726862008101e-08,
+        "max_dw_rpm": 3.250988811487332e-09
       }
     },
     {
       "case_id": "query-0135",
       "prediction": {
-        "residual_inf": 0.9267303702826188,
+        "residual_inf": 0.9267303702820247,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6035,14 +6035,14 @@
         "residual_inf": 1.804984606224025e-09
       },
       "agreement": {
-        "max_dp_bar": 9.294205405296907e-10,
-        "max_dw_rpm": 1.2623786460608244e-09
+        "max_dp_bar": 9.294218727973202e-10,
+        "max_dw_rpm": 1.2623218026419636e-09
       }
     },
     {
       "case_id": "query-0136",
       "prediction": {
-        "residual_inf": 3.4177612345553587,
+        "residual_inf": 3.4177612345545185,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6079,14 +6079,14 @@
         "residual_inf": 3.552713678800501e-15
       },
       "agreement": {
-        "max_dp_bar": 6.232809823814023e-10,
+        "max_dp_bar": 6.232880878087599e-10,
         "max_dw_rpm": 7.253220246639103e-10
       }
     },
     {
       "case_id": "query-0137",
       "prediction": {
-        "residual_inf": 4.036008801540422,
+        "residual_inf": 4.03600880153806,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6114,23 +6114,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 4.3520387293938256e-10
+        "residual_inf": 4.3518610937098856e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 4.3520387293938256e-10
+        "residual_inf": 4.3518610937098856e-10
       },
       "agreement": {
-        "max_dp_bar": 6.7449974494593334e-09,
+        "max_dp_bar": 6.745011660314049e-09,
         "max_dw_rpm": 5.4815245675854385e-09
       }
     },
     {
       "case_id": "query-0138",
       "prediction": {
-        "residual_inf": 11.61942341567093,
+        "residual_inf": 11.619423415670155,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6158,23 +6158,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.842170943040401e-14
+        "residual_inf": 3.907985046680551e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.842170943040401e-14
+        "residual_inf": 3.907985046680551e-14
       },
       "agreement": {
-        "max_dp_bar": 1.1901462926289241e-08,
+        "max_dp_bar": 1.1901448715434526e-08,
         "max_dw_rpm": 1.8768673726299312e-08
       }
     },
     {
       "case_id": "query-0139",
       "prediction": {
-        "residual_inf": 14.988862434922833,
+        "residual_inf": 14.98886243492291,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -3.2 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -6218,7 +6218,7 @@
     {
       "case_id": "query-0140",
       "prediction": {
-        "residual_inf": 2.4629999241707026,
+        "residual_inf": 2.4629999241685496,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6246,13 +6246,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 1.1191048088221578e-11
+        "residual_inf": 1.1183942660863977e-11
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 1.1191048088221578e-11
+        "residual_inf": 1.1183942660863977e-11
       },
       "agreement": {
         "max_dp_bar": 1.4042257134860847e-08,
@@ -6262,7 +6262,7 @@
     {
       "case_id": "query-0141",
       "prediction": {
-        "residual_inf": 23.214514902739186,
+        "residual_inf": 23.214514902745442,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6306,7 +6306,7 @@
     {
       "case_id": "query-0142",
       "prediction": {
-        "residual_inf": 1.8865188150350818,
+        "residual_inf": 1.8865188150348828,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6334,23 +6334,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 1.5099033134902129e-12
+        "residual_inf": 1.5170087408478139e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 1.5099033134902129e-12
+        "residual_inf": 1.5170087408478139e-12
       },
       "agreement": {
-        "max_dp_bar": 1.7834622667578515e-12,
+        "max_dp_bar": 1.787014980436652e-12,
         "max_dw_rpm": 4.206412995699793e-12
       }
     },
     {
       "case_id": "query-0143",
       "prediction": {
-        "residual_inf": 6.240116380803471,
+        "residual_inf": 6.240116380801979,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6394,7 +6394,7 @@
     {
       "case_id": "query-0144",
       "prediction": {
-        "residual_inf": 163.49867464842333,
+        "residual_inf": 163.49867464842515,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -5.7 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -6431,14 +6431,14 @@
         "residual_inf": 1.2289902429074573e-10
       },
       "agreement": {
-        "max_dp_bar": 7.105427357601002e-15,
+        "max_dp_bar": 1.4210854715202004e-14,
         "max_dw_rpm": 1.1368683772161603e-13
       }
     },
     {
       "case_id": "query-0145",
       "prediction": {
-        "residual_inf": 12.373561545217953,
+        "residual_inf": 12.373561545217843,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6482,7 +6482,7 @@
     {
       "case_id": "query-0146",
       "prediction": {
-        "residual_inf": 165.50206163161613,
+        "residual_inf": 165.50206163161621,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -2.3 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -6522,7 +6522,7 @@
     {
       "case_id": "query-0147",
       "prediction": {
-        "residual_inf": 156.2697951614046,
+        "residual_inf": 156.26979516141958,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6550,23 +6550,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 1.2803891280555035e-10
+        "residual_inf": 1.2803802462713065e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 1.2803891280555035e-10
+        "residual_inf": 1.2803802462713065e-10
       },
       "agreement": {
-        "max_dp_bar": 4.5748071997309125e-11,
-        "max_dw_rpm": 2.8421709430404007e-11
+        "max_dp_bar": 4.57478499527042e-11,
+        "max_dw_rpm": 2.845013113983441e-11
       }
     },
     {
       "case_id": "query-0148",
       "prediction": {
-        "residual_inf": 16.333810137429765,
+        "residual_inf": 16.33381013743113,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6604,13 +6604,13 @@
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-13,
-        "max_dw_rpm": 6.821210263296962e-13
+        "max_dw_rpm": 5.684341886080801e-13
       }
     },
     {
       "case_id": "query-0149",
       "prediction": {
-        "residual_inf": 4.339545287258581,
+        "residual_inf": 4.339545287258822,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6647,14 +6647,14 @@
         "residual_inf": 3.5276315202281694e-10
       },
       "agreement": {
-        "max_dp_bar": 5.313083306646149e-10,
+        "max_dp_bar": 5.313154360919725e-10,
         "max_dw_rpm": 1.4233592082746327e-10
       }
     },
     {
       "case_id": "query-0150",
       "prediction": {
-        "residual_inf": 117.95463627110398,
+        "residual_inf": 117.9546362710469,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6698,7 +6698,7 @@
     {
       "case_id": "query-0151",
       "prediction": {
-        "residual_inf": 3.0054921434913027,
+        "residual_inf": 3.0054921434931146,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6742,7 +6742,7 @@
     {
       "case_id": "query-0152",
       "prediction": {
-        "residual_inf": 1.3938545948207484,
+        "residual_inf": 1.3938545948201337,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6786,7 +6786,7 @@
     {
       "case_id": "query-0153",
       "prediction": {
-        "residual_inf": 7.835072796560905,
+        "residual_inf": 7.835072796563573,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6814,23 +6814,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.2026824808563106e-13
+        "residual_inf": 2.1316282072803006e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.2026824808563106e-13
+        "residual_inf": 2.1316282072803006e-13
       },
       "agreement": {
-        "max_dp_bar": 6.394174079105142e-11,
+        "max_dp_bar": 6.394884621840902e-11,
         "max_dw_rpm": 9.174527804134414e-11
       }
     },
     {
       "case_id": "query-0154",
       "prediction": {
-        "residual_inf": 15.740560375975804,
+        "residual_inf": 15.740560375975814,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6868,13 +6868,13 @@
       },
       "agreement": {
         "max_dp_bar": 1.1579626146840383e-13,
-        "max_dw_rpm": 1.1368683772161603e-13
+        "max_dw_rpm": 2.2737367544323206e-13
       }
     },
     {
       "case_id": "query-0155",
       "prediction": {
-        "residual_inf": 57.28753908028379,
+        "residual_inf": 57.28753908028796,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6918,7 +6918,7 @@
     {
       "case_id": "query-0156",
       "prediction": {
-        "residual_inf": 7.073910894281294,
+        "residual_inf": 7.073910894280715,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6956,13 +6956,13 @@
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
-        "max_dw_rpm": 0.0
+        "max_dw_rpm": 1.1368683772161603e-13
       }
     },
     {
       "case_id": "query-0157",
       "prediction": {
-        "residual_inf": 78.06364839474448,
+        "residual_inf": 78.06364839474293,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -6990,23 +6990,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 2.384428654522708e-09
+        "residual_inf": 2.384425101809029e-09
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 2.384428654522708e-09
+        "residual_inf": 2.384425101809029e-09
       },
       "agreement": {
         "max_dp_bar": 1.0892122759287304e-09,
-        "max_dw_rpm": 5.838671768287895e-09
+        "max_dw_rpm": 5.8386149248690344e-09
       }
     },
     {
       "case_id": "query-0158",
       "prediction": {
-        "residual_inf": 17.09174733882597,
+        "residual_inf": 17.091747338825297,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7043,14 +7043,14 @@
         "residual_inf": 7.105427357601002e-15
       },
       "agreement": {
-        "max_dp_bar": 1.4210854715202004e-14,
+        "max_dp_bar": 2.1316282072803006e-14,
         "max_dw_rpm": 2.2737367544323206e-13
       }
     },
     {
       "case_id": "query-0159",
       "prediction": {
-        "residual_inf": 2.564518922365872,
+        "residual_inf": 2.5645189223663465,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7087,14 +7087,14 @@
         "residual_inf": 2.552020816892764e-10
       },
       "agreement": {
-        "max_dp_bar": 7.454872275047819e-10,
+        "max_dp_bar": 7.454730166500667e-10,
         "max_dw_rpm": 2.049773684120737e-10
       }
     },
     {
       "case_id": "query-0160",
       "prediction": {
-        "residual_inf": 1.800892551101267,
+        "residual_inf": 1.8008925511032707,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7122,17 +7122,17 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 8.01492205937393e-12
+        "residual_inf": 8.004263918337529e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 8.01492205937393e-12
+        "residual_inf": 8.004263918337529e-12
       },
       "agreement": {
         "max_dp_bar": 2.5913493573170854e-10,
-        "max_dw_rpm": 5.546780812437646e-10
+        "max_dw_rpm": 5.547917680814862e-10
       }
     },
     {
@@ -7182,7 +7182,7 @@
     {
       "case_id": "query-0162",
       "prediction": {
-        "residual_inf": 7.069861375905123,
+        "residual_inf": 7.069861375904857,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7220,13 +7220,13 @@
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
-        "max_dw_rpm": 2.2737367544323206e-13
+        "max_dw_rpm": 1.1368683772161603e-13
       }
     },
     {
       "case_id": "query-0163",
       "prediction": {
-        "residual_inf": 4.157458975864326,
+        "residual_inf": 4.157458975864625,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7254,23 +7254,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 3.8544811786778155e-10
+        "residual_inf": 3.8545522329513915e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 3.8544811786778155e-10
+        "residual_inf": 3.8545522329513915e-10
       },
       "agreement": {
-        "max_dp_bar": 7.443077265634201e-10,
+        "max_dp_bar": 7.442793048539897e-10,
         "max_dw_rpm": 5.003357728128321e-10
       }
     },
     {
       "case_id": "query-0164",
       "prediction": {
-        "residual_inf": 6.2984605182390325,
+        "residual_inf": 6.298460518237569,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7308,13 +7308,13 @@
       },
       "agreement": {
         "max_dp_bar": 3.2384832593379542e-09,
-        "max_dw_rpm": 9.346081242256332e-09
+        "max_dw_rpm": 9.346194929094054e-09
       }
     },
     {
       "case_id": "query-0165",
       "prediction": {
-        "residual_inf": 1.0090947594968291,
+        "residual_inf": 1.0090947594959498,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7342,23 +7342,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 8.348877145181177e-14
+        "residual_inf": 8.171241461241152e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 8.348877145181177e-14
+        "residual_inf": 8.171241461241152e-14
       },
       "agreement": {
-        "max_dp_bar": 4.973799150320701e-14,
+        "max_dp_bar": 4.8405723873656825e-14,
         "max_dw_rpm": 1.1368683772161603e-13
       }
     },
     {
       "case_id": "query-0166",
       "prediction": {
-        "residual_inf": 80.58483061999323,
+        "residual_inf": 80.58483061999007,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7402,7 +7402,7 @@
     {
       "case_id": "query-0167",
       "prediction": {
-        "residual_inf": 5.6977169977735205,
+        "residual_inf": 5.697716997771192,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7430,19 +7430,19 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.4210854715202004e-14
+        "residual_inf": 3.552713678800501e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.4210854715202004e-14
+        "residual_inf": 3.552713678800501e-15
       }
     },
     {
       "case_id": "query-0168",
       "prediction": {
-        "residual_inf": 0.8534930171069348,
+        "residual_inf": 0.853493017106338,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7486,7 +7486,7 @@
     {
       "case_id": "query-0169",
       "prediction": {
-        "residual_inf": 9.986713661073892,
+        "residual_inf": 9.986713661072361,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7514,23 +7514,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.4210854715202004e-14
+        "residual_inf": 1.0658141036401503e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.4210854715202004e-14
+        "residual_inf": 1.0658141036401503e-14
       },
       "agreement": {
-        "max_dp_bar": 1.5141253584260994e-08,
+        "max_dp_bar": 1.514126779511571e-08,
         "max_dw_rpm": 7.011294655967504e-09
       }
     },
     {
       "case_id": "query-0170",
       "prediction": {
-        "residual_inf": 3.2509536264712153,
+        "residual_inf": 3.2509536264701246,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7558,23 +7558,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 2.3099744339560857e-11
+        "residual_inf": 2.3092638912203256e-11
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 2.3099744339560857e-11
+        "residual_inf": 2.3092638912203256e-11
       },
       "agreement": {
-        "max_dp_bar": 2.8492763703980017e-11,
-        "max_dw_rpm": 4.8203219193965197e-11
+        "max_dp_bar": 2.850697455869522e-11,
+        "max_dw_rpm": 4.7975845518521965e-11
       }
     },
     {
       "case_id": "query-0171",
       "prediction": {
-        "residual_inf": 18.06496081364863,
+        "residual_inf": 18.06496081364791,
         "admissible": false,
         "rule": "cavitation",
         "reason": "converged with -4.2 bar in the circuit -- below vapour pressure, the model does not describe this"
@@ -7618,7 +7618,7 @@
     {
       "case_id": "query-0172",
       "prediction": {
-        "residual_inf": 15.85442484651233,
+        "residual_inf": 15.854424846514853,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7646,23 +7646,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 6.849631972727366e-12
+        "residual_inf": 6.856737400084967e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 6.849631972727366e-12
+        "residual_inf": 6.856737400084967e-12
       },
       "agreement": {
         "max_dp_bar": 9.076913443095691e-09,
-        "max_dw_rpm": 3.323179953440558e-09
+        "max_dw_rpm": 3.3230662666028365e-09
       }
     },
     {
       "case_id": "query-0173",
       "prediction": {
-        "residual_inf": 14.310164183989698,
+        "residual_inf": 14.310164183990526,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7706,7 +7706,7 @@
     {
       "case_id": "query-0174",
       "prediction": {
-        "residual_inf": 3.534226299825818,
+        "residual_inf": 3.534226299825349,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7750,7 +7750,7 @@
     {
       "case_id": "query-0175",
       "prediction": {
-        "residual_inf": 8.637915132088345,
+        "residual_inf": 8.63791513208902,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7778,23 +7778,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 3.552713678800501e-15
+        "residual_inf": 1.7763568394002505e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 3.552713678800501e-15
+        "residual_inf": 1.7763568394002505e-14
       },
       "agreement": {
-        "max_dp_bar": 2.842170943040401e-14,
+        "max_dp_bar": 1.4210854715202004e-14,
         "max_dw_rpm": 1.1368683772161603e-13
       }
     },
     {
       "case_id": "query-0176",
       "prediction": {
-        "residual_inf": 33.575918420851046,
+        "residual_inf": 33.575918420847586,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7822,13 +7822,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 8.98755914136018e-09
+        "residual_inf": 8.987548483219143e-09
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 8.98755914136018e-09
+        "residual_inf": 8.987548483219143e-09
       },
       "agreement": {
         "max_dp_bar": 3.834038864169997e-09,
@@ -7838,7 +7838,7 @@
     {
       "case_id": "query-0177",
       "prediction": {
-        "residual_inf": 3.1680555448662204,
+        "residual_inf": 3.168055544867114,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7882,7 +7882,7 @@
     {
       "case_id": "query-0178",
       "prediction": {
-        "residual_inf": 1.7645093252864186,
+        "residual_inf": 1.7645093252859496,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7910,23 +7910,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 2.1316282072803006e-14
+        "residual_inf": 4.263256414560601e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 3,
-        "residual_inf": 2.1316282072803006e-14
+        "residual_inf": 4.263256414560601e-14
       },
       "agreement": {
-        "max_dp_bar": 5.684341886080802e-14,
+        "max_dp_bar": 8.526512829121202e-14,
         "max_dw_rpm": 2.2737367544323206e-13
       }
     },
     {
       "case_id": "query-0179",
       "prediction": {
-        "residual_inf": 198.9010494075858,
+        "residual_inf": 198.90104940758462,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7970,7 +7970,7 @@
     {
       "case_id": "query-0180",
       "prediction": {
-        "residual_inf": 8.702892596172202,
+        "residual_inf": 8.702892596176184,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -7998,23 +7998,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.7763568394002505e-14
+        "residual_inf": 1.4210854715202004e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.7763568394002505e-14
+        "residual_inf": 1.4210854715202004e-14
       },
       "agreement": {
-        "max_dp_bar": 7.665214241114882e-09,
+        "max_dp_bar": 7.665228451969597e-09,
         "max_dw_rpm": 3.156742423016112e-08
       }
     },
     {
       "case_id": "query-0181",
       "prediction": {
-        "residual_inf": 11.317995376796617,
+        "residual_inf": 11.317995376796901,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8058,7 +8058,7 @@
     {
       "case_id": "query-0182",
       "prediction": {
-        "residual_inf": 6.473692477205812,
+        "residual_inf": 6.473692477207511,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8086,13 +8086,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 1.8951507030351422e-13
+        "residual_inf": 1.8240964294591322e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 7,
-        "residual_inf": 1.8951507030351422e-13
+        "residual_inf": 1.8240964294591322e-13
       },
       "agreement": {
         "max_dp_bar": 5.684341886080802e-14,
@@ -8102,7 +8102,7 @@
     {
       "case_id": "query-0183",
       "prediction": {
-        "residual_inf": 4.113955219517184,
+        "residual_inf": 4.11395521951771,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8139,14 +8139,14 @@
         "residual_inf": 6.700982879692674e-09
       },
       "agreement": {
-        "max_dp_bar": 7.463924589501403e-09,
-        "max_dw_rpm": 2.86983095065807e-08
+        "max_dp_bar": 7.463910378646688e-09,
+        "max_dw_rpm": 2.869842319341842e-08
       }
     },
     {
       "case_id": "query-0184",
       "prediction": {
-        "residual_inf": 6.6083950418645685,
+        "residual_inf": 6.6083950418653465,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8174,23 +8174,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.0658141036401503e-14
+        "residual_inf": 3.552713678800501e-15
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 1.0658141036401503e-14
+        "residual_inf": 3.552713678800501e-15
       },
       "agreement": {
-        "max_dp_bar": 2.842170943040401e-14,
+        "max_dp_bar": 7.105427357601002e-15,
         "max_dw_rpm": 1.1368683772161603e-13
       }
     },
     {
       "case_id": "query-0185",
       "prediction": {
-        "residual_inf": 11.531098534457836,
+        "residual_inf": 11.531098534458692,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8218,13 +8218,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 7.558398351648066e-13
+        "residual_inf": 7.629452625224076e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 6,
-        "residual_inf": 7.558398351648066e-13
+        "residual_inf": 7.629452625224076e-13
       },
       "agreement": {
         "max_dp_bar": 2.5579538487363607e-13,
@@ -8234,7 +8234,7 @@
     {
       "case_id": "query-0186",
       "prediction": {
-        "residual_inf": 11.020993004315198,
+        "residual_inf": 11.020993004316473,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8272,13 +8272,13 @@
       },
       "agreement": {
         "max_dp_bar": 7.105427357601002e-14,
-        "max_dw_rpm": 3.410605131648481e-13
+        "max_dw_rpm": 2.2737367544323206e-13
       }
     },
     {
       "case_id": "query-0187",
       "prediction": {
-        "residual_inf": 8.827690681793763,
+        "residual_inf": 8.827690681790779,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8322,7 +8322,7 @@
     {
       "case_id": "query-0188",
       "prediction": {
-        "residual_inf": 7.883337285833811,
+        "residual_inf": 7.883337285832017,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8360,13 +8360,13 @@
       },
       "agreement": {
         "max_dp_bar": 1.4210854715202004e-14,
-        "max_dw_rpm": 1.1368683772161603e-13
+        "max_dw_rpm": 2.2737367544323206e-13
       }
     },
     {
       "case_id": "query-0189",
       "prediction": {
-        "residual_inf": 11.349148655117283,
+        "residual_inf": 11.349148655117475,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8410,7 +8410,7 @@
     {
       "case_id": "query-0190",
       "prediction": {
-        "residual_inf": 9.297074828647272,
+        "residual_inf": 9.297074828647169,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8438,23 +8438,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 3.907985046680551e-14
+        "residual_inf": 4.263256414560601e-14
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 3.907985046680551e-14
+        "residual_inf": 4.263256414560601e-14
       },
       "agreement": {
-        "max_dp_bar": 1.1354273965480388e-08,
-        "max_dw_rpm": 1.8450236893841065e-08
+        "max_dp_bar": 1.1354259754625673e-08,
+        "max_dw_rpm": 1.8450123207003344e-08
       }
     },
     {
       "case_id": "query-0191",
       "prediction": {
-        "residual_inf": 13.948794934872708,
+        "residual_inf": 13.948794934873044,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8498,7 +8498,7 @@
     {
       "case_id": "query-0192",
       "prediction": {
-        "residual_inf": 13.663170386798903,
+        "residual_inf": 13.663170386798996,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8542,7 +8542,7 @@
     {
       "case_id": "query-0193",
       "prediction": {
-        "residual_inf": 195.7445034692376,
+        "residual_inf": 195.74450346932116,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8580,13 +8580,13 @@
       },
       "agreement": {
         "max_dp_bar": 2.842170943040401e-14,
-        "max_dw_rpm": 2.2737367544323206e-13
+        "max_dw_rpm": 0.0
       }
     },
     {
       "case_id": "query-0194",
       "prediction": {
-        "residual_inf": 70.2340229601115,
+        "residual_inf": 70.23402296010536,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8614,23 +8614,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 2.9598368200822733e-10
+        "residual_inf": 2.9600144557662134e-10
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 2.9598368200822733e-10
+        "residual_inf": 2.9600144557662134e-10
       },
       "agreement": {
-        "max_dp_bar": 1.056719156622421e-10,
+        "max_dp_bar": 1.056790210895997e-10,
         "max_dw_rpm": 8.066081136348657e-10
       }
     },
     {
       "case_id": "query-0195",
       "prediction": {
-        "residual_inf": 196.58940593194237,
+        "residual_inf": 196.58940593194305,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8658,13 +8658,13 @@
         "converged": true,
         "status": "converged",
         "iterations": 8,
-        "residual_inf": 3.597122599785507e-12
+        "residual_inf": 3.5988989566249074e-12
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 8,
-        "residual_inf": 3.597122599785507e-12
+        "residual_inf": 3.5988989566249074e-12
       },
       "agreement": {
         "max_dp_bar": 1.9771961845549413e-12,
@@ -8674,7 +8674,7 @@
     {
       "case_id": "query-0196",
       "prediction": {
-        "residual_inf": 51.69455381385229,
+        "residual_inf": 51.69455381384936,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8702,23 +8702,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 7.069900220812997e-13
+        "residual_inf": 7.140954494389007e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 5,
-        "residual_inf": 7.069900220812997e-13
+        "residual_inf": 7.140954494389007e-13
       },
       "agreement": {
-        "max_dp_bar": 4.192202140984591e-13,
+        "max_dp_bar": 4.263256414560601e-13,
         "max_dw_rpm": 3.183231456205249e-12
       }
     },
     {
       "case_id": "query-0197",
       "prediction": {
-        "residual_inf": 14.483731452254798,
+        "residual_inf": 14.48373145225434,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8746,23 +8746,23 @@
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.6290081223123707e-13
+        "residual_inf": 2.7711166694643907e-13
       },
       "verified": {
         "converged": true,
         "status": "converged",
         "iterations": 4,
-        "residual_inf": 2.6290081223123707e-13
+        "residual_inf": 2.7711166694643907e-13
       },
       "agreement": {
-        "max_dp_bar": 3.694822225952521e-13,
+        "max_dp_bar": 4.121147867408581e-13,
         "max_dw_rpm": 5.684341886080801e-13
       }
     },
     {
       "case_id": "query-0198",
       "prediction": {
-        "residual_inf": 6.515961828447502,
+        "residual_inf": 6.515961828452838,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8799,14 +8799,14 @@
         "residual_inf": 3.3516300845803926e-11
       },
       "agreement": {
-        "max_dp_bar": 1.1006306976923952e-11,
+        "max_dp_bar": 1.0999201549566351e-11,
         "max_dw_rpm": 8.969891496235505e-11
       }
     },
     {
       "case_id": "query-0199",
       "prediction": {
-        "residual_inf": 4.13051209688728,
+        "residual_inf": 4.130512096886562,
         "admissible": true,
         "rule": "ok",
         "reason": "stable operating point"
@@ -8844,7 +8844,7 @@
       },
       "agreement": {
         "max_dp_bar": 8.657252692501061e-11,
-        "max_dw_rpm": 4.0472514228895307e-11
+        "max_dw_rpm": 4.058620106661692e-11
       }
     }
   ]

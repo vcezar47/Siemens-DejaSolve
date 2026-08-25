@@ -1,0 +1,216 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Déjà Solve — networking layer. One VPC, two AZs, public subnets for the
+  ALB + a bastion, private subnets for ECS tasks and Aurora. Single NAT
+  gateway on purpose: this is a demo account against a time-boxed credit,
+  not a production HA target, and a second NAT is the single biggest
+  optional cost in this stack.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dejasolve
+  VpcCidr:
+    Type: String
+    Default: 10.42.0.0/16
+  PublicSubnet1Cidr:
+    Type: String
+    Default: 10.42.0.0/24
+  PublicSubnet2Cidr:
+    Type: String
+    Default: 10.42.1.0/24
+  PrivateSubnet1Cidr:
+    Type: String
+    Default: 10.42.10.0/24
+  PrivateSubnet2Cidr:
+    Type: String
+    Default: 10.42.11.0/24
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - { Key: Name, Value: !Sub "${EnvironmentName}-vpc" }
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-igw" }]
+
+  IGWAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnet1Cidr
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-public-1" }]
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnet2Cidr
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-public-2" }]
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet1Cidr
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-private-1" }]
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet2Cidr
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-private-2" }]
+
+  NatEip:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEip.AllocationId
+      SubnetId: !Ref PublicSubnet1
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-nat" }]
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-public-rt" }]
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: IGWAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: { SubnetId: !Ref PublicSubnet1, RouteTableId: !Ref PublicRouteTable }
+
+  PublicSubnet2RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: { SubnetId: !Ref PublicSubnet2, RouteTableId: !Ref PublicRouteTable }
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-private-rt" }]
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+
+  PrivateSubnet1RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: { SubnetId: !Ref PrivateSubnet1, RouteTableId: !Ref PrivateRouteTable }
+
+  PrivateSubnet2RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: { SubnetId: !Ref PrivateSubnet2, RouteTableId: !Ref PrivateRouteTable }
+
+  AlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ALB - public HTTP in, nothing else
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 80, ToPort: 80, CidrIp: 0.0.0.0/0 }
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-alb-sg" }]
+
+  EcsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ECS tasks - only from the ALB on the app port
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 8000, ToPort: 8000, SourceSecurityGroupId: !Ref AlbSecurityGroup }
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-ecs-sg" }]
+
+  AuroraSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Aurora - only from ECS tasks and the bastion, port 5432
+      VpcId: !Ref VPC
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-aurora-sg" }]
+
+  BastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SSM-only bastion - no inbound rules, no open SSH port
+      VpcId: !Ref VPC
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-bastion-sg" }]
+
+  AuroraIngressFromEcs:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref AuroraSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5432
+      ToPort: 5432
+      SourceSecurityGroupId: !Ref EcsSecurityGroup
+
+  AuroraIngressFromBastion:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref AuroraSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5432
+      ToPort: 5432
+      SourceSecurityGroupId: !Ref BastionSecurityGroup
+
+Outputs:
+  VpcId:
+    Value: !Ref VPC
+    Export: { Name: !Sub "${EnvironmentName}-VpcId" }
+  PublicSubnet1Id:
+    Value: !Ref PublicSubnet1
+    Export: { Name: !Sub "${EnvironmentName}-PublicSubnet1Id" }
+  PublicSubnet2Id:
+    Value: !Ref PublicSubnet2
+    Export: { Name: !Sub "${EnvironmentName}-PublicSubnet2Id" }
+  PrivateSubnet1Id:
+    Value: !Ref PrivateSubnet1
+    Export: { Name: !Sub "${EnvironmentName}-PrivateSubnet1Id" }
+  PrivateSubnet2Id:
+    Value: !Ref PrivateSubnet2
+    Export: { Name: !Sub "${EnvironmentName}-PrivateSubnet2Id" }
+  AlbSecurityGroupId:
+    Value: !Ref AlbSecurityGroup
+    Export: { Name: !Sub "${EnvironmentName}-AlbSecurityGroupId" }
+  EcsSecurityGroupId:
+    Value: !Ref EcsSecurityGroup
+    Export: { Name: !Sub "${EnvironmentName}-EcsSecurityGroupId" }
+  AuroraSecurityGroupId:
+    Value: !Ref AuroraSecurityGroup
+    Export: { Name: !Sub "${EnvironmentName}-AuroraSecurityGroupId" }
+  BastionSecurityGroupId:
+    Value: !Ref BastionSecurityGroup
+    Export: { Name: !Sub "${EnvironmentName}-BastionSecurityGroupId" }

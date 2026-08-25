@@ -47,6 +47,7 @@ import model
 OUT = Path("viz_results.json")
 RESULTS = Path("results.json")
 ARCHIVE = Path("archive/cases.jsonl")
+FAILURES = Path("archive/failures.jsonl")
 
 #: how many cases the contact sheet draws. Kept small on purpose: the sheet is
 #: there to read as a real archive at a glance, while the comparison the demo
@@ -149,6 +150,36 @@ def tile_payload(rec: dict, xyz: np.ndarray) -> dict:
         "relief_open": bool(rec["regime"]["relief_open"]),
         "relief_flow_share": float(rec["regime"]["relief_flow_share"]),
     }
+
+
+# --- the runs that died -----------------------------------------------------
+
+def failure_payload(path: Path) -> list[dict]:
+    """The failed runs, carried by their *setup* only.
+
+    A failure has no solved state -- that is what failure means -- so it cannot
+    be placed in the solution-space cloud the rest of this file draws, and it
+    cannot be rendered as a machine: there is no pressure to colour a pipe with
+    and no speed to turn a shaft at. What a failure does have is the setup that
+    produced it, so that is what is published, and the page places it by true
+    distance in the parameter space retrieval actually searches rather than by
+    a projection that would have to be caveated.
+    """
+    if not path.exists():
+        return []
+    out = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line:
+            continue
+        f = json.loads(line)
+        out.append({
+            "id": f["case_id"],
+            "status": f["status"],
+            "params": {k: float(f["params"][k]) for k in model.PARAM_NAMES},
+            "iterations": f.get("iterations"),
+            "residual_inf": f.get("residual_inf"),
+        })
+    return out
 
 
 # --- the race ---------------------------------------------------------------
@@ -263,6 +294,12 @@ def run(archive_path: Path = ARCHIVE, results_path: Path = RESULTS,
             ],
         },
         "parameter_space": parameter_space_fidelity(archive_norm),
+        # the sweep bounds, so the page can compute the *exact* normalised
+        # distance retrieval uses instead of measuring one off a projection
+        "param_bounds": {k: [float(model.PARAM_BOUNDS[k][0]),
+                             float(model.PARAM_BOUNDS[k][1])]
+                         for k in model.PARAM_NAMES},
+        "failures": failure_payload(FAILURES),
         "archive": [
             {"id": r["case_id"],
              "xyz": [round(float(v), 4) for v in xyz[i]],

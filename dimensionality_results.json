@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-24T10:18:24+00:00",
+  "generated_utc": "2026-08-24T13:29:49+00:00",
   "archive_size": 395,
   "n_queries": 200,
   "real_parameters": 7,
@@ -124,7 +124,7 @@
       },
       "same_neighbour_as_physics": 2,
       "relative_contrast": 0.09311576715961473,
-      "coverage_radius": 6.704230641245873,
+      "coverage_radius": 6.704230641245877,
       "gate_verdicts": {
         "ok": 198,
         "envelope": 1,
@@ -141,8 +141,8 @@
         "mean_iterations": 6.2
       },
       "same_neighbour_as_physics": 1,
-      "relative_contrast": 0.0516778241833701,
-      "coverage_radius": 12.51934088509604,
+      "relative_contrast": 0.051677824183370066,
+      "coverage_radius": 12.519340885096032,
       "gate_verdicts": {
         "ok": 196,
         "coverage": 3,

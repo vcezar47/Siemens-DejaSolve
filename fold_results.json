@@ -1353,7 +1353,7 @@
       "naive": {
         "converged": true,
         "iterations": 6,
-        "residual_inf": 7.460698725481052e-14,
+        "residual_inf": 7.815970093361102e-14,
         "admissible": true,
         "w_a": 660.2467406448383,
         "w_b": 650.911844536647
@@ -4150,7 +4150,7 @@
       "naive": {
         "converged": false,
         "iterations": 12,
-        "residual_inf": 0.3901562522301987,
+        "residual_inf": 0.3901562522301951,
         "admissible": false,
         "w_a": null,
         "w_b": null
@@ -4882,10 +4882,10 @@
       "naive": {
         "converged": true,
         "iterations": 9,
-        "residual_inf": 4.263256414560601e-14,
+        "residual_inf": 3.552713678800501e-14,
         "admissible": true,
         "w_a": 605.5946278716575,
-        "w_b": 871.8354598262353
+        "w_b": 871.8354598262354
       },
       "guarded": {
         "admissible": true,
@@ -4897,14 +4897,14 @@
         ],
         "iterations_total": 9,
         "w_a": 605.5946278716575,
-        "w_b": 871.8354598262353
+        "w_b": 871.8354598262354
       },
       "guarded_cold_fallback": {
         "resolved_by": "warm",
         "iterations_total": 9,
         "admissible": true,
         "w_a": 605.5946278716575,
-        "w_b": 871.8354598262353,
+        "w_b": 871.8354598262354,
         "same_answer": true
       }
     },
@@ -8368,7 +8368,7 @@
         "residual_inf": 3.9968028886505635e-14,
         "admissible": true,
         "w_a": 10.661932429266843,
-        "w_b": 10.746192771292426
+        "w_b": 10.746192771292446
       },
       "guarded": {
         "admissible": true,

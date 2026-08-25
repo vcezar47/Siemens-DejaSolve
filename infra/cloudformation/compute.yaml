@@ -1,0 +1,347 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Déjà Solve — compute layer. ECS Fargate cluster running two services from
+  one image (mirrors docker-compose.yml's own comment: two services, one
+  image, because that's what's honestly here): `ui` behind an ALB, and
+  `ingest-worker` pulling from the SQS queue in data.yaml. Task roles are
+  scoped per service rather than one shared admin-ish role.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dejasolve
+  ImageUri:
+    Type: String
+    Description: >-
+      <account-id>.dkr.ecr.<region>.amazonaws.com/dejasolve:latest — create the
+      repo and push this image (see README.md step 2) before deploying this
+      stack; it is a parameter, not a resource here, to avoid the
+      create-repo/push/deploy ordering problem
+  ContainerPort:
+    Type: Number
+    Default: 8000
+  UiDesiredCount:
+    Type: Number
+    Default: 1
+  IngestWorkerDesiredCount:
+    Type: Number
+    Default: 0
+    Description: >-
+      Leave at 0 until ingest_worker.py exists in the image (see README.md
+      §"wiring the app to this infrastructure") — the task definition below
+      names that entrypoint and will crash-loop without it.
+  RetrievalBackend:
+    Type: String
+    Default: file
+    AllowedValues: [file, aurora]
+    Description: >-
+      "file" (default) matches every benchmarked number exactly -- the ui
+      container reads the bundled archive/cases.jsonl, same as docker compose.
+      "aurora" points the live demo's retrieval at Aurora + pgvector instead;
+      requires sync_archive_to_aurora.py to have been run first.
+
+Resources:
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub "${EnvironmentName}-cluster"
+
+  UiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/ecs/${EnvironmentName}-ui"
+      RetentionInDays: 7
+
+  IngestWorkerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/ecs/${EnvironmentName}-ingest-worker"
+      RetentionInDays: 7
+
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - {
+              Effect: Allow,
+              Principal: { Service: ecs-tasks.amazonaws.com },
+              Action: sts:AssumeRole,
+            }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  UiTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - {
+              Effect: Allow,
+              Principal: { Service: ecs-tasks.amazonaws.com },
+              Action: sts:AssumeRole,
+            }
+      Policies:
+        - PolicyName: ui-task-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: [s3:GetObject, s3:ListBucket]
+                Resource:
+                  - Fn::Sub:
+                      - "arn:aws:s3:::${bucket}"
+                      - bucket:
+                          {
+                            Fn::ImportValue: !Sub "${EnvironmentName}-DataBucketName",
+                          }
+                  - Fn::Sub:
+                      - "arn:aws:s3:::${bucket}/*"
+                      - bucket:
+                          {
+                            Fn::ImportValue: !Sub "${EnvironmentName}-DataBucketName",
+                          }
+              - Effect: Allow
+                Action: [dynamodb:PutItem, dynamodb:Query, dynamodb:GetItem]
+                Resource:
+                  - Fn::Sub:
+                      - "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${table}"
+                      - table:
+                          {
+                            Fn::ImportValue: !Sub "${EnvironmentName}-AuditTableName",
+                          }
+              - Effect: Allow
+                Action: sqs:SendMessage
+                Resource:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-IngestQueueArn" }
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-AuroraSecretArn" }
+
+  IngestWorkerTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - {
+              Effect: Allow,
+              Principal: { Service: ecs-tasks.amazonaws.com },
+              Action: sts:AssumeRole,
+            }
+      Policies:
+        - PolicyName: ingest-worker-task-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  [
+                    sqs:ReceiveMessage,
+                    sqs:DeleteMessage,
+                    sqs:GetQueueAttributes,
+                  ]
+                Resource:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-IngestQueueArn" }
+              - Effect: Allow
+                Action: [s3:GetObject, s3:PutObject]
+                Resource:
+                  - Fn::Sub:
+                      - "arn:aws:s3:::${bucket}/*"
+                      - bucket:
+                          {
+                            Fn::ImportValue: !Sub "${EnvironmentName}-DataBucketName",
+                          }
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-AuroraSecretArn" }
+
+  UiTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${EnvironmentName}-ui"
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "512"
+      Memory: "1024"
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+      TaskRoleArn: !GetAtt UiTaskRole.Arn
+      ContainerDefinitions:
+        - Name: ui
+          Image: !Ref ImageUri
+          PortMappings: [{ ContainerPort: !Ref ContainerPort }]
+          Environment:
+            - {
+                Name: DATA_BUCKET,
+                Value:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-DataBucketName" },
+              }
+            - {
+                Name: AUDIT_TABLE,
+                Value:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-AuditTableName" },
+              }
+            - {
+                Name: INGEST_QUEUE_URL,
+                Value:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-IngestQueueUrl" },
+              }
+            - {
+                Name: AURORA_ENDPOINT,
+                Value:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-AuroraEndpoint" },
+              }
+            - {
+                Name: AURORA_SECRET_ARN,
+                Value:
+                  {
+                    Fn::ImportValue: !Sub "${EnvironmentName}-AuroraSecretArn",
+                  },
+              }
+            - { Name: RETRIEVAL_BACKEND, Value: !Ref RetrievalBackend }
+            - {
+                Name: OLLAMA_URL,
+                Value: { Fn::ImportValue: !Sub "${EnvironmentName}-OllamaUrl" },
+              }
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref UiLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ui
+
+  UiService:
+    Type: AWS::ECS::Service
+    DependsOn: Listener
+    Properties:
+      ServiceName: !Sub "${EnvironmentName}-ui"
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref UiTaskDefinition
+      DesiredCount: !Ref UiDesiredCount
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - Fn::ImportValue: !Sub "${EnvironmentName}-PrivateSubnet1Id"
+            - Fn::ImportValue: !Sub "${EnvironmentName}-PrivateSubnet2Id"
+          SecurityGroups:
+            - Fn::ImportValue: !Sub "${EnvironmentName}-EcsSecurityGroupId"
+      LoadBalancers:
+        - ContainerName: ui
+          ContainerPort: !Ref ContainerPort
+          TargetGroupArn: !Ref TargetGroup
+
+  IngestWorkerTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${EnvironmentName}-ingest-worker"
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "256"
+      Memory: "512"
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+      TaskRoleArn: !GetAtt IngestWorkerTaskRole.Arn
+      ContainerDefinitions:
+        - Name: ingest-worker
+          Image: !Ref ImageUri
+          Command: ["python", "ingest_worker.py"]
+          Environment:
+            - {
+                Name: DATA_BUCKET,
+                Value:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-DataBucketName" },
+              }
+            - {
+                Name: INGEST_QUEUE_URL,
+                Value:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-IngestQueueUrl" },
+              }
+            - {
+                Name: AURORA_ENDPOINT,
+                Value:
+                  { Fn::ImportValue: !Sub "${EnvironmentName}-AuroraEndpoint" },
+              }
+            - {
+                Name: AURORA_SECRET_ARN,
+                Value:
+                  {
+                    Fn::ImportValue: !Sub "${EnvironmentName}-AuroraSecretArn",
+                  },
+              }
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref IngestWorkerLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ingest-worker
+
+  IngestWorkerService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub "${EnvironmentName}-ingest-worker"
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref IngestWorkerTaskDefinition
+      DesiredCount: !Ref IngestWorkerDesiredCount
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - Fn::ImportValue: !Sub "${EnvironmentName}-PrivateSubnet1Id"
+            - Fn::ImportValue: !Sub "${EnvironmentName}-PrivateSubnet2Id"
+          SecurityGroups:
+            - Fn::ImportValue: !Sub "${EnvironmentName}-EcsSecurityGroupId"
+
+  Alb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub "${EnvironmentName}-alb"
+      Scheme: internet-facing
+      Type: application
+      Subnets:
+        - Fn::ImportValue: !Sub "${EnvironmentName}-PublicSubnet1Id"
+        - Fn::ImportValue: !Sub "${EnvironmentName}-PublicSubnet2Id"
+      SecurityGroups:
+        - Fn::ImportValue: !Sub "${EnvironmentName}-AlbSecurityGroupId"
+      LoadBalancerAttributes:
+        # ALB defaults to 60s, well under ingest_ollama()'s own 180s client
+        # timeout in ingest.py -- CPU-only inference on the Ollama EC2 instance
+        # is slow enough that the default was cutting the connection before
+        # the backend (correctly) finished. 300s gives a small margin above
+        # that 180s so a genuine backend timeout surfaces as ingest.py's own
+        # RuntimeError -- a real pipeline stage the UI can render -- rather
+        # than a bare ALB 504 with no context.
+        - { Key: idle_timeout.timeout_seconds, Value: "300" }
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${EnvironmentName}-ui-tg"
+      Port: !Ref ContainerPort
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: { Fn::ImportValue: !Sub "${EnvironmentName}-VpcId" }
+      HealthCheckPath: /api/health
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref Alb
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - { Type: forward, TargetGroupArn: !Ref TargetGroup }
+
+Outputs:
+  AlbDnsName:
+    Value: !GetAtt Alb.DNSName
+    Description: The demo URL — http://<this>/
+  ClusterName:
+    Value: !Ref Cluster

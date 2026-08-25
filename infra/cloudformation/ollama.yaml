@@ -1,0 +1,101 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Déjà Solve — Ollama, in the VPC. GPU instance families are quota-gated to 0
+  on this account (confirmed via Service Quotas before writing this), so this
+  runs the model on CPU instead: an 8-vCPU instance is well inside the
+  Standard-family quota alongside the bastion, and the extraction task here is
+  a short structured JSON output, not long-form generation, which is the case
+  CPU inference handles least badly. Depends only on network.yaml.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dejasolve
+  InstanceType:
+    Type: String
+    Default: c5.2xlarge
+  OllamaModel:
+    Type: String
+    Default: qwen2.5:7b
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+Resources:
+  OllamaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Ollama - only from ECS tasks, port 11434
+      VpcId: { Fn::ImportValue: !Sub "${EnvironmentName}-VpcId" }
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-ollama-sg" }]
+
+  OllamaIngressFromEcs:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref OllamaSecurityGroup
+      IpProtocol: tcp
+      FromPort: 11434
+      ToPort: 11434
+      SourceSecurityGroupId: { Fn::ImportValue: !Sub "${EnvironmentName}-EcsSecurityGroupId" }
+
+  OllamaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - { Effect: Allow, Principal: { Service: ec2.amazonaws.com }, Action: sts:AssumeRole }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  OllamaInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [!Ref OllamaRole]
+
+  OllamaInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref LatestAmiId
+      IamInstanceProfile: !Ref OllamaInstanceProfile
+      SubnetId: { Fn::ImportValue: !Sub "${EnvironmentName}-PrivateSubnet1Id" }
+      SecurityGroupIds: [!Ref OllamaSecurityGroup]
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs: { VolumeSize: 30, VolumeType: gp3 }
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/bash
+            set -x
+            curl -fsSL https://ollama.com/install.sh | sh
+
+            mkdir -p /etc/systemd/system/ollama.service.d
+            cat <<'EOF' > /etc/systemd/system/ollama.service.d/override.conf
+            [Service]
+            Environment="OLLAMA_HOST=0.0.0.0:11434"
+            EOF
+            systemctl daemon-reload
+            systemctl enable ollama
+            systemctl restart ollama
+
+            until curl -sf http://127.0.0.1:11434/api/tags >/dev/null; do sleep 2; done
+            # Run as the ollama system user, not root: cloud-init's root shell has
+            # no $HOME, which `ollama pull` needs and panics without -- and pulling
+            # as root would land the model in /root/.ollama anyway, a different
+            # place than the systemd-managed server (running as `ollama`) reads
+            # from. `-H` resolves $HOME from that user's own passwd entry rather
+            # than hardcoding a path that happens to match today's installer.
+            sudo -u ollama -H ollama pull ${OllamaModel}
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-ollama" }]
+
+Outputs:
+  OllamaPrivateIp:
+    Value: !GetAtt OllamaInstance.PrivateIp
+    Export: { Name: !Sub "${EnvironmentName}-OllamaPrivateIp" }
+  OllamaUrl:
+    Value: !Sub "http://${OllamaInstance.PrivateIp}:11434"
+    Export: { Name: !Sub "${EnvironmentName}-OllamaUrl" }
+  OllamaInstanceId:
+    Value: !Ref OllamaInstance

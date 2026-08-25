@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -39,6 +40,12 @@ api = FastAPI(title="Déjà Solve", version="0.3.0",
               description="Find the physically-nearest solved case, verify that "
                           "reusing it is legitimate, warm-start the solver.")
 
+#: "file" (default) reads archive/cases.jsonl exactly as every benchmark does.
+#: "aurora" points the *live demo's* retrieval at the Aurora + pgvector backend
+#: from docs/architecture.md instead -- additive, and never the default, so
+#: `docker compose up` with no AWS credentials is unaffected either way.
+RETRIEVAL_BACKEND = os.environ.get("RETRIEVAL_BACKEND", "file")
+
 _archive: dejasolve.Archive | None = None
 
 
@@ -46,11 +53,38 @@ def archive() -> dejasolve.Archive:
     """Loaded once, on first use — the sweep is 400 cases, not a database."""
     global _archive
     if _archive is None:
-        try:
-            _archive = dejasolve.Archive(ARCHIVE_PATH)
-        except FileNotFoundError as exc:
-            raise HTTPException(503, str(exc)) from exc
+        if RETRIEVAL_BACKEND == "aurora":
+            import archive_aurora
+            try:
+                _archive = archive_aurora.AuroraArchive()
+            except Exception as exc:
+                raise HTTPException(503, f"Aurora archive unavailable: {exc}") from exc
+        else:
+            try:
+                _archive = dejasolve.Archive(ARCHIVE_PATH)
+            except FileNotFoundError as exc:
+                raise HTTPException(503, str(exc)) from exc
     return _archive
+
+
+def _mirror_audit_to_dynamo(trace: dict) -> None:
+    """Best-effort copy of trace["audit"] into DynamoDB, for a durable,
+    cross-request audit trail -- see docs/architecture.md's "at scale" row.
+    A no-op wherever AUDIT_TABLE isn't set, and never allowed to fail the
+    request it's attached to: an audit trail nobody can retrieve is a gap,
+    but a demo that 500s because a mirror write failed would be worse.
+    """
+    table_name = os.environ.get("AUDIT_TABLE")
+    if not table_name or not trace.get("audit"):
+        return
+    try:
+        import boto3
+        table = boto3.resource("dynamodb").Table(table_name)
+        case_id = trace.get("card", {}).get("case_id") or trace["artifact"]
+        for entry in trace["audit"]:
+            table.put_item(Item={"case_id": case_id, "recorded_at": entry["at"], **entry})
+    except Exception as exc:  # noqa: BLE001 -- see docstring
+        print(f"audit mirror skipped: {exc}")
 
 
 class AnalyseRequest(BaseModel):
@@ -88,18 +122,29 @@ def health() -> dict:
     the network, and an option contradicting that -- greyed out or not -- is the
     one thing on screen an engineer will ask about.
     """
-    ok = ARCHIVE_PATH.exists()
+    # archive() can now reach out to Aurora (RETRIEVAL_BACKEND=aurora), and a
+    # health probe that fails whenever a backend hiccups gets the ECS task
+    # killed and cycled over something that should just be a reported field --
+    # the same reasoning ollama_available() already applies below.
+    try:
+        arc = archive()
+        archive_ok = True
+    except Exception as exc:  # noqa: BLE001 -- see comment above
+        arc, archive_ok = None, False
+        archive_error = str(exc)
     ollama_ok, ollama_detail = ingest.ollama_available()
     return {
-        "ok": ok,
-        "archive": str(ARCHIVE_PATH),
-        "archive_size": len(archive().records) if ok else 0,
+        "ok": archive_ok,
+        "archive": str(ARCHIVE_PATH) if RETRIEVAL_BACKEND == "file" else RETRIEVAL_BACKEND,
+        "retrieval_backend": RETRIEVAL_BACKEND,
+        "archive_size": len(arc.records) if archive_ok else 0,
         # The archive is two things now. Reporting only the solved half is how
         # the page ended up describing an archive that had changed underneath
         # it: an engineer asked for the failed runs to be kept, they are, and a
         # health endpoint that says "395 cases" is quietly incomplete.
-        "archive_failed": len(archive().failures) if ok else 0,
-        "failure_modes": archive().failure_modes if ok else {},
+        "archive_failed": len(arc.failures) if archive_ok else 0,
+        "failure_modes": arc.failure_modes if archive_ok else {},
+        **({} if archive_ok else {"archive_error": archive_error}),
         "parameters": list(model.PARAM_NAMES),
         "backends": {
             "hybrid": {"available": ollama_ok or ingest.credentials_available(),
@@ -360,6 +405,7 @@ def analyse(req: AnalyseRequest) -> JSONResponse:
     trace = dejasolve.analyse(req.text, req.name, archive(), backend=req.backend,
                               override=req.override, operator=req.operator,
                               basis=req.basis)
+    _mirror_audit_to_dynamo(trace)
     return JSONResponse(trace)
 
 

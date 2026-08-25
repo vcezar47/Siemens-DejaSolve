@@ -5,6 +5,15 @@ matplotlib>=3.8
 fastapi>=0.110
 uvicorn>=0.27
 
+# Phase 4's "at scale" backends (archive_aurora.py, ingest_worker.py, and
+# app.py's DynamoDB audit mirror). Every one of those is gated behind an
+# environment variable that defaults to off, so a plain `docker compose up`
+# with no AWS credentials never touches these -- they're real dependencies,
+# not optional ones, only because the code that uses them needs to actually
+# import successfully once switched on.
+boto3>=1.34
+psycopg2-binary>=2.9
+
 # Optional: the Claude ingest backend. Imported lazily inside ingest.ingest_llm,
 # so the pipeline runs without it and falls back to the deterministic parser.
 # anthropic>=0.116

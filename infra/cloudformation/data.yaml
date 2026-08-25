@@ -1,0 +1,168 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Déjà Solve — data layer. Maps docs/architecture.md's "at scale" row for
+  each layer onto a real resource: S3 for run artifacts, SQS for the ingest
+  queue, Aurora Serverless v2 (Postgres + pgvector) for the archive and
+  retrieval, DynamoDB for the audit trail (trace["audit"] is already an
+  append-only, case-keyed record — that is a DynamoDB access pattern, not a
+  relational one). An SSM-only bastion is included because Aurora sits in
+  private subnets and pgvector's CREATE EXTENSION is a one-time psql
+  statement, not a CloudFormation resource.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dejasolve
+  DbMasterUsername:
+    Type: String
+    Default: dejasolve_admin
+  AuroraMinCapacity:
+    Type: Number
+    Default: 0.5
+    Description: ACUs. 0.5 is the floor — this is a demo cluster, not a production one.
+  AuroraMaxCapacity:
+    Type: Number
+    Default: 2
+  BastionInstanceType:
+    Type: String
+    Default: t3.micro
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+Resources:
+  DataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${EnvironmentName}-data-${AWS::AccountId}-${AWS::Region}"
+      VersioningConfiguration: { Status: Enabled }
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-data" }]
+
+  IngestDlq:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${EnvironmentName}-ingest-dlq"
+      MessageRetentionPeriod: 1209600  # 14 days
+
+  IngestQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${EnvironmentName}-ingest-queue"
+      VisibilityTimeout: 120
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt IngestDlq.Arn
+        maxReceiveCount: 3
+
+  AuditTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${EnvironmentName}-audit"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: case_id, AttributeType: S }
+        - { AttributeName: recorded_at, AttributeType: S }
+      KeySchema:
+        - { AttributeName: case_id, KeyType: HASH }
+        - { AttributeName: recorded_at, KeyType: RANGE }
+
+  DbSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Private subnets for Aurora
+      SubnetIds:
+        - Fn::ImportValue: !Sub "${EnvironmentName}-PrivateSubnet1Id"
+        - Fn::ImportValue: !Sub "${EnvironmentName}-PrivateSubnet2Id"
+
+  AuroraCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora-postgresql
+      DatabaseName: dejasolve
+      MasterUsername: !Ref DbMasterUsername
+      ManageMasterUserPassword: true
+      DBSubnetGroupName: !Ref DbSubnetGroup
+      VpcSecurityGroupIds:
+        - Fn::ImportValue: !Sub "${EnvironmentName}-AuroraSecurityGroupId"
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: !Ref AuroraMinCapacity
+        MaxCapacity: !Ref AuroraMaxCapacity
+      StorageEncrypted: true
+      BackupRetentionPeriod: 1
+      DeletionProtection: false
+
+  AuroraInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      Engine: aurora-postgresql
+      DBInstanceClass: db.serverless
+      DBClusterIdentifier: !Ref AuroraCluster
+      PubliclyAccessible: false
+
+  BastionInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [!Ref BastionRole]
+
+  BastionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - { Effect: Allow, Principal: { Service: ec2.amazonaws.com }, Action: sts:AssumeRole }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+        - PolicyName: read-aurora-secret
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !GetAtt AuroraCluster.MasterUserSecret.SecretArn
+
+  BastionInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref BastionInstanceType
+      ImageId: !Ref LatestAmiId
+      IamInstanceProfile: !Ref BastionInstanceProfile
+      SubnetId:
+        Fn::ImportValue: !Sub "${EnvironmentName}-PublicSubnet1Id"
+      SecurityGroupIds:
+        - Fn::ImportValue: !Sub "${EnvironmentName}-BastionSecurityGroupId"
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          dnf install -y postgresql15
+      Tags: [{ Key: Name, Value: !Sub "${EnvironmentName}-bastion" }]
+
+Outputs:
+  DataBucketName:
+    Value: !Ref DataBucket
+    Export: { Name: !Sub "${EnvironmentName}-DataBucketName" }
+  IngestQueueUrl:
+    Value: !Ref IngestQueue
+    Export: { Name: !Sub "${EnvironmentName}-IngestQueueUrl" }
+  IngestQueueArn:
+    Value: !GetAtt IngestQueue.Arn
+    Export: { Name: !Sub "${EnvironmentName}-IngestQueueArn" }
+  AuditTableName:
+    Value: !Ref AuditTable
+    Export: { Name: !Sub "${EnvironmentName}-AuditTableName" }
+  AuroraClusterEndpoint:
+    Value: !GetAtt AuroraCluster.Endpoint.Address
+    Export: { Name: !Sub "${EnvironmentName}-AuroraEndpoint" }
+  AuroraSecretArn:
+    Value: !GetAtt AuroraCluster.MasterUserSecret.SecretArn
+    Export: { Name: !Sub "${EnvironmentName}-AuroraSecretArn" }
+  BastionInstanceId:
+    Value: !Ref BastionInstance

@@ -6,60 +6,121 @@
 <title>Déjà Solve</title>
 <style>
   :root{
-    --bg:#0e1416; --panel:#141d20; --panel-2:#1a2529; --line:#243237;
+    --bg:#0e1416; --panel:#141d20; --panel-2:#1a2529;
+    /* outlines read as near-black on purpose -- the colour budget goes to the
+       gradient below, and a bright border would compete with it everywhere
+       it appears. --line-soft is for internal hairlines that should recede
+       (table rows, the panel/section divider) rather than read as a frame. */
+    --line:#070b0c; --line-soft:#1c282c;
     --ink:#e6eef0; --dim:#8fa3a9; --faint:#5d7076;
     --teal:#00b3b3; --teal-dim:#0a6b6b;
     --ok:#3ddc97; --refuse:#ff6b5e; --warn:#ffb454; --skip:#3a4a50;
+    /* the brand gradient: petrol teal through cyan into a cooler blue. Used as
+       flowing text (the wordmark), a moving accent bar (header), and the
+       primary action -- three places, not everywhere, so it still reads as an
+       accent rather than wallpaper. Everywhere else keeps --teal. */
+    --grad-1:#00d9a3; --grad-2:#00b7d8; --grad-3:#1a90e8;
+    --grad: linear-gradient(90deg, var(--grad-1), var(--grad-2), var(--grad-3),
+                            var(--grad-2), var(--grad-1));
     --mono:ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,monospace;
   }
+  @keyframes gradflow{0%{background-position:0% 50%}
+                      100%{background-position:300% 50%}}
+  .gradtext{background:var(--grad);background-size:300% 100%;
+            -webkit-background-clip:text;background-clip:text;color:transparent;
+            -webkit-text-fill-color:transparent;
+            animation:gradflow 10s linear infinite}
+  @media(prefers-reduced-motion: reduce){
+    .gradtext,.run,header::after{animation:none!important}
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-       font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-  header{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
-         padding:18px 26px;border-bottom:1px solid var(--line);background:var(--panel)}
-  h1{margin:0;font-size:19px;letter-spacing:.2px}
-  h1 span{color:var(--teal)}
-  .tagline{color:var(--dim);font-size:13px}
-  .badges{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  body{margin:0;color:var(--ink);
+       font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;
+       /* the gradient as the page's own atmosphere rather than a UI accent:
+          three soft blooms of the brand hues, oversized and slowly drifting
+          behind everything. Panels stay fully opaque (--panel/--panel-2), so
+          this is only ever visible in the canvas and the gutters between
+          cards -- it never sits behind a table, a status colour, or a wire
+          diagram, which is where legibility actually lives on this page. */
+       background:
+         radial-gradient(58% 50% at 20% 34%, rgba(0,217,163,.20), transparent 70%),
+         radial-gradient(52% 50% at 84% 26%, rgba(26,144,232,.20), transparent 70%),
+         radial-gradient(60% 55% at 55% 108%, rgba(0,183,216,.15), transparent 70%),
+         var(--bg);
+       background-size:220% 220%,220% 220%,220% 220%,auto;
+       background-repeat:no-repeat;
+       animation:bgflow 34s ease-in-out infinite alternate}
+  @keyframes bgflow{
+    0%  {background-position:8% 6%,   92% 4%,  40% 100%, 0 0}
+    100%{background-position:26% 26%, 76% 26%, 58% 84%,  0 0}
+  }
+  @media(prefers-reduced-motion: reduce){ body{animation:none} }
+  header{position:relative;padding:38px 26px 26px;
+         border-bottom:1px solid var(--line);background:var(--panel);
+         overflow:hidden;display:flex;flex-direction:column;gap:20px}
+  /* a hero glow local to the header -- stronger and closer than the page wash
+     below it, so the title reads as the brightest thing on screen without the
+     header having to compete with the body's own drifting blooms */
+  header::before{content:'';position:absolute;inset:0;pointer-events:none;
+                background:
+                  radial-gradient(60% 160% at 6% -10%, rgba(0,217,163,.16), transparent 62%),
+                  radial-gradient(55% 160% at 96% -10%, rgba(26,144,232,.16), transparent 62%)}
+  header::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+                background:var(--grad);background-size:300% 100%;
+                animation:gradflow 7s linear infinite}
+  .hero{position:relative}
+  h1{margin:0;font-size:clamp(32px,4.6vw,52px);letter-spacing:-.01em;
+     font-weight:750;line-height:1.04}
+  h1 span{}
+  .tagline{position:relative;color:var(--dim);font-size:15px;margin-top:8px;
+           max-width:56ch}
+  .badges{position:relative;display:flex;gap:12px;flex-wrap:wrap}
   /* availability is a status, so it gets status colour, not just a suffix.
      Option colours render in the popup on Chromium/Firefox; the closed select
      is coloured directly so the state is visible without opening it. */
   select option.on{color:var(--ok)}
   select option.off{color:var(--refuse)}
   select.on{color:var(--ok)} select.off{color:var(--refuse)}
-  .badge{font:12px/1 var(--mono);color:var(--dim);background:var(--panel-2);
-         border:1px solid var(--line);border-radius:99px;padding:6px 11px;white-space:nowrap}
-  .badge b{color:var(--ink);font-weight:600}
+  .badge{display:inline-flex;align-items:baseline;gap:7px;
+         font:13px var(--mono);color:var(--dim);background:var(--panel-2);
+         border:1px solid var(--line);border-left:3px solid var(--badge-accent,var(--line));
+         border-radius:8px;padding:9px 15px;white-space:nowrap}
+  .badge b{color:var(--ink);font-weight:700;font-size:16px}
   main{display:grid;grid-template-columns:minmax(320px,1fr) minmax(420px,1.35fr);
        gap:20px;padding:20px 26px;align-items:start}
   @media(max-width:900px){main{grid-template-columns:1fr}}
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
   .panel > h2{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.9px;
-              color:var(--dim);padding:12px 16px;border-bottom:1px solid var(--line);
-              font-weight:600}
+              color:var(--dim);padding:12px 16px;font-weight:600;
+              border-bottom:2px solid transparent;
+              border-image:linear-gradient(90deg,var(--grad-1),var(--grad-3)) 1}
+  .geo h2,.mach h2,.ev h2{border-bottom:2px solid transparent;
+              border-image:linear-gradient(90deg,var(--grad-1),var(--grad-3)) 1;
+              padding-bottom:8px}
   .body{padding:16px}
   .samples{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
   button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--line);
          background:var(--panel-2);color:var(--ink);padding:7px 12px;transition:.14s}
   button:hover{border-color:var(--teal-dim);color:var(--teal)}
   button.chip{font:12px/1 var(--mono);padding:7px 10px}
-  button.chip.on{border-color:var(--teal);color:var(--teal);background:#0d2426}
+  button.chip.on{border-color:var(--grad-2);color:var(--grad-2);background:#0d2426}
   textarea{width:100%;height:260px;resize:vertical;background:var(--bg);color:var(--ink);
            border:1px solid var(--line);border-radius:8px;padding:12px;
            font:12.5px/1.55 var(--mono);tab-size:2}
-  textarea:focus{outline:none;border-color:var(--teal-dim)}
+  textarea:focus{outline:none;border-color:var(--grad-2)}
   .row{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
-  .run{background:var(--teal);border-color:var(--teal);color:#04201f;font-weight:650;
-       padding:9px 20px}
-  .run:hover{background:#00cfcf;color:#04201f}
-  .run:disabled{opacity:.5;cursor:default}
+  .run{background:var(--grad);background-size:300% 100%;border-color:transparent;
+       color:#03211d;font-weight:650;padding:9px 20px;
+       animation:gradflow 9s linear infinite}
+  .run:hover{filter:brightness(1.12)}
+  .run:disabled{opacity:.5;cursor:default;animation-play-state:paused}
   select{font:13px var(--mono);background:var(--panel-2);color:var(--ink);
          border:1px solid var(--line);border-radius:7px;padding:8px 10px}
   .hint{color:var(--faint);font-size:12px}
 
   /* pipeline */
   .stage{display:grid;grid-template-columns:26px 128px 1fr;gap:12px;align-items:start;
-         padding:13px 16px;border-bottom:1px solid var(--line);
+         padding:13px 16px;border-bottom:1px solid var(--line-soft);
          opacity:0;transform:translateY(5px);animation:in .32s ease forwards}
   @keyframes in{to{opacity:1;transform:none}}
   .stage:last-child{border-bottom:none}
@@ -95,14 +156,14 @@
   .metric .v.nominal{color:var(--warn)}
   .metric .v.same{color:var(--teal);font-size:17px}
   .arrow{color:var(--faint);font-size:20px}
-  .verdictbar{padding:11px 16px;font:12.8px var(--mono);border-bottom:1px solid var(--line)}
+  .verdictbar{padding:11px 16px;font:12.8px var(--mono);border-bottom:1px solid var(--line-soft)}
   .verdictbar.ok{color:var(--ok);background:rgba(61,220,151,.07)}
   .verdictbar.warned{color:var(--warn);background:rgba(255,180,84,.07)}
   .verdictbar.blocked{color:var(--refuse);background:rgba(255,107,94,.07)}
 
   /* the report: what the engineers asked for instead of a silent refusal --
      what happened, what it means, and what they can do about it */
-  .report{padding:14px 16px;border-bottom:1px solid var(--line)}
+  .report{padding:14px 16px;border-bottom:1px solid var(--line-soft)}
   .report.ok{background:rgba(61,220,151,.05);border-left:3px solid var(--ok)}
   .report.warned{background:rgba(255,180,84,.07);border-left:3px solid var(--warn)}
   .report.blocked{background:rgba(255,107,94,.07);border-left:3px solid var(--refuse)}
@@ -123,7 +184,7 @@
   .ovrbtn:hover{background:rgba(255,180,84,.12);border-color:var(--warn);color:var(--warn)}
 
   /* simulation is a departmental activity, so an accepted risk is attributed */
-  .audit{padding:12px 16px;border-top:1px solid var(--line);background:var(--panel-2)}
+  .audit{padding:12px 16px;border-top:1px solid var(--line-soft);background:var(--panel-2)}
   .audit .ahead{font:11px var(--mono);letter-spacing:1.1px;text-transform:uppercase;
                 color:var(--faint);margin-bottom:7px;font-weight:600}
   .audit .arow{font:11.8px/1.7 var(--mono);color:var(--dim)}
@@ -133,8 +194,8 @@
   table{width:100%;border-collapse:collapse;font:12.5px var(--mono)}
   th{text-align:left;color:var(--faint);font-weight:600;font-size:11px;
      text-transform:uppercase;letter-spacing:.6px;padding:9px 16px;
-     border-bottom:1px solid var(--line)}
-  td{padding:7px 16px;border-bottom:1px solid rgba(36,50,55,.5)}
+     border-bottom:1px solid var(--line-soft)}
+  td{padding:7px 16px;border-bottom:1px solid var(--line-soft)}
   tr:last-child td{border-bottom:none}
   td.num{text-align:right;color:var(--ink)}
   td.unit{color:var(--faint)} td.raw{color:var(--teal-dim);font-size:11.5px}
@@ -143,67 +204,6 @@
   .err{margin:16px;padding:12px;border:1px solid var(--refuse);border-radius:8px;
        color:var(--refuse);font:12.5px var(--mono)}
 
-  /* --- evidence: measured offline, shown beside the live pipeline ---------
-     Labelled rather than blended in. Everything above this line is the service
-     doing something now; everything below it is a number `run_all.py`
-     produced. A demo that shows both without saying which is which is the
-     failure mode this project is about. */
-  .ev{padding:0 26px 26px}
-  .ev > h2{margin:0 0 3px;font-size:12px;text-transform:uppercase;letter-spacing:.9px;
-           color:var(--dim);font-weight:600}
-  .ev .evsub{color:var(--faint);font-size:12px;margin-bottom:14px}
-  .ev .evsub code{color:var(--teal);background:var(--panel-2);padding:2px 6px;
-                  border-radius:5px;font-size:11.5px}
-  .evgrid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-  .card h3{margin:0 0 2px;font-size:13.5px;font-weight:650}
-  .card .cn{color:var(--faint);font-size:11.5px;margin-bottom:11px}
-  .card .lede{font:12.5px/1.55 var(--mono);color:var(--dim);margin-top:10px}
-  .card .lede b{color:var(--ink)}
-
-  .bars{display:flex;flex-direction:column;gap:7px}
-  .bar{display:grid;grid-template-columns:78px 1fr 46px;gap:9px;align-items:center;
-       font:12px var(--mono)}
-  .bar .bl{color:var(--dim);text-align:right}
-  .bar .bt{height:15px;border-radius:4px;background:var(--teal-dim);opacity:.85}
-  .bar .bv{color:var(--ink);font-weight:600}
-  .bar.best .bt{background:var(--ok)} .bar.best .bv{color:var(--ok)}
-  .bar.worst .bt{background:var(--refuse)} .bar.worst .bv{color:var(--refuse)}
-  .bar.mid .bt{background:var(--warn)} .bar.mid .bv{color:var(--warn)}
-
-  .cmp{width:100%;border-collapse:collapse;font:12px var(--mono)}
-  .cmp th{color:var(--faint);font-size:10.5px;text-transform:uppercase;
-          letter-spacing:.6px;padding:0 0 7px;text-align:right;font-weight:600}
-  .cmp th:first-child{text-align:left}
-  .cmp td{padding:5px 0;border-top:1px solid rgba(36,50,55,.6);text-align:right;color:var(--ink)}
-  .cmp td:first-child{text-align:left;color:var(--dim)}
-  .cmp tr.alarm td{color:var(--refuse);font-weight:650}
-  .cmp tr.alarm td:first-child{color:var(--refuse)}
-  .cmp tr.good td{color:var(--ok);font-weight:650}
-  .cmp tr.good td:first-child{color:var(--ok)}
-
-  .kv{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}
-  .kv > div{min-width:88px}
-  .kv .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint)}
-  .kv .v{font:17px/1.3 var(--mono);font-weight:650}
-  .kv .v.ok{color:var(--ok)} .kv .v.warn{color:var(--warn)} .kv .v.bad{color:var(--refuse)}
-  .kv .v.dim{color:var(--dim);font-size:14px}
-  .chart{margin-top:4px}
-  .chart text{fill:var(--faint);font:10px var(--mono)}
-  .evmissing{color:var(--warn);font:12px var(--mono);padding:10px 0}
-  .card.wide{grid-column:1/-1}
-  .rkgrid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-  .rkc .rkh{font:11px var(--mono);color:var(--faint);text-transform:uppercase;
-            letter-spacing:.7px;margin-bottom:9px}
-  .rkc .rkn{font:10.5px var(--mono);color:var(--faint);margin:-4px 0 7px 87px}
-  .rkc .rkf{margin-top:9px;font:11.5px/1.6 var(--mono);color:var(--dim)}
-  .rkc .rkf b{color:var(--ink)}
-  /* the numbers above are only worth reading if the invariants under them hold */
-  .inv{font:11.5px var(--mono);padding:8px 11px;margin-bottom:12px;border-radius:7px;
-       border:1px solid var(--line);background:var(--panel)}
-  .inv.ok{color:var(--ok);border-color:rgba(61,220,151,.35)}
-  .inv.bad{color:var(--refuse);border-color:var(--refuse)}
-  .inv b{color:var(--ink)}
 /* --- the geometry view ------------------------------------------------- */
 .geo{max-width:1180px;margin:26px auto 0;padding:0 18px}
 .geo h2{font-size:15px;letter-spacing:.08em;text-transform:uppercase;
@@ -268,12 +268,24 @@
 .machview{width:100%;display:block;background:var(--panel);touch-action:none;
           border:1px solid var(--line);border-radius:8px;cursor:grab;user-select:none}
 .machview:active{cursor:grabbing}
+
+/* --- the failed runs ---------------------------------------------------- */
+.failwrap{background:var(--panel);border:1px solid var(--line);border-radius:8px;
+          padding:10px 12px 12px;margin-top:14px}
+.failwrap h3{margin:0 0 6px;font-size:13px;color:var(--ink);font-weight:600;
+             display:flex;align-items:baseline;gap:8px}
+.failwrap .failn{font-size:11px;color:var(--refuse);font-family:var(--mono);font-weight:400}
+.failnote{color:var(--faint);font-size:11.5px;line-height:1.6;margin-top:4px}
+.failnote b{color:var(--dim)}
+
 </style>
 </head>
 <body>
 <header>
-  <h1>Déjà <span>Solve</span></h1>
-  <div class="tagline">Every solver run starts from zero. This one doesn't.</div>
+  <div class="hero">
+    <h1>Déjà <span class="gradtext">Solve</span></h1>
+    <div class="tagline">Every solver run starts from zero. This one doesn't.</div>
+  </div>
   <div class="badges" id="badges"></div>
 </header>
 
@@ -325,18 +337,15 @@
       <div class="geonums" id="geonums"></div>
     </div>
   </div>
+  <div class="failwrap" id="failwrap"></div>
 </section>
 
 <section class="mach" id="mach">
   <h2>The machine</h2>
   <div class="machsub" id="machsub">
-    The circuit being solved &mdash; reservoir, pump, manifold block, relief valve,
-    two feed lines through their orifices, two motors. <b>The layout is illustrative:
-    the model is lumped, so it has no geometry and nothing here was meshed or
-    simulated in space.</b> What is solved is what you see &mdash; pipe colour is the
-    solved pressure at that node, the orifice bore is the valve&rsquo;s real flow area,
-    the relief valve stands open only when the solved regime says it does, and each
-    shaft turns at its own solved speed (slowed to watch; the ratio is solved).
+    The circuit being solved. Pipe colour is solved pressure, bore is the valve's real
+    flow area, each shaft turns at its solved speed. The layout is illustrative &mdash;
+    the model is lumped and has no geometry.
   </div>
   <div class="georow" style="margin-bottom:8px">
     <button class="geobtn" id="machspin">Stop</button>
@@ -352,13 +361,6 @@
   </div>
   <div class="geonums" id="machdiff"></div>
   <div class="geocap" id="machnote"></div>
-</section>
-
-<section class="ev">
-  <h2>Evidence</h2>
-  <div class="evsub">Measured offline, not computed for this page &mdash;
-    regenerate every number with <code>python run_all.py</code>.</div>
-  <div id="evidence"></div>
 </section>
 
 <script>
@@ -391,11 +393,17 @@ function renderHealth(h){
   // the more expensive half of what the archive knows.
   const failed = h.archive_failed
     ? ` <span style="color:var(--warn)">&middot; <b>${h.archive_failed}</b> failed</span>` : '';
+  //: each stat gets a category accent (--badge-accent) so archive / ingest /
+  //: local read as three distinct facts at a glance, the way a dashboard's
+  //: KPI row does, rather than as one run of small grey text.
   $('#badges').innerHTML =
-    `<span class="badge">archive <b>${h.archive_size}</b> solved${failed}</span>` +
-    `<span class="badge">ingest <b>${ready.join(' + ') || 'none'}</b></span>` +
+    `<span class="badge" style="--badge-accent:var(--grad-1)">archive
+       <b>${h.archive_size}</b> solved${failed}</span>` +
+    `<span class="badge" style="--badge-accent:var(--grad-3)">ingest
+       <b>${ready.join(' + ') || 'none'}</b></span>` +
     (B.ollama && B.ollama.available
-      ? `<span class="badge" style="color:var(--ok)">local <b>on-prem</b></span>` : '');
+      ? `<span class="badge" style="--badge-accent:var(--ok);color:var(--ok)">local
+           <b>on-prem</b></span>` : '');
 
   // Whatever /api/health offers is what the page offers — the list is not
   // written out here, so a backend can never exist on one side only.
@@ -448,209 +456,6 @@ async function refreshHealth(){
   catch(e){ /* transient: keep showing the last known state */ }
 }
 
-
-//: Everything below renders `/api/evidence` -- numbers `run_all.py` measured,
-//: never anything the service computed for this page view. The heading says so
-//: rather than leaving the viewer to work out which half is which.
-const f2 = v => (v === null || v === undefined) ? '-' : (+v).toFixed(2);
-const f3 = v => (v === null || v === undefined) ? '-' : (+v).toFixed(3);
-
-function bars(arms, opts){
-  const vals = arms.map(a => a.mean).filter(v => v != null);
-  const max = Math.max(...vals);
-  const best = Math.min(...vals);
-  return `<div class="bars">` + arms.map(a => {
-    const cls = a.mean === best ? 'best' : a.mean === max ? 'worst'
-              : (opts && opts.mid === a.label) ? 'mid' : '';
-    const w = a.mean == null ? 0 : (a.mean / max) * 100;
-    return `<div class="bar ${cls}"><div class="bl">${esc(a.label)}</div>` +
-           `<div><div class="bt" style="width:${w}%"></div></div>` +
-           `<div class="bv">${f2(a.mean)}</div></div>`;
-  }).join('') + `</div>`;
-}
-
-//: A hand-drawn SVG rather than a charting library: the page is one file with
-//: no CDN, and this is 30 lines. Log x because the interesting range spans 7 to
-//: 1007; y is a percentage so both series share one axis honestly.
-function lineChart(series, xs){
-  const W = 340, H = 150, L = 30, R = 8, T = 10, B = 24;
-  const lx = v => Math.log10(v);
-  const x0 = lx(Math.min(...xs)), x1 = lx(Math.max(...xs));
-  const px = v => L + (lx(v) - x0) / (x1 - x0) * (W - L - R);
-  const py = v => H - B - (v / 100) * (H - T - B);
-  const grid = [0, 50, 100].map(v =>
-    `<line x1="${L}" y1="${py(v)}" x2="${W - R}" y2="${py(v)}"
-           stroke="#243237" stroke-width="1"/>
-     <text x="${L - 5}" y="${py(v) + 3}" text-anchor="end">${v}</text>`).join('');
-  const ticks = [xs[0], xs[Math.floor(xs.length / 2)], xs[xs.length - 1]].map(v =>
-    `<text x="${px(v)}" y="${H - 8}" text-anchor="middle">${v}</text>`).join('');
-  const paths = series.map(s => {
-    const d = s.pts.map((p, i) => `${i ? 'L' : 'M'}${px(p[0])},${py(p[1])}`).join(' ');
-    const dots = s.pts.map(p =>
-      `<circle cx="${px(p[0])}" cy="${py(p[1])}" r="3" fill="${s.color}"/>`).join('');
-    return `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2"/>${dots}`;
-  }).join('');
-  const key = series.map((s, i) =>
-    `<text x="${L + 4}" y="${T + 12 + i * 13}" fill="${s.color}">${esc(s.label)}</text>`).join('');
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img">
-            ${grid}${ticks}${paths}${key}</svg>`;
-}
-
-function drawEvidence(ev){
-  const S = ev.sections || {};
-  const cards = [];
-
-  if(S.phase1){
-    const a = S.phase1;
-    cards.push(`<div class="card"><h3>${esc(a.title)}</h3>
-      <div class="cn">${a.n} fresh cases &middot; ${esc(a.basis)}</div>
-      ${bars(a.arms, {mid: 'nominal'})}
-      <div class="lede">The <b>nominal</b> guess is the baseline that matters &mdash;
-        a flat start is one nobody ships. <b>31% fewer iterations</b> than a good
-        engineering guess.</div></div>`);
-  }
-
-  if(S.surrogate){
-    const s = S.surrogate;
-    cards.push(`<div class="card"><h3>${esc(s.title)}</h3>
-      <div class="cn">${s.n} cases &middot; ${esc(s.basis)}</div>
-      ${bars(s.arms, {mid: 'nominal'})}
-      <div class="lede">And it is <b>not an answer</b>: median residual
-        <b>${(+s.residual_median).toFixed(2)}</b> against a solver tolerance of
-        ${s.solver_tolerance}. <b>${s.were_solutions} of ${s.n}</b> predictions were
-        solutions. The best starting guess is the one that satisfies nothing.</div></div>`);
-  }
-
-  if(S.fold){
-    const f = S.fold;
-    cards.push(`<div class="card"><h3>${esc(f.title)}</h3>
-      <div class="cn">the fold circuit, where the guess selects the answer &middot; ${f.n} cases</div>
-      <table class="cmp"><thead><tr><th></th><th>retrieval</th><th>prediction</th></tr></thead>
-      <tbody>${f.rows.map(r =>
-        `<tr class="${r.alarm ? 'alarm' : r.good ? 'good' : ''}">
-           <td>${esc(r.label)}</td><td>${r.retrieval}</td><td>${r.prediction}</td></tr>`).join('')}
-      </tbody></table>
-      <div class="lede">The prediction wins on speed and is <b>ten times more dangerous</b>
-        unverified. Retrieval fails loudly 49 times; the prediction converges and is
-        wrong 40 times. <b>Verified, both are zero.</b></div></div>`);
-  }
-
-  if(S.failures){
-    const x = S.failures;
-    cards.push(`<div class="card"><h3>${esc(x.title)}</h3>
-      <div class="cn">${x.archive.succeeded} solved / ${x.archive.failed} failed in the archive</div>
-      <div class="kv">
-        <div><div class="k">will this run die?</div>
-             <div class="v ok">${f3(x.auc_hard_case)}</div></div>
-        <div><div class="k">control</div>
-             <div class="v dim">${f3(x.auc_control)}</div></div>
-        <div><div class="k">will reuse go wrong?</div>
-             <div class="v warn">${f3(x.auc_bad_transfer)}</div></div>
-      </div>
-      <div class="lede">AUC, 0.50 is a coin flip. The failures carry information the
-        successes do not (<b>0.65 &rarr; 0.77</b>) &mdash; but they predict a hard
-        <b>case</b>, not an illegitimate <b>transfer</b>. So: <b>${esc(x.verdict)}</b>.</div></div>`);
-  }
-
-  if(S.dimensionality){
-    const d = S.dimensionality;
-    const xs = d.points.map(p => p.width);
-    const chart = lineChart([
-      {label: 'admitted by the distance gate', color: '#ffb454',
-       pts: d.points.map(p => [p.width, 100 * p.admitted / d.n])},
-      {label: 'found the right neighbour', color: '#1f77b4',
-       pts: d.points.map(p => [p.width, 100 * p.same_pick / d.n])},
-    ], xs);
-    const last = d.points[d.points.length - 1];
-    cards.push(`<div class="card"><h3>${esc(d.title)}</h3>
-      <div class="cn">% of ${d.n} queries &middot; Case Card width, 7 real + inert</div>
-      ${chart}
-      <div class="lede">At <b>${last.width}</b> parameters retrieval picks the right
-        neighbour <b>${last.same_pick} time${last.same_pick === 1 ? '' : 's'} in ${d.n}</b>
-        &mdash; and the distance gate still admits it. Iterations only slip
-        ${f2(d.warm_physics)} &rarr; <b>${f2(last.mean)}</b>, so nothing looks wrong.
-        <b>A distance threshold cannot detect the failure of a distance metric.</b></div></div>`);
-  }
-
-  if(S.wide){
-    const w = S.wide;
-    const scan = w.scan && w.scan.length
-      ? `<table class="cmp"><thead><tr><th>per-unit scatter</th>
-           <th>admitted</th><th>refused as other hardware</th></tr></thead><tbody>` +
-        w.scan.map(r => `<tr class="${r.refused_hardware > r.admitted ? 'alarm' : ''}">
-            <td>${(r.tolerance * 100).toFixed(0)}%</td>
-            <td>${r.admitted}/${r.n}</td><td>${r.refused_hardware}</td></tr>`).join('') +
-        `</tbody></table>` : '';
-    cards.push(`<div class="card"><h3>${esc(w.title)}</h3>
-      <div class="cn">${w.parameters.swept} operating + ${w.parameters.hardware}
-        hardware parameters &middot; ${w.n} cases</div>
-      ${bars(w.arms.filter(a => a.label !== 'warm_gated')
-               .map(a => ({...a, label: a.label === 'warm_naive' ? 'warm' : a.label})),
-             {mid: 'nominal'})}
-      ${scan}
-      <div class="lede">Retrieval holds when the extra parameters are <b>real</b>:
-        <b>26%</b> under the nominal guess. And with hardware on the Case Card the
-        index separates machines by itself &mdash; <b>${w.cross_machine} of ${w.n}</b>
-        neighbours came from another machine.
-        <br><br>The table is the <b>hardware rule</b>, which no experiment could
-        reach until hardware varied. It compares the norm of the relative
-        difference against a <b>${(w.band * 100).toFixed(0)}%</b> band: same-design
-        units stay admitted through 2% scatter, and at 5% &mdash; scatter as wide as
-        the band &mdash; it refuses, correctly. <b>The band has to exceed the fleet's
-        own scatter.</b> An exact match instead of a band refused all 200, including
-        every same-machine transfer.</div></div>`);
-  }
-
-  if(S.ranking){
-    const rk = S.ranking;
-    // One card, both circuits. Bars are scaled against the worst arm so the
-    // bunching is the visible thing: every achievable ranker lands in the same
-    // place and the oracle does not.
-    const block = c => {
-      const worst = Math.max(...c.arms.map(a => a.total));
-      const best = Math.min(...c.arms.map(a => a.total));
-      return `<div class="rkc"><div class="rkh">${esc(c.circuit)} circuit &middot;
-          ${c.n} queries &middot; k=${c.k}</div>` +
-        c.arms.map(a => {
-          const cls = a.total === best ? 'best' : a.total === worst ? 'worst' : '';
-          return `<div class="bar ${cls}"><div class="bl">${esc(a.label)}</div>
-            <div><div class="bt" style="width:${(a.total / worst) * 100}%"></div></div>
-            <div class="bv">${a.total}</div></div>
-            <div class="rkn">${esc(a.note)}</div>`;
-        }).join('') +
-        `<div class="rkf">distance already picked the best candidate
-           <b>${c.distance_optimal}</b> of ${c.of_admitted} times &middot;
-           headroom for any ranker <b>${c.headroom_pct.toFixed(1)}%</b></div></div>`;
-    };
-    cards.push(`<div class="card wide"><h3>${esc(rk.title)}</h3>
-      <div class="cn">the oracle solves every candidate &mdash; it is the bound, not an arm</div>
-      <div class="rkgrid">${rk.circuits.map(block).join('')}</div>
-      <div class="lede">${rk.model_ran
-        ? `Every achievable ranker lands within a few percent of the others, and
-           <b>the models rank at or below the random floor</b> &mdash; a 7.6B model
-           does no better than a 3.4B one, so it is the task and not the size.
-           Ranking by physics is <b>identical</b> to distance on the fold circuit,
-           because the gate already spent that information deciding admission.
-           <b>A signal cannot be spent twice.</b> The 12&ndash;14% an oracle wins
-           is real, and nothing here can see it.`
-        : `The model arm has not been run on this machine &mdash;
-           <code>python agent_select.py --model granite4</code>. The arms shown are
-           deterministic.`}</div></div>`);
-  }
-
-  const miss = (ev.missing || []).length
-    ? `<div class="evmissing">not measured yet: ${ev.missing.join(', ')}
-       &mdash; run <code>${esc(ev.reproduce)}</code></div>` : '';
-  const st = ev.selftest;
-  const inv = st
-    ? `<div class="inv ${st.passed === st.total ? 'ok' : 'bad'}">
-         invariants <b>${st.passed}/${st.total}</b> passing &middot;
-         analytic Jacobian agrees with central differences to
-         ${st.jacobian_worst.toExponential(1)} &middot;
-         hardware defaults ${st.defaults_exact ? 'exact' : 'NOT exact'}</div>` : '';
-  $('#evidence').innerHTML = miss + inv +
-    `<div class="evgrid">${cards.join('')}</div>`;
-}
 
 /* --- the geometry view --------------------------------------------------
 //: Three beats on one viewport: where the archive's solved states sit, which
@@ -725,9 +530,9 @@ function adoptTrace(t){
        &mdash; the artifact you just analysed, and the case retrieval chose for it</span>`;
   $('#livereset').onclick = () => {
     LIVE = null; GEO.bounds = geoBounds(); $('#liverow').innerHTML = '';
-    renderControls(); renderView(); renderMachPanel();
+    renderControls(); renderView(); renderMachPanel(); renderFailures();
   };
-  renderControls(); renderView(); renderMachPanel();
+  renderControls(); renderView(); renderMachPanel(); renderFailures();
 }
 
 //: from here down, the views ask these two for their subject instead of
@@ -917,56 +722,23 @@ function renderControls(){
 
 const CAPTION = {
   archive: () => {
-    const p = VIZ.projection, q = VIZ.parameter_space;
-    return `${VIZ.config.archive_size} solved cases, placed by <b>where their answer
-      landed</b> &mdash; five pressures and two shaft speeds, projected onto three
-      principal axes carrying <b>${p.top3_variance_pct}%</b> of the variance
-      (distance fidelity r&nbsp;=&nbsp;${p.distance_fidelity_r}). The states fall on a
-      thin sheet: the seven unknowns are coupled by the circuit, so the answers are
-      effectively two-dimensional even though the inputs are not. <b>Retrieval does
-      not search this space</b> &mdash; it searches the seven parameters, which have no
-      such structure (three axes carry only ${q.top3_variance_pct}%, r&nbsp;=&nbsp;${q.distance_fidelity_r}),
-      which is why every distance quoted here is a true seven-parameter distance
-      rather than one measured on screen.`;
+    const p = VIZ.projection;
+    return `${VIZ.config.archive_size} solved cases, placed by where their answer landed.
+      Three axes carry <b>${p.top3_variance_pct}%</b> of the variance. Distances quoted
+      here are true seven-parameter distances, not screen distances.`;
   },
   pair: () => {
-    const P = subjectPair();
-    const g = pairGap(P);
-    if(P.live) return `<b>${esc(P.query.id)}</b> is the artifact you just analysed &mdash;
-      a run this archive has never seen. Its nearest neighbour on the seven setup
-      parameters is <b>${esc(P.neighbour.id)}</b>, at a true distance of
-      <b>${(+P.distance).toFixed(3)}</b>. Their solved states differ by
-      <b>${g.dp.toFixed(1)} bar</b> and <b>${Math.round(g.dw)} rev/min</b>. This is the
-      same retrieval the pipeline above ran &mdash; the picture is not a re-enactment
-      of it, it is the result of it.`;
-    const p = VIZ.pair;
-    return `<b>${esc(p.query.id)}</b> is a case the archive has never seen. Its nearest
-      neighbour on the seven setup parameters is <b>${esc(p.neighbour.id)}</b>, at a true
-      distance of <b>${p.setup_distance.toFixed(3)}</b> in the normalised parameter space.
-      Their solved states differ by <b>${p.state_gap_bar.toFixed(1)} bar</b> and
-      <b>${Math.round(p.state_gap_rpm)} rev/min</b> &mdash; close, and not the answer. That
-      gap is the whole proposition: near enough to start from, far enough that it still
-      has to be solved and verified.`;
+    const P = subjectPair(), g = pairGap(P);
+    return `<b>${esc(P.query.id)}</b> &rarr; <b>${esc(P.neighbour.id)}</b> at distance
+      <b>${(+P.distance).toFixed(3)}</b>. Solved states differ by
+      <b>${g.dp.toFixed(1)} bar</b> and <b>${Math.round(g.dw)} rev/min</b>.`;
   },
   race: () => {
-    const P = subjectPair(), R = subjectRace();
-    if(P.live) return `The artifact you just analysed, solved three ways. Same residual,
-      same Jacobian, same tolerance &mdash; <b>the only thing that differs is where the
-      solver starts.</b> Cold takes <b>${R.cold.iterations}</b> iterations, an engineer's
-      nominal guess <b>${R.nominal ? R.nominal.iterations : '&mdash;'}</b>, and starting
-      from <b>${esc(P.neighbour.id)}</b>'s state
-      <b>${R.warm ? R.warm.iterations : '&mdash;'}</b>. These are the iterate paths the
-      pipeline actually walked for your run, not a stored example.`;
-    const r = VIZ.race, g = r.warm.agreement_vs_cold;
-    return `The same query, the same residual, the same Jacobian, the same tolerance.
-      <b>The only thing that differs is where the solver starts.</b> Cold begins with every
-      unknown at zero, far off the sheet, and takes <b>${r.cold.iterations}</b> iterations;
-      an engineer's nominal guess takes <b>${r.nominal.iterations}</b>; starting from the
-      retrieved neighbour's state takes <b>${r.warm.iterations}</b>. All three land in the
-      same place &mdash; warm and cold agree to
-      <b>${(+g.max_dp_bar).toExponential(1)} bar</b> and
-      <b>${(+g.max_dw_rpm).toExponential(1)} rev/min</b>. A faster route to the same answer,
-      not a different answer.`;
+    const R = subjectRace();
+    const n = k => R[k] ? R[k].iterations : '&mdash;';
+    return `Only the starting point differs. Cold <b>${n('cold')}</b>,
+      nominal <b>${n('nominal')}</b>, warm <b>${n('warm')}</b> iterations &mdash;
+      same answer.`;
   },
 };
 
@@ -1009,6 +781,64 @@ function schematic(c, w){
     ${branch(18, s.p2a, s.p3a, s.w_a, p.A_valve_a)}
     ${branch(66, s.p2b, s.p3b, s.w_b, p.A_valve_b)}
   </svg>`;
+}
+
+/* --- the runs that died --------------------------------------------------
+//: Failures cannot go in the cloud above: that view is drawn in solution
+//: space and a failed run has no solution. They are placed here on the one
+//: axis that needs no projection at all -- true Euclidean distance in the
+//: normalised parameter space retrieval actually searches -- so nothing about
+//: this strip is approximate. The nearest *solved* case is drawn on the same
+//: axis, because a distance means nothing without the scale beside it.
+*/
+function normParams(p){
+  const B = VIZ.param_bounds;
+  return VIZ.param_names.map(k => (p[k] - B[k][0]) / (B[k][1] - B[k][0]));
+}
+function paramDistance(a, b){
+  const x = normParams(a), y = normParams(b);
+  return Math.hypot(...x.map((v, i) => v - y[i]));
+}
+
+function renderFailures(){
+  if(!VIZ.failures || !VIZ.failures.length){ $('#failwrap').innerHTML = ''; return; }
+  const P = subjectPair();
+  const rows = VIZ.failures
+    .map(f => ({...f, d: paramDistance(P.query.params, f.params)}))
+    .sort((a, b) => a.d - b.d);
+  const near = rows[0];
+  const good = P.distance;
+  const max = Math.max(rows[rows.length - 1].d, good) * 1.12;
+  const W = 520, L = 8, R = 96, y = 30;
+  const px = d => L + (d / max) * (W - L - R);
+
+  const marks = rows.map(f =>
+    `<g><line x1="${px(f.d).toFixed(1)}" y1="${y - 7}" x2="${px(f.d).toFixed(1)}" y2="${y + 7}"
+        stroke="#ff6b5e" stroke-width="2"/>
+      <title>${esc(f.id)} — ${esc(f.status)} — distance ${f.d.toFixed(3)}</title></g>`).join('');
+
+  $('#failwrap').innerHTML = `
+    <h3>The runs that died <span class="failn">${VIZ.failures.length} of
+      ${VIZ.config.archive_size + VIZ.failures.length}</span></h3>
+    <svg viewBox="0 0 ${W} 58" width="100%" role="img"
+         aria-label="failed runs by true distance from the current case">
+      <line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#243237" stroke-width="1"/>
+      <g><line x1="${px(good).toFixed(1)}" y1="${y - 9}" x2="${px(good).toFixed(1)}" y2="${y + 9}"
+           stroke="#3ddc97" stroke-width="2.5"/>
+        <title>${esc(P.neighbour.id)} — the retrieved case — distance ${good.toFixed(3)}</title></g>
+      ${marks}
+      <text x="${L}" y="${y + 24}" fill="#5d7076" font-size="10">0 &mdash; identical setup</text>
+      <text x="${(W - R).toFixed(0)}" y="${y + 24}" fill="#5d7076" font-size="10"
+            text-anchor="end">${max.toFixed(2)}</text>
+      <text x="${(W - R + 8).toFixed(0)}" y="${y - 2}" fill="#3ddc97" font-size="10">retrieved</text>
+      <text x="${(W - R + 8).toFixed(0)}" y="${y + 11}" fill="#ff6b5e" font-size="10">failed</text>
+    </svg>
+    <div class="failnote">
+      Nearest failed run <b>${esc(near.id)}</b> (<b>${esc(near.status)}</b>) at
+      <b>${near.d.toFixed(3)}</b>, against <b>${good.toFixed(3)}</b> to the retrieved
+      case. Failures have no solved state, so they have no 3D model and no place in
+      the cloud &mdash; shown here as setups only. Context, not a decision.
+    </div>`;
 }
 
 function renderTiles(){
@@ -1092,14 +922,11 @@ async function geoBoot(){
   GEO.bounds = geoBounds();
   const p = VIZ.projection;
   $('#geosub').innerHTML =
-    `Where the solved states actually sit &mdash; and why a neighbour's answer is a good
-     place to start. Measured offline by <code>python run_all.py</code>; the axes are
-     principal components of ${VIZ.config.archive_size} solved states, carrying
-     ${p.top3_variance_pct}% of the variance between them.`;
+    `Where the solved states sit, and why a neighbour is a good place to start.`;
   $('#geotabs').onclick = e => {
     const b = e.target.closest('button'); if(b) setMode(b.dataset.mode);
   };
-  renderTiles(); renderControls(); renderView(); geoDrag();
+  renderTiles(); renderFailures(); renderControls(); renderView(); geoDrag();
   GEO.raf = requestAnimationFrame(geoTick);
   machBoot();
 }
@@ -1119,7 +946,7 @@ async function geoBoot(){
 //: Drawing a mesh would have claimed the thing §6h is careful never to claim;
 //: drawing the circuit claims exactly what the solver actually computed.
 */
-const MACH = {yaw:0.72, pitch:0.26, t0:performance.now(), raf:null, right:null,
+const MACH = {yaw:0.72, pitch:0.42, t0:performance.now(), raf:null, right:null,
               spin:true};
 
 //: bore in model units. Diameter, not area, scales with sqrt(A) — an orifice
@@ -1139,8 +966,14 @@ function machineParts(c){
               r:BORE_MAIN, col:'#2c3f45'});
   // pump, and the supply line into the manifold
   parts.push({t:'motor', c:[-11, 0, 0], len:1.5, r:1.15, col:'#2b3b41', w:0, axis:'y'});
-  parts.push({t:'pipe', pts:[[-11, 0.9, 0], [-11, 1.6, 0], [-8.4, 1.6, 0],
-                             [-8.4, 0, 0], [-7.9, 0, 0]], r:BORE_MAIN, col:P(s.p1)});
+  // The delivery line carries manifold pressure, so it is the same colour as the
+  // block -- but routed down the block's centreline (z=0) it entered the left
+  // face at that face's own depth, and the face sorted in front of it. Bringing
+  // the run forward puts the port on the front half of the left face, where the
+  // pipe stays in front of everything it touches.
+  parts.push({t:'pipe', pts:[[-11, 0.9, 0], [-11, 1.85, 1.25], [-8.9, 1.85, 1.25],
+                             [-8.9, 0, 1.25], [-7.9, 0, 1.25]],
+              r:BORE_MAIN, col:P(s.p1)});
   // the manifold block itself is at p1
   parts.push({t:'box', c:[-7.0, 0, 0], s:[1.9, 6.4, 3.4], col:P(s.p1), edge:true});
 
@@ -1153,8 +986,11 @@ function machineParts(c){
               r:0.22, col:c.relief_open ? '#ffb454' : '#2c3f45'});
 
   const branch = (Y, Z, p2, p3, w, area) => {
-    // manifold -> orifice
-    parts.push({t:'pipe', pts:[[-6.0, Y, 0], [-4.4, Y, Z], [-2.2, Y, Z]],
+    // manifold -> orifice. The port sits on the block's right face at this
+    // branch's own side (z), not on its centreline: a run starting at z=0
+    // begins inside the manifold, so the block's front faces paint over the
+    // one length that should obviously match the block's colour.
+    parts.push({t:'pipe', pts:[[-6.02, Y, Z * 0.46], [-4.6, Y, Z], [-2.2, Y, Z]],
                 r:BORE_MAIN, col:P(s.p1)});
     // the orifice: a short narrow run, bore set by the valve's real flow area
     parts.push({t:'pipe', pts:[[-2.2, Y, Z], [-1.2, Y, Z]], r:bore(area),
@@ -1209,7 +1045,7 @@ function shade(hex, f){
 //: gradients are collected per frame rather than declared once: their direction
 //: is perpendicular to each pipe *on screen*, so it changes as the assembly
 //: turns. DEFS is reset by renderMachine before anything is drawn.
-let DEFS = [], DEFN = 0;
+let DEFS = [], DEFN = 0, DEF_PREFIX = '';
 function tubeGrad(a, b, r){
   let nx = -(b[1]-a[1]), ny = (b[0]-a[0]);
   const L = Math.hypot(nx, ny) || 1; nx /= L; ny /= L;
@@ -1223,7 +1059,7 @@ function tubeGrad(a, b, r){
 //: Two stops give a wedge, which is what made these read as flat ribbons.
 function pipePaint(col, a, b, r){
   const [x1,y1,x2,y2] = tubeGrad(a, b, r);
-  const id = `g${DEFN++}`;
+  const id = `${DEF_PREFIX}_g${DEFN++}`;
   DEFS.push(`<linearGradient id="${id}" gradientUnits="userSpaceOnUse"
       x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}">
       <stop offset="0" stop-color="${shade(col,0.34)}"/>
@@ -1233,7 +1069,7 @@ function pipePaint(col, a, b, r){
   return `url(#${id})`;
 }
 function ballPaint(col){
-  const id = `b${DEFN++}`;
+  const id = `${DEF_PREFIX}_b${DEFN++}`;
   DEFS.push(`<radialGradient id="${id}" cx="0.35" cy="0.3" r="0.75">
       <stop offset="0" stop-color="${shade(col,1.35)}"/>
       <stop offset="0.55" stop-color="${col}"/>
@@ -1246,9 +1082,24 @@ function ballPaint(col){
 //: a line that travels from the back of the assembly to the front cannot be
 //: entirely in front of, or entirely behind, the block it passes.
 function drawPipe(pr, out){
+  //: subdivide any run that spans real depth. Painter's algorithm gives each
+  //: piece one sort key, so a length travelling from the back of the assembly
+  //: to the front is either wholly in front of or wholly behind whatever it
+  //: passes. Short, flat runs are left alone.
+  const model = [];
+  for(let i=0;i<pr.pts.length-1;i++){
+    const A = pr.pts[i], B = pr.pts[i+1];
+    const dz = Math.abs(rotOnly(A)[2] - rotOnly(B)[2]);
+    const k = dz > 0.9 ? Math.min(4, Math.ceil(dz / 0.9)) : 1;
+    for(let j=0;j<k;j++){
+      const t0 = j/k, t1 = (j+1)/k;
+      model.push([[A[0]+(B[0]-A[0])*t0, A[1]+(B[1]-A[1])*t0, A[2]+(B[2]-A[2])*t0],
+                  [A[0]+(B[0]-A[0])*t1, A[1]+(B[1]-A[1])*t1, A[2]+(B[2]-A[2])*t1]]);
+    }
+  }
   const pts = pr.pts.map(scr);
-  for(let i=0;i<pts.length-1;i++){
-    const a = pts[i], b = pts[i+1];
+  for(const [mA, mB] of model){
+    const a = scr(mA), b = scr(mB);
     const f = (a[3]+b[3])/2, w = pr.r*2*MS*f;
     const d = `M${a[0].toFixed(1)},${a[1].toFixed(1)} L${b[0].toFixed(1)},${b[1].toFixed(1)}`;
     const paint = pipePaint(pr.col, a, b, w/2);
@@ -1268,26 +1119,69 @@ function drawPipe(pr, out){
 }
 
 const BOX_FACES = [[0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6],[0,3,7,4],[1,2,6,5]];
+
+//: rotation without the perspective divide. Normals have to be computed from
+//: these: a perspective-divided quad is not similar to the face it came from,
+//: so its cross product points somewhere slightly wrong and the shading wobbles
+//: as the assembly turns.
+function rotOnly(p){
+  return rotM([p[0]-MODEL_C[0], p[1]-MODEL_C[1], p[2]-MODEL_C[2]]);
+}
+
+//: a fixed light, up and to the left and slightly toward the viewer, in the
+//: *rotated* frame -- so it behaves like a lamp in the room rather than one
+//: bolted to the model, and turning the assembly actually changes which faces
+//: catch it.
+const LIGHT = (() => { const v=[-0.42,0.82,0.39], m=Math.hypot(...v);
+                       return v.map(c=>c/m); })();
+
 function drawBox(b, out){
   const [w,h,d] = b.s, hx=w/2, hy=h/2, hz=d/2;
-  const v = [[-hx,-hy,hz],[hx,-hy,hz],[hx,hy,hz],[-hx,hy,hz],
-             [-hx,-hy,-hz],[hx,-hy,-hz],[hx,hy,-hz],[-hx,hy,-hz]]
-            .map(p => scr([p[0]+b.c[0], p[1]+b.c[1], p[2]+b.c[2]]));
+  const corners = [[-hx,-hy,hz],[hx,-hy,hz],[hx,hy,hz],[-hx,hy,hz],
+                   [-hx,-hy,-hz],[hx,-hy,-hz],[hx,hy,-hz],[-hx,hy,-hz]]
+                  .map(p => [p[0]+b.c[0], p[1]+b.c[1], p[2]+b.c[2]]);
+  const V = corners.map(scr);        // screen, for the polygon
+  const R = corners.map(rotOnly);    // rotated, for the normal
+
   BOX_FACES.forEach(f => {
-    const pts = f.map(i => v[i]);
+    const pts = f.map(i => V[i]);
     let a = 0;
     for(let i=0;i<pts.length;i++){ const q = pts[(i+1)%pts.length];
       a += pts[i][0]*q[1] - q[0]*pts[i][1]; }
-    if(a >= 0) return;                       // looking at its back face
-    // brightness from how far forward the face sits, so opposite faces differ
-    const lit = 0.52 + 0.34 * Math.max(0, Math.min(1,
-      (pts.reduce((s,p) => s+p[2], 0)/4 + 6) / 12));
-    out.push({z: pts.reduce((s,p) => s+p[2], 0)/4, svg:
-      `<polygon points="${pts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}"
+    if(a >= -0.5) return;            // back face, or degenerate to a sliver
+
+    // Lambert on the true face normal. Shading by depth (what this used to do)
+    // gives every face of a flat slab almost the same value, which is why the
+    // reservoir could read as a bare outline at a shallow pitch -- a box needs
+    // its top and its sides to differ, and only the normal knows that.
+    const p0=R[f[0]], p1=R[f[1]], p2=R[f[2]];
+    const u=[p1[0]-p0[0],p1[1]-p0[1],p1[2]-p0[2]];
+    const t=[p2[0]-p0[0],p2[1]-p0[1],p2[2]-p0[2]];
+    let n=[u[1]*t[2]-u[2]*t[1], u[2]*t[0]-u[0]*t[2], u[0]*t[1]-u[1]*t[0]];
+    const nm=Math.hypot(...n)||1; n=n.map(c=>c/nm);
+    if(n[2] < 0) n = n.map(c => -c);            // orient toward the viewer
+    const lam = Math.max(0, n[0]*LIGHT[0] + n[1]*LIGHT[1] + n[2]*LIGHT[2]);
+    const lit = 0.34 + 0.92 * lam;              // ambient + diffuse
+
+    out.push({z: pts.reduce((s,q) => s+q[2], 0)/4, svg:
+      `<polygon points="${pts.map(q => `${q[0].toFixed(1)},${q[1].toFixed(1)}`).join(' ')}"
          fill="${shade(b.col, lit)}"
-         stroke="${b.edge ? shade(b.col,1.15) : shade(b.col,0.42)}" stroke-width="1"
+         stroke="${shade(b.col, lit*0.55)}" stroke-width="1"
          stroke-linejoin="round"/>`});
   });
+
+  //: the silhouette, drawn last and on top. It is what stops a slab seen
+  //: edge-on from disappearing: the faces collapse to nothing at that angle,
+  //: the outline does not.
+  if(b.edge !== false){
+    const hull = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],
+                  [0,4],[1,5],[2,6],[3,7]];
+    const seg = hull.map(([i,j]) =>
+      `M${V[i][0].toFixed(1)},${V[i][1].toFixed(1)} L${V[j][0].toFixed(1)},${V[j][1].toFixed(1)}`).join(' ');
+    out.push({z: Math.max(...V.map(q => q[2])) + 0.02, svg:
+      `<path d="${seg}" fill="none" stroke="${shade(b.col,1.5)}" stroke-width="0.9"
+         opacity="0.30" stroke-linecap="round"/>`});
+  }
 }
 
 //: the shaft mark turns at the solved speed, slowed by a fixed factor so it
@@ -1321,11 +1215,22 @@ function drawMotor(m, tms, out){
        stroke="${shade(m.col,0.3)}" stroke-width="${(w+2.4).toFixed(1)}"/>
      <path d="${d}" fill="none" stroke-linecap="butt"
        stroke="${pipePaint(m.col, pa, pb, w/2)}" stroke-width="${w.toFixed(1)}"/>`});
-  for(const [c, br] of [[a, 0.72], [b, 1.0]]){
+  //: the caps face along the axis, so they get the same Lambert term the boxes
+  //: do -- otherwise a cylinder end reads as a flat sticker on a lit barrel
+  const axisR = (() => {
+    const ra = rotOnly(a), rb = rotOnly(b);
+    let n = [rb[0]-ra[0], rb[1]-ra[1], rb[2]-ra[2]];
+    const nm = Math.hypot(...n) || 1; return n.map(c => c/nm);
+  })();
+  for(const [c, sgn] of [[a, -1], [b, 1]]){
+    let n = axisR.map(x => x * sgn);
+    if(n[2] < 0) n = n.map(x => -x);
+    const lam = Math.max(0, n[0]*LIGHT[0] + n[1]*LIGHT[1] + n[2]*LIGHT[2]);
     const poly = capPoly(c, m.r, u, v2, 26);
     out.push({z: poly.reduce((s,p) => s+p[2], 0)/poly.length + 0.02, svg:
       `<polygon points="${poly.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}"
-         fill="${shade(m.col, br*1.25)}" stroke="${shade(m.col,0.4)}" stroke-width="1"/>`});
+         fill="${shade(m.col, 0.42 + 1.05*lam)}" stroke="${shade(m.col,0.4)}"
+         stroke-width="1"/>`});
   }
   if(m.w){
     const th = tms * RPM_SLOW * m.w / 60;
@@ -1351,6 +1256,7 @@ function drawShadow(out){
 
 function renderMachine(el, c, tms, label){
   if(!c) return;
+  DEF_PREFIX = (el && el.id) ? el.id : 'm';
   DEFS = []; DEFN = 0;
   const out = [];
   drawShadow(out);
@@ -1395,15 +1301,11 @@ function renderMachPanel(){
   //: A hand-chosen case is a control, and saying how much worse it is turns the
   //: comparison from an illustration into a measurement the room can check.
   $('#machnote').innerHTML = picked
-    ? `Comparing against <b>${esc(MACH.right.id)}</b>, picked by hand from the sheet
-       &mdash; <b>not</b> the case retrieval chose. Its state is
+    ? `<b>${esc(MACH.right.id)}</b> picked by hand, not chosen by retrieval &mdash;
        <b>${d.dp.toFixed(1)} bar</b> away against the retrieved case's
-       <b>${best.dp.toFixed(1)} bar</b>: this is what the archive looks like when you
-       start from the wrong neighbour. Press <i>Show the retrieved pair</i> to go back.`
-    : `<b>${esc(P.neighbour.id)}</b> is the case retrieval actually chose for
-       <b>${esc(P.query.id)}</b>, out of ${VIZ.config.archive_size}. Click any
-       tile above to compare against a different one instead &mdash; the gap it opens
-       is the thing retrieval is for.`;
+       <b>${best.dp.toFixed(1)} bar</b>.`
+    : `<b>${esc(P.neighbour.id)}</b> is what retrieval chose out of
+       ${VIZ.config.archive_size}. Click a tile to compare against another.`;
 }
 
 function machTick(){
@@ -1454,15 +1356,8 @@ async function boot(){
     // and a slow backstop for the case where neither of those happens
     setInterval(refreshHealth, 15000);
 
-    // The evidence panel is decoration for the demo, so a failure here must
-    // not take the pipeline down with it.
-    fetch('/api/evidence').then(r => r.json()).then(drawEvidence)
-      .catch(() => { $('#evidence').innerHTML =
-        '<div class="evmissing">evidence unavailable</div>'; });
-
-    // Same rule as the evidence panel: a view is not allowed to take the
-    // pipeline down with it. A fresh clone that has not run the reproducer
-    // says so here rather than throwing.
+    // A view is not allowed to take the pipeline down with it. A fresh
+    // clone that has not run the reproducer says so here rather than throwing.
     geoBoot().catch(() => {
       $('#geo').innerHTML =
         '<div class="geomissing">geometry unavailable &mdash; run '

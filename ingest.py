@@ -295,7 +295,14 @@ def ingest_ollama(text: str, artifact: str, case_id: str,
     req = urllib.request.Request(f"{OLLAMA_URL}/api/chat", data=body,
                                  headers={"content-type": "application/json"})
     try:
-        with urllib.request.urlopen(req, timeout=180) as r:
+        # 280s, not 180 -- CPU-only inference (the AWS deployment's Ollama
+        # instance has no GPU, quota-blocked on this account) lands close to
+        # 180s on a prose artifact, close enough that it was a coin flip
+        # whether this raised before the model actually finished. Margin is
+        # kept under the ALB's own 300s idle timeout so a genuine failure
+        # still surfaces as this function's RuntimeError -- a real pipeline
+        # stage -- rather than a bare gateway timeout with no context.
+        with urllib.request.urlopen(req, timeout=280) as r:
             payload = json.load(r)
     except (urllib.error.URLError, OSError) as exc:
         raise RuntimeError(f"Ollama call failed: {exc}") from exc

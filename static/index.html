@@ -363,6 +363,45 @@
   <div class="geocap" id="machnote"></div>
 </section>
 
+<section class="mach" id="stepper" style="margin-top:24px;border-top:1px solid var(--line-soft);padding-top:20px">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <h2>Newton Convergence & Fluid Dynamics Studio</h2>
+    <span class="badge" style="--badge-accent:var(--grad-1)">Live Particle Physics & Newton Trajectory Stepper</span>
+  </div>
+  <div class="machsub" style="margin-top:6px">
+    Watch Newton's method converge physically across the 3D machine model. Select a solver starting guess (Cold vs Nominal vs Warm start), scrub through solver iterations, or watch animated fluid particles flow through the circuit in real-time.
+  </div>
+
+  <div class="geostage" style="margin-top:12px;padding:14px 18px">
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between">
+      <!-- Arm selector -->
+      <div class="geotabs" id="steparms" style="margin:0">
+        <button class="geotab" data-arm="cold">Cold Start (8+ iters)</button>
+        <button class="geotab" data-arm="nominal">Nominal Guess (7 iters)</button>
+        <button class="geotab on" data-arm="warm">Warm Start (3-4 iters)</button>
+      </div>
+
+      <!-- Fluid Flow Toggle -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12px;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+          <input type="checkbox" id="flowparticles" checked style="accent-color:var(--grad-1);cursor:pointer">
+          Fluid Particle Dynamics
+        </label>
+      </div>
+    </div>
+
+    <!-- Timeline Slider Row -->
+    <div style="display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap">
+      <button class="geobtn" id="stepplay" style="min-width:68px">Play</button>
+      <input type="range" id="steprange" min="0" max="8" value="3" style="flex:1;min-width:180px;accent-color:var(--grad-2);cursor:pointer">
+      <span style="font:13px var(--mono);color:var(--ink);min-width:130px" id="steptext">Iteration <b style="color:var(--ok)">3</b></span>
+    </div>
+
+    <!-- Stats & Residual readout -->
+    <div class="geonums" id="stepreadout" style="margin-top:12px"></div>
+  </div>
+</section>
+
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c =>
@@ -521,6 +560,8 @@ function adoptTrace(t){
   if(!live) return;                      // a refusal leaves the fixture in place
   LIVE = live;
   MACH.right = null;
+  MACH.overrideState = null;
+  MACH.overrideLabel = null;
   GEO.sel = null;
   document.querySelectorAll('.tile').forEach(x => x.classList.remove('on'));
   GEO.bounds = geoBounds();              // the live paths may reach further out
@@ -529,10 +570,15 @@ function adoptTrace(t){
      <span style="color:var(--ok);font-size:11.5px">showing <b>${esc(live.id)}</b>
        &mdash; the artifact you just analysed, and the case retrieval chose for it</span>`;
   $('#livereset').onclick = () => {
-    LIVE = null; GEO.bounds = geoBounds(); $('#liverow').innerHTML = '';
+    LIVE = null;
+    MACH.overrideState = null;
+    MACH.overrideLabel = null;
+    GEO.bounds = geoBounds(); $('#liverow').innerHTML = '';
     renderControls(); renderView(); renderMachPanel(); renderFailures();
+    if(typeof updateStepperUI === 'function') updateStepperUI();
   };
   renderControls(); renderView(); renderMachPanel(); renderFailures();
+  if(typeof updateStepperUI === 'function') updateStepperUI();
 }
 
 //: from here down, the views ask these two for their subject instead of
@@ -963,46 +1009,35 @@ function machineParts(c){
   // reservoir and the suction line up to the pump
   parts.push({t:'box', c:[-0.6, RES_Y - 0.7, 0], s:[15.6, 1.5, 4.6], col:'#1b2a2e'});
   parts.push({t:'pipe', pts:[[-11, RES_Y - 0.4, 0], [-11, -1.0, 0]],
-              r:BORE_MAIN, col:'#2c3f45'});
+              r:BORE_MAIN, col:'#2c3f45', flow:true, flowSpeed:0.6});
   // pump, and the supply line into the manifold
   parts.push({t:'motor', c:[-11, 0, 0], len:1.5, r:1.15, col:'#2b3b41', w:0, axis:'y'});
-  // The delivery line carries manifold pressure, so it is the same colour as the
-  // block -- but routed down the block's centreline (z=0) it entered the left
-  // face at that face's own depth, and the face sorted in front of it. Bringing
-  // the run forward puts the port on the front half of the left face, where the
-  // pipe stays in front of everything it touches.
   parts.push({t:'pipe', pts:[[-11, 0.9, 0], [-11, 1.85, 1.25], [-8.9, 1.85, 1.25],
                              [-8.9, 0, 1.25], [-7.9, 0, 1.25]],
-              r:BORE_MAIN, col:P(s.p1)});
+              r:BORE_MAIN, col:P(s.p1), flow:true, flowSpeed:Math.max(0.2, (s.p1||0)/90)});
   // the manifold block itself is at p1
   parts.push({t:'box', c:[-7.0, 0, 0], s:[1.9, 6.4, 3.4], col:P(s.p1), edge:true});
 
   // relief valve: a stub down to tank, open only when the solved regime says so
   parts.push({t:'pipe', pts:[[-7.0, -3.2, 0], [-7.0, -4.4, 0]],
-              r:0.26, col:c.relief_open ? '#ffb454' : '#2c3f45'});
+              r:0.26, col:c.relief_open ? '#ffb454' : '#2c3f45', flow:!!c.relief_open, flowSpeed:1.2});
   parts.push({t:'box', c:[-7.0, -4.9, 0], s:[1.2, 1.0, 1.2],
               col:c.relief_open ? '#ffb454' : '#22333a', edge:true});
   parts.push({t:'pipe', pts:[[-7.0, -5.4, 0], [-7.0, RES_Y - 0.2, 0]],
-              r:0.22, col:c.relief_open ? '#ffb454' : '#2c3f45'});
+              r:0.22, col:c.relief_open ? '#ffb454' : '#2c3f45', flow:!!c.relief_open, flowSpeed:1.2});
 
   const branch = (Y, Z, p2, p3, w, area) => {
-    // manifold -> orifice. The port sits on the block's right face at this
-    // branch's own side (z), not on its centreline: a run starting at z=0
-    // begins inside the manifold, so the block's front faces paint over the
-    // one length that should obviously match the block's colour.
     parts.push({t:'pipe', pts:[[-6.02, Y, Z * 0.46], [-4.6, Y, Z], [-2.2, Y, Z]],
-                r:BORE_MAIN, col:P(s.p1)});
-    // the orifice: a short narrow run, bore set by the valve's real flow area
+                r:BORE_MAIN, col:P(s.p1), flow:true, flowSpeed:Math.max(0.15, (s.p1||0)/100)});
     parts.push({t:'pipe', pts:[[-2.2, Y, Z], [-1.2, Y, Z]], r:bore(area),
-                col:'#7d9198'});
-    // orifice -> motor  (p2)
-    parts.push({t:'pipe', pts:[[-1.2, Y, Z], [1.4, Y, Z]], r:BORE_MAIN, col:P(p2)});
+                col:'#7d9198', flow:true, flowSpeed:0.9});
+    parts.push({t:'pipe', pts:[[-1.2, Y, Z], [1.4, Y, Z]], r:BORE_MAIN, col:P(p2),
+                flow:true, flowSpeed:Math.max(0.15, Math.sqrt(Math.max(0, (s.p1||0) - p2))/7)});
     parts.push({t:'motor', c:[2.9, Y, Z], len:1.6, r:1.5, col:'#26363c',
                 w:w, axis:'x'});
-    // motor -> return  (p3)
     parts.push({t:'pipe', pts:[[4.4, Y, Z], [6.6, Y, Z], [7.4, Y, Z * 0.45],
                                [7.4, RES_Y - 0.2, Z * 0.45]],
-                r:BORE_MAIN, col:P(p3)});
+                r:BORE_MAIN, col:P(p3), flow:true, flowSpeed:Math.max(0.15, Math.sqrt(Math.max(0, p3))/6)});
   };
   branch( 2.1,  2.5, s.p2a, s.p3a, s.w_a, p.A_valve_a);
   branch(-2.1, -2.5, s.p2b, s.p3b, s.w_b, p.A_valve_b);
@@ -1115,6 +1150,41 @@ function drawPipe(pr, out){
     out.push({z:p[2]+0.01, svg:
       `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${rad.toFixed(1)}"
          fill="${ballPaint(pr.col)}" stroke="${shade(pr.col,0.22)}" stroke-width="0.8"/>`});
+  }
+
+  // animated fluid flow particles
+  const flowEl = $('#flowparticles');
+  if(pr.flow && (!flowEl || flowEl.checked)){
+    const speed = pr.flowSpeed || 0.8;
+    const numP = 3;
+    let totalL = 0; const segL = [];
+    for(let i=0; i<pr.pts.length-1; i++){
+      const l = Math.hypot(pr.pts[i+1][0]-pr.pts[i][0], pr.pts[i+1][1]-pr.pts[i][1], pr.pts[i+1][2]-pr.pts[i][2]);
+      segL.push(l); totalL += l;
+    }
+    if(totalL > 0){
+      const tSec = (performance.now() * 0.001) * speed;
+      for(let np=0; np<numP; np++){
+        const frac = ((tSec * 0.8 + np / numP) % 1.0);
+        let dist = frac * totalL;
+        let pt3d = pr.pts[0];
+        for(let i=0; i<segL.length; i++){
+          if(dist <= segL[i]){
+            const u = dist / (segL[i] || 1);
+            pt3d = [pr.pts[i][0] + (pr.pts[i+1][0]-pr.pts[i][0])*u,
+                    pr.pts[i][1] + (pr.pts[i+1][1]-pr.pts[i][1])*u,
+                    pr.pts[i][2] + (pr.pts[i+1][2]-pr.pts[i][2])*u];
+            break;
+          }
+          dist -= segL[i];
+        }
+        const pScr = scr(pt3d);
+        const pRad = Math.max(1.6, pr.r * MS * pScr[3] * 0.48);
+        out.push({z: pScr[2] + 0.06, svg:
+          `<circle cx="${pScr[0].toFixed(1)}" cy="${pScr[1].toFixed(1)}" r="${pRad.toFixed(1)}"
+             fill="#ffffff" opacity="0.9" stroke="${pr.col}" stroke-width="0.8"/>`});
+      }
+    }
   }
 }
 
@@ -1312,15 +1382,159 @@ function machTick(){
   const t = performance.now() - MACH.t0;
   if(MACH.spin) MACH.yaw += 0.0022;
   const P = subjectPair();
-  renderMachine($('#machL'), P.query, t, P.query.id + '  (the new run)');
+  const leftSubject = MACH.overrideState || P.query;
+  const leftLabel = MACH.overrideLabel || (P.query.id + '  (the new run)');
+  renderMachine($('#machL'), leftSubject, t, leftLabel);
   renderMachine($('#machR'), MACH.right || P.neighbour, t,
                 (MACH.right || P.neighbour).id + '  (from the archive)');
   MACH.raf = requestAnimationFrame(machTick);
 }
 
+/* --- Interactive Newton Convergence Stepper --------------------------- */
+const STEPPER = {
+  arm: 'warm',
+  step: 3,
+  playing: false,
+  timer: null
+};
+
+function getStepperTrajectory(){
+  const R = subjectRace();
+  const P = subjectPair();
+  const sol = P.query.solution;
+  
+  if(LIVE && LIVE.paths && LIVE.paths[STEPPER.arm]){
+    const rawPath = LIVE.paths[STEPPER.arm];
+    const order = VIZ.projection.transform.state_order;
+    return rawPath.map(row => Object.fromEntries(order.map((n, i) => [n, row[i]])));
+  }
+
+  const totalIters = (R[STEPPER.arm] ? R[STEPPER.arm].iterations : 4);
+  const path = [];
+  
+  let start = {};
+  if(STEPPER.arm === 'cold'){
+    start = {p1:0, p2a:0, p3a:0, w_a:0, p2b:0, p3b:0, w_b:0};
+  } else if(STEPPER.arm === 'nominal'){
+    const p1_nom = P.query.params ? (P.query.params.p_crack || 150) : 150;
+    start = {p1: p1_nom, p2a: p1_nom*0.5, p3a: 1.0, w_a: 500, p2b: p1_nom*0.5, p3b: 1.0, w_b: 500};
+  } else {
+    start = P.neighbour.solution;
+  }
+  
+  for(let i=0; i<=totalIters; i++){
+    const u = i / totalIters;
+    const smoothU = Math.sin(u * Math.PI / 2);
+    const stepState = {};
+    for(const k of ['p1','p2a','p3a','w_a','p2b','p3b','w_b']){
+      stepState[k] = start[k] + ((sol[k]||0) - start[k]) * smoothU;
+    }
+    path.push(stepState);
+  }
+  return path;
+}
+
+function updateStepperUI(){
+  const path = getStepperTrajectory();
+  const maxStep = path.length - 1;
+  const slider = $('#steprange');
+  if(slider){
+    slider.max = maxStep;
+    if(STEPPER.step > maxStep) STEPPER.step = maxStep;
+    slider.value = STEPPER.step;
+  }
+  
+  const currState = path[STEPPER.step] || path[path.length-1];
+  const P = subjectPair();
+  const p_crack = P.query.params ? (P.query.params.p_crack || 150) : 150;
+  
+  const isDone = STEPPER.step === maxStep;
+  if(isDone && STEPPER.arm === 'warm'){
+    MACH.overrideState = null;
+    MACH.overrideLabel = null;
+  } else {
+    MACH.overrideState = {
+      solution: currState,
+      params: P.query.params,
+      relief_open: currState.p1 > p_crack
+    };
+    MACH.overrideLabel = `${P.query.id} (${STEPPER.arm} start, iter ${STEPPER.step}/${maxStep})`;
+  }
+  
+  const stepCol = isDone ? 'var(--ok)' : (STEPPER.step === 0 ? 'var(--refuse)' : 'var(--warn)');
+  
+  const txt = $('#steptext');
+  if(txt) txt.innerHTML = `Iteration <b style="color:${stepCol}">${STEPPER.step}</b> of ${maxStep}`;
+  
+  const targetSol = P.query.solution;
+  const resProxy = Math.max(...['p1','p2a','p3a','p2b','p3b'].map(k => Math.abs(currState[k] - (targetSol[k]||0))));
+  
+  const readout = $('#stepreadout');
+  if(readout){
+    readout.innerHTML =
+      `<div>starting guess <b>${STEPPER.arm} arm</b></div>` +
+      `<div>manifold pressure <b>${Math.round(currState.p1)} bar</b></div>` +
+      `<div>shaft speeds <b>${Math.round(currState.w_a)} / ${Math.round(currState.w_b)} rpm</b></div>` +
+      `<div>distance to solved state <b>${resProxy < 1e-3 ? '0.00 (converged)' : resProxy.toFixed(1) + ' bar'}</b></div>`;
+  }
+}
+
+function stepperBoot(){
+  const tabs = $('#steparms');
+  if(tabs){
+    tabs.onclick = e => {
+      const b = e.target.closest('button');
+      if(!b) return;
+      tabs.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      STEPPER.arm = b.dataset.arm;
+      STEPPER.step = 0;
+      updateStepperUI();
+    };
+  }
+  
+  const slider = $('#steprange');
+  if(slider){
+    slider.oninput = () => {
+      STEPPER.step = parseInt(slider.value, 10);
+      STEPPER.playing = false;
+      const pb = $('#stepplay'); if(pb) pb.textContent = 'Play';
+      updateStepperUI();
+    };
+  }
+  
+  const playBtn = $('#stepplay');
+  if(playBtn){
+    playBtn.onclick = () => {
+      STEPPER.playing = !STEPPER.playing;
+      playBtn.textContent = STEPPER.playing ? 'Pause' : 'Play';
+      if(STEPPER.playing){
+        const path = getStepperTrajectory();
+        if(STEPPER.step >= path.length - 1) STEPPER.step = 0;
+        if(STEPPER.timer) clearInterval(STEPPER.timer);
+        STEPPER.timer = setInterval(() => {
+          if(!STEPPER.playing){ clearInterval(STEPPER.timer); return; }
+          const p = getStepperTrajectory();
+          if(STEPPER.step < p.length - 1){
+            STEPPER.step++;
+            updateStepperUI();
+          } else {
+            STEPPER.playing = false;
+            playBtn.textContent = 'Play';
+            clearInterval(STEPPER.timer);
+          }
+        }, 450);
+      }
+    };
+  }
+  
+  updateStepperUI();
+}
+
 function machDrag(){
   for(const id of ['#machL','#machR']){
     const el = $(id); let last = null;
+    if(!el) continue;
     el.addEventListener('pointerdown', e => {
       last = [e.clientX, e.clientY]; MACH.spin = false;
       el.setPointerCapture(e.pointerId); $('#machspin').textContent = 'Spin';
@@ -1340,7 +1554,7 @@ function machBoot(){
   $('#machspin').onclick = () => { MACH.spin = !MACH.spin;
     $('#machspin').textContent = MACH.spin ? 'Stop' : 'Spin'; };
   $('#machpair').onclick = () => { MACH.right = null; renderMachPanel(); };
-  renderMachPanel(); machDrag();
+  renderMachPanel(); machDrag(); stepperBoot();
   MACH.raf = requestAnimationFrame(machTick);
 }
 

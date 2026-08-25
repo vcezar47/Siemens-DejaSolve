@@ -36,7 +36,7 @@ Requires Python 3.11+, numpy and matplotlib (`pip install -r requirements.txt`).
 |---|---|
 | `model.py` | The physics: a hydraulic manifold driving two motors against Stribeck friction. 7 nonlinear equations, analytic Jacobian, damped Newton, dynamic stability |
 | `sweep.py` | Runs a 400-case parameter sweep. What converged becomes the archive; what failed is kept too, in `archive/failures.jsonl` |
-| `bench.py` | On 200 *fresh* cases: solve from a flat start, from a nominal guess, and warm from the nearest archived case. Writes `results.json` |
+| `bench.py` | On 200 *fresh* cases: solve from a flat start, a nominal guess, the nearest archived case verbatim, and the same case transferred first-order (`model.solution_sensitivity`, `model.transfer_start`). Writes `results.json` |
 | `surrogate.py` | The *other* source of a warm start: a quadratic response surface fitted to the archive, predicting a state instead of recalling one. The PhysicsAI arrow, at laptop scale |
 | `dimensionality.py` | What happens to retrieval when the Case Card carries hundreds of parameters instead of 7 — and which gate stops working |
 | `failure_zone.py` | Are the failed runs worth keeping? Tests whether proximity to a failure predicts anything — with the controls that decide whether it is real |
@@ -68,17 +68,17 @@ alongside the nearest solved one — as two distances, never as a verdict. Under
 it means, and — when the verdict is a warning — a name field, a reason field and
 **Warm-start anyway**. Accepting a warning appends to the audit trail shown at the
 bottom of the page.
-The headline is the number, against both baselines: **8 cold / 7 nominal → 4 warm Newton iterations, same answer to 2.3e-13**.
+The headline is the number, against both baselines: **8 cold / 7 nominal → 3 warm Newton iterations, same answer to 2.3e-13** — the warm start now transfers first-order (§ Result), not verbatim.
 
-Below the pipeline sits an **Evidence** panel: the measured results — the three
-arms, the surrogate arms, the fold circuit's 4-vs-40, the failure-archive AUC and
-its control, the dimensionality chart, and the 25-parameter sweep with the
-hardware rule's scatter table, and the four rankers that all lose to an oracle — read live from the result JSONs by
-`GET /api/evidence`, above a line stating whether the numerical invariants in
-`selftest.py` currently hold. It is labelled *measured offline*, because none of it is
-something the service computes per request, and each card states the basis its
-means were taken over. One page to open on stage instead of a browser, a terminal
-and a PNG viewer.
+An **Evidence** panel used to sit below the pipeline — the measured results,
+the three arms, the surrogate arms, the fold circuit's 4-vs-40, the
+failure-archive AUC, the dimensionality chart, and the 25-parameter sweep,
+read live from the result JSONs by `GET /api/evidence`. It has been pulled
+off the live page: a demo showing curated offline benchmark numbers next to a
+live pipeline read as more decided than the work deserved. The same
+CSS/HTML/JS is kept intact in
+[presentation/evidence-section.html](presentation/evidence-section.html) for
+reuse in the deck, and `GET /api/evidence` still serves the data behind it.
 
 It is a **service with a page attached**, not a notebook app: the page is a
 client of `POST /api/analyse`, which is the same endpoint a Study Manager sweep
@@ -276,6 +276,42 @@ no solve. **Warm** is the nearest archived case's converged state.
 **42% fewer iterations than the flat start, 31% fewer than the nominal guess**,
 and the answers agree to 4e-08 bar and 3e-08 rev/min across all 196 cases where
 both converged. The 31% is the number that matters — see below.
+
+### The archive knows more than the endpoint
+
+The `warm` column above hands Newton the neighbour's converged state
+**verbatim** — the retrieved answer, asserted as the query's answer. That
+throws away everything the archived run knows except where it landed. It also
+knows the tangent of its own solution: differentiating the converged residual
+through the implicit function theorem gives `dx*/dp = -J⁻¹ ∂F/∂p`, cheap to
+compute once per card and stored on it (`model.solution_sensitivity`). The
+start becomes `x0 = x_j + S_j (p - p_j)` — the neighbour's answer, walked
+toward the query — instead of the neighbour's answer standing in for it.
+
+| | warm (verbatim) | + sensitivity | + ranked by predicted error, k=5 |
+|---|---|---|---|
+| mean Newton iterations | 4.9 | 3.8 | 3.4 |
+| **vs nominal** | **31.1%** | **47.1%** | **51.5%** |
+| vs the verbatim warm start | — | 23.3% | 29.7% |
+
+Same candidate as `warm` in the middle column — only the transfer changes, so
+it isolates what the tangent alone is worth. The right column also lets the
+tangent choose *which* card to transfer from, ranked by predicted start error
+(`‖S_j Δp‖`, scaled) instead of by parameter distance — which is the actual
+question retrieval was a proxy for. **0 answers differ** from the verbatim
+column across all three; same tolerance, same agreement to 3e-08 bar.
+
+It costs 392 bytes and 277 µs per card, computed once when the case enters the
+archive, and a 7×7 matrix–vector product per query — about 15% of one residual
+evaluation. `python selftest.py` checks the analytic `∂F/∂p` against central
+differences (worst relative error 3e-08) the same way it checks the Jacobian.
+
+**The 31% still ships as the conservative number** — it is what a verbatim
+transfer gets, and every other result in this file (the surrogate comparison,
+the dimensionality table, the wide-parameter sweep) is measured against it, so
+changing the baseline there would mean re-measuring all of them. The 47%/51.5%
+is the newer result, on the base circuit, reported alongside it rather than in
+place of it.
 
 ### Why there is a third column
 
@@ -506,6 +542,27 @@ point** (max |dw| 789 rev/min). Both are stable and both pass the verifier —
 these cases are genuinely bistable. The guarantee is that you never land on an
 *impossible* operating point, not that you land on the same valid one a
 different starting guess would have found.
+
+### The first-order transfer is safer here, not just cheaper
+
+The base-circuit finding above holds on the harder circuit too — and here the
+transfer gate is already in the loop, so it is measured through it rather than
+instead of it. `agent_select.py`'s k=5 shortlist evaluation reruns this
+comparison with the same gated retrieval, transferring first-order instead of
+verbatim:
+
+| arm (gated, k=5) | mean iterations | inadmissible |
+|---|---|---|
+| verbatim (distance picks, copies) | 7.95 | 11 |
+| + sensitivity (distance picks, tangent transfers) | 5.33 | 1 |
+| + sensitivity ranked | 5.13 | **1** |
+
+These are the k=5 gated-shortlist numbers, not the k=1 arm in the table above,
+so they are not directly comparable line-for-line — see
+`agent_select_results.json`. The mechanism is the same one that helps on the
+base circuit: a start that lands closer to the true operating point is a start
+less likely to overshoot into an unstable one, so cost and correctness improve
+together instead of trading off.
 
 ## Not done yet
 

@@ -14,6 +14,8 @@
     "max": 21,
     "total": 3283
   },
-  "wall_s": 0.5197744870000065,
-  "relief_open_share": 0.3139240506329114
+  "wall_s": 2.1876621000010346,
+  "relief_open_share": 0.3139240506329114,
+  "with_sensitivity": 395,
+  "with_hessian": 395
 }

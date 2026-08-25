@@ -376,6 +376,253 @@ def jacobian(x, p: dict) -> np.ndarray:
     return J
 
 
+# --- how the solution moves when the case changes ---------------------------
+#
+# Everything above answers "what is the answer for this case?". This answers
+# "and how does that answer move if the case changes?" — which is the part an
+# archive of solved runs throws away and should not.
+#
+# A retrieved case is used today by handing Newton the neighbour's converged
+# state verbatim. That is a *zeroth-order* transfer: it asserts the neighbour's
+# answer is the query's answer, and every bar of parameter difference between
+# them is error the solver then has to work off. The archived run knows better
+# than that. Differentiating F(x*, p) = 0 through the implicit function theorem,
+#
+#     dF/dp + J dx/dp = 0    =>    dx/dp = -J^-1 dF/dp
+#
+# gives the tangent to the solution manifold at the archived point. Carrying
+# that 7x7 in the Case Card turns the transfer first-order:
+#
+#     x0 = x_j + S_j (p - p_j)
+#
+# It costs one linear solve per archive record *offline*, and a matrix-vector
+# product at query time. The archive pays once; every future query is refunded.
+
+def dresidual_dp(x, p: dict) -> np.ndarray:
+    """d(residual)/d(case parameter), analytic, shaped (7 residuals, 7 params).
+
+    Analytic for the same reason :func:`jacobian` is: a finite difference over
+    a *parameter* is better behaved than one over a state, but it is still a
+    step size someone has to choose, and the whole point of this matrix is to
+    be trustworthy enough to ship inside a Case Card. `selftest.py` checks it
+    against central differences.
+
+    Columns follow :data:`PARAM_NAMES`. Only the swept setup parameters appear
+    here -- a query that differs from its archive case in *hardware* is not
+    covered by this correction, which is why the transfer gate still has to
+    refuse those rather than trusting a tangent that does not describe them.
+    """
+    p1, p2a, p3a, wa, p2b, p3b, wb = x
+    rho = float(p["rho"])
+    h = hardware(p)
+    ha, hb = shaft_hw(h, "a"), shaft_hw(h, "b")
+    g_va = orifice_gain(p["A_valve_a"], rho, h["cd"])
+    g_vb = orifice_gain(p["A_valve_b"], rho, h["cd"])
+    g_ra = orifice_gain(ha["A_ret"], rho, h["cd"])
+    g_rb = orifice_gain(hb["A_ret"], rho, h["cd"])
+    g_rel = orifice_gain(h["A_relief_max"], rho, h["cd"])
+
+    q_va = g_va * f_dp(p1 - p2a)
+    q_vb = g_vb * f_dp(p1 - p2b)
+    q_ra = g_ra * f_dp(p3a - P_TANK)
+    q_rb = g_rb * f_dp(p3b - P_TANK)
+    op = relief_opening(p1, p["p_crack"], h["relief_band"])
+    q_rel = g_rel * op * f_dp(p1 - P_TANK)
+
+    D = np.zeros((7, 7))
+    col = {name: k for k, name in enumerate(PARAM_NAMES)}
+
+    # pump delivery enters the manifold balance directly
+    D[0, col["Q_nom"]] = 1.0
+
+    # orifice gain is linear in area, so dq/dA = q/A
+    D[0, col["A_valve_a"]] = -q_va / p["A_valve_a"]
+    D[1, col["A_valve_a"]] = q_va / p["A_valve_a"]
+    D[0, col["A_valve_b"]] = -q_vb / p["A_valve_b"]
+    D[4, col["A_valve_b"]] = q_vb / p["A_valve_b"]
+
+    # the quadratic load enters its own shaft's torque balance and nothing else
+    D[3, col["c_load_a"]] = -wa * abs(wa)
+    D[6, col["c_load_b"]] = -wb * abs(wb)
+
+    # raising the cracking pressure closes the relief valve by the same slope
+    # the valve opens with in p1, negated: d(open)/d(p_crack) = -d(open)/d(p1)
+    D[0, col["p_crack"]] = (g_rel * d_relief_opening(p1, p["p_crack"],
+                                                     h["relief_band"])
+                            * f_dp(p1 - P_TANK))
+
+    # every orifice gain carries sqrt(2e5/rho), so each flow scales as
+    # rho^-1/2 and dq/drho = -q/(2 rho)
+    two_rho = 2.0 * rho
+    D[0, col["rho"]] = (q_va + q_vb + q_rel) / two_rho
+    D[1, col["rho"]] = -q_va / two_rho
+    D[2, col["rho"]] = q_ra / two_rho
+    D[4, col["rho"]] = -q_vb / two_rho
+    D[5, col["rho"]] = q_rb / two_rho
+    return D
+
+
+def solution_sensitivity(x, p: dict) -> np.ndarray:
+    """dx*/dp at a converged solution — the tangent to the solution manifold.
+
+    Rows are :data:`STATE_NAMES`, columns :data:`PARAM_NAMES`, so entry [i, k]
+    reads "how much state i moves per unit of parameter k". Only meaningful at
+    a converged `x`; at any other point it is the tangent to nothing.
+
+    Raises ``numpy.linalg.LinAlgError`` if the Jacobian is singular there. The
+    caller decides what that means — :mod:`sweep` records the card without a
+    sensitivity rather than dropping a perfectly good solved case.
+    """
+    return np.linalg.solve(jacobian(x, p), -dresidual_dp(x, p))
+
+
+def transfer_start(x_src, sens, p_src: dict, p_query: dict) -> np.ndarray:
+    """First-order warm start: the source solution, walked toward the query.
+
+    With ``sens`` absent this degrades to the verbatim archived state, which is
+    exactly the old behaviour — so a card written before sensitivities existed
+    still transfers, just without the correction.
+    """
+    x0 = np.asarray(x_src, dtype=float)
+    if sens is None:
+        return x0
+    return x0 + np.asarray(sens, dtype=float) @ (param_vector(p_query)
+                                                 - param_vector(p_src))
+
+
+#: How wrong the first-order transfer expects to be, as a single number.
+#: Pressures in bar and speeds in rev/min are not comparable, so each state is
+#: divided by a scale of its own kind before the max is taken.
+TRANSFER_SCALE = np.array([1.0, 1.0, 1.0, 50.0, 1.0, 1.0, 50.0])
+
+
+def predicted_start_error(sens, p_src: dict, p_query: dict) -> float:
+    """Estimated distance from the transferred start to the query's solution.
+
+    This is the ranking signal plain parameter distance is a proxy for. Distance
+    asks "how different is this case?"; this asks "how far will its answer move,
+    given how *this* case's answer actually responds" — the same parameter step
+    matters far more on a case sitting near the relief valve's cracking point
+    than on one far from it, and only the second question knows that.
+    """
+    if sens is None:
+        return float("inf")
+    d = np.asarray(sens, dtype=float) @ (param_vector(p_query)
+                                         - param_vector(p_src))
+    return float(np.max(np.abs(d) / TRANSFER_SCALE))
+
+
+# --- second-order sensitivity -----------------------------------------------
+#
+# The first-order transfer uses dx*/dp = -J^-1 dF/dp — the tangent to the
+# solution manifold. It is exact when the manifold is flat and wrong when it
+# curves, which is everywhere the relief valve cracks or a shaft crosses the
+# Stribeck peak. The second-order term corrects for that curvature:
+#
+#     x0 = x_j + S·Δp + ½ Δp^T·H·Δp
+#
+# where H[i,:,:] = d²x*_i / dp dp, the Hessian of each state w.r.t. the
+# parameters. Computing it analytically would require third derivatives of the
+# residual (∂²J/∂p², ∂²F/∂p∂x, …) — tedious and fragile for a system with
+# regularised orifice, Stribeck and relief-valve nonlinearities. Instead, it is
+# obtained by central-differencing the *first-order sensitivity*, which is
+# already validated by selftest.py:
+#
+#     H[:, :, k] ≈ (S(p + h_k·e_k) − S(p − h_k·e_k)) / (2·h_k)
+#
+# This requires 2·n_params solves + sensitivity evaluations per card, but it
+# runs once offline during the sweep and costs ~50 ms per card on this system.
+
+def solution_hessian(x, p: dict, rel_step: float = 1e-4) -> np.ndarray | None:
+    """d²x*/dp² at a converged solution — the curvature of the solution manifold.
+
+    Shaped ``(n_state, n_param, n_param)`` so that ``H[i, j, k]`` reads
+    "second derivative of state i w.r.t. parameters j and k".
+
+    Computed by central-differencing :func:`solution_sensitivity` over each
+    parameter direction.  The step is relative to the parameter value, with a
+    floor at the bound width to keep it meaningful for small parameters like
+    ``c_load``.  Returns ``None`` if any inner sensitivity call fails.
+    """
+    n_p = len(PARAM_NAMES)
+    n_x = len(STATE_NAMES)
+    H = np.zeros((n_x, n_p, n_p))
+    for k, name in enumerate(PARAM_NAMES):
+        v = float(p[name])
+        lo, hi = PARAM_BOUNDS[name]
+        h = rel_step * max(abs(v), 0.01 * (hi - lo))
+        pp, pm = dict(p), dict(p)
+        pp[name] = v + h
+        pm[name] = v - h
+        # re-solve at each perturbed parameter to get the sensitivity there
+        rp = solve(pp, x0=x, max_iter=MAX_ITER)
+        rm = solve(pm, x0=x, max_iter=MAX_ITER)
+        if not (rp["converged"] and rm["converged"]):
+            return None
+        try:
+            Sp = solution_sensitivity(np.asarray(rp["x"]), pp)
+            Sm = solution_sensitivity(np.asarray(rm["x"]), pm)
+        except np.linalg.LinAlgError:
+            return None
+        H[:, :, k] = (Sp - Sm) / (2.0 * h)
+    # symmetrise: H[:, j, k] should equal H[:, k, j] by Schwarz's theorem
+    H = 0.5 * (H + np.transpose(H, (0, 2, 1)))
+    return H
+
+
+def transfer_start_second_order(x_src, sens, hess, p_src: dict,
+                                p_query: dict) -> np.ndarray:
+    """Second-order warm start: the source solution, with tangent and curvature.
+
+    Falls back to first-order if ``hess`` is None, and to verbatim if ``sens``
+    is also None — the same graceful degradation the rest of the pipeline uses.
+    """
+    x0 = np.asarray(x_src, dtype=float).copy()
+    dp = param_vector(p_query) - param_vector(p_src)
+    if sens is not None:
+        x0 += np.asarray(sens, dtype=float) @ dp
+    if hess is not None:
+        H = np.asarray(hess, dtype=float)
+        # ½ Δp^T · H[i] · Δp  for each state i
+        x0 += 0.5 * np.einsum('ijk,j,k->i', H, dp, dp)
+    return x0
+
+
+# --- multi-point interpolation ----------------------------------------------
+#
+# Instead of picking one candidate and walking its tangent, combine *all*
+# admitted candidates' first-order transfers with inverse-distance weighting.
+# This creates a local response surface from the neighbourhood without any new
+# offline computation — it reuses the existing sensitivities.
+
+def transfer_start_simplex(candidates: list[tuple], p_query: dict) -> np.ndarray:
+    """Multi-point inverse-distance-weighted first-order transfer.
+
+    Each entry in ``candidates`` is ``(x, sens, p_src, distance)`` where
+    distance is the normalised parameter distance.  The weight is ``1/d²``
+    (Shepard interpolation), which gives nearby candidates much more influence
+    while still blending information from further ones.
+
+    Falls back to the single nearest candidate's first-order transfer when the
+    list has only one entry.
+    """
+    if not candidates:
+        raise ValueError("transfer_start_simplex needs at least one candidate")
+
+    eps = 1e-12  # prevent division by zero on an exact match
+    weights = []
+    transfers = []
+    for x_src, sens, p_src, dist in candidates:
+        x0 = transfer_start(x_src, sens, p_src, p_query)
+        w = 1.0 / max(dist, eps) ** 2
+        weights.append(w)
+        transfers.append(x0)
+
+    weights = np.array(weights)
+    weights /= weights.sum()
+    return sum(w * t for w, t in zip(weights, transfers))
+
+
 # --- the solve --------------------------------------------------------------
 
 TOL = 1e-8          # max-norm of the residual (L/min on nodes, Nm on shafts)

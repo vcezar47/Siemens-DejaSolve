@@ -1,7 +1,8 @@
 # Déjà Solve — Plan (Siemens Summer School 2026)
 
 **Deadline:** Friday 28 August 2026, 13:00 · **Today:** Wednesday 19 August 2026 · **9 days**
-*(plan revised 16 Aug after mentor's answers — see §0; revised again 19 Aug after the engineer interview — see §0b)*
+*(plan revised 16 Aug after mentor's answers — see §0; revised again 19 Aug after the engineer interview — see §0b;
+revised again 25 Aug after the first-order transfer landed — see §6a)*
 **Presentation:** 10 minutes · **Audience:** SISW SRL Brașov colleagues, incl. teachers/lab assistants
 **Domain to register under:** *Digital Twins & Platforms* (primary) — it is a platform/data layer, and it avoids
 colliding with the colleague who took *Procesare Semnal & Algoritmi* with the ROM idea.
@@ -467,13 +468,17 @@ that produced it throws it away and starts the validation run from zero."*
 you might expect — the prediction wins by 5.6%. Concede it there (§6e), do not stage it here.
 
 Say the last row out loud: **"the speed of AI, the guarantee of the solver."** Then the sweep-level number
-from §6a: *"Across 200 fresh cases: 31% fewer Newton iterations than a good engineering guess — 42% against
-a flat start — and the answers agree to 4×10⁻⁸ bar."*
+from §6a: *"Across 200 fresh cases: 51% fewer Newton iterations than a good engineering guess, by walking the
+archived state toward the query instead of copying it — 31% if I only reuse the state as-is — and the answers
+agree to 4×10⁻⁸ bar."*
 
-**Quote the 31%, not the 42%.** If someone asks why, the answer is the strongest thing on this slide: *"42%
-is against a flat start, which is a baseline nobody ships. I added the guess a competent tool actually makes
-and re-measured against that."* Do **not** say "all four cold-start failures rescued" — that claim was
-retracted (§6a), because the nominal guess rescues the same four.
+**Lead with 51%, and have the 31% ready as the fallback number.** If time is short or the room is not
+technical, the three-arm table and its 31%/42% is still a complete, true story — say it and stop; the
+fourth-arm slide is additive, not required. If someone asks *"is that the best you can do?"*, the honest
+answer moved: **"the 31% is what copying the archived state gets. It also knows how its own answer moves —
+that is one derivative, computed once, offline — and using that gets 51%, with the same 0 disagreements."**
+Do **not** say "all four cold-start failures rescued" — that claim was retracted (§6a), because the nominal
+guess rescues the same four.
 
 **Act 3 — the trust layer (80s), in two beats.** This is the act the engineer interview rewrote, and the two
 beats are the two halves of one rule: *the engineer decides what to do with a risk; the system decides what is
@@ -566,6 +571,33 @@ methodological error [WARP](https://arxiv.org/abs/2605.05728) documents in the w
 baseline is one nobody would ship, so the win is inflated. The flat start is especially weak *here*: equal
 pressures sit on the worst spot of the orifice sqrt curve and zero speed sits in the Stribeck
 regularisation, so the model punishes that guess specifically.
+
+### A fourth arm — 25 Aug, and this one is the new headline
+
+The `warm` row above still hands Newton the neighbour's converged state **verbatim** — the archived answer,
+asserted as this query's answer. It throws away everything the archived run knows except where it landed.
+It also knows the *tangent* of its own solution: `dx*/dp = -J⁻¹ ∂F/∂p` by the implicit function theorem, one
+linear solve per card, computed once and stored on the Case Card (392 bytes, 277 µs). The start becomes
+`x0 = x_j + S_j (p - p_j)` — the neighbour's answer, walked toward the query — instead of standing in for it.
+
+| | cold | nominal | warm (verbatim) | + sensitivity | + ranked, k=5 |
+|---|---|---|---|---|---|
+| mean iterations | 8.3 | 7.1 | 4.9 | **3.8** | **3.4** |
+| vs nominal | — | — | 31.1% | **47.1%** | **51.5%** |
+
+**0 answers differ from the verbatim column**, same 3e-08 bar agreement, `selftest.py` gained a fourth
+invariant checking the new derivative (worst relative error 3e-08), and **the phase-1 summary hash did not
+move** — `830da3e6a4480676`, same as 16 Aug. This is additive: the archive gained a field, cold/nominal/warm
+are bit-identical, and every other number in this file measured against the 31% (the surrogate comparison,
+the dimensionality table, the wide-parameter sweep) still is — none of those were re-run.
+
+**Say 51.5%, not 31%, if there is time for one number.** If there is only room for the three-arm table, say
+31% and move on — it is still true, and it is the more conservative claim. If asked *"is that the best you
+can do?"* the honest answer is now yes, further: it also **fixes** the fold circuit's inadmissible answers
+(11 → 1 on the same k=5 gated shortlist, § 6k) — something none of §6k's four rankers managed, because every
+arm there, including the oracle, still copied the state verbatim. It is the reason §6k's "four rankers that
+all lose" is no longer the last word: none of them were choosing badly, they were all limited by what a
+verbatim transfer can buy no matter which candidate is picked.
 
 **One claim was retracted when the third arm went in, and saying so is an asset, not a liability:** *"all 4
 cold-start failures rescued"* is gone. The nominal guess rescues the same four, so the archive rescues
@@ -1280,6 +1312,28 @@ arm writes its own file and stays out of `run_all.py`. The deterministic arms ar
 pre-filter as a safety mechanism (§6e), the failure-proximity gate rule (§6f) and top-k retrieval (§6j). The
 pattern is the most credible thing in the deck — and this one cost two models and a prompt to establish.
 
+### The headroom this section could not reach — reached, 25 Aug, and not by ranking
+
+Point 5 above named what was missing: *"capturing it needs a predictor of transfer cost."* Every arm in this
+table shares one assumption — the transferred state is the neighbour's state, verbatim, and the only freedom
+is *which* neighbour. That assumption is what makes the ceiling a ceiling. Differentiating the converged
+residual through the implicit function theorem gives `dx*/dp = -J⁻¹ ∂F/∂p` at the archived solution — a
+predictor of transfer cost, computed offline and stored on the card, not asked of a model. `‖S_j Δp‖` scaled
+per state is that predictor, and ranking by it is the sixth arm this table did not have:
+
+| arm (k=5, gated) | base total | fold total, inadmissible |
+|---|---|---|
+| oracle *(this table's ceiling)* | 868 | 1361, 5 |
+| distance — today | 984 | 1589, 11 |
+| **+ sensitivity (transfer only, distance still picks)** | **757** | **1067, 1** |
+| **+ sensitivity, ranked by it** | **705** | **1026, 1** |
+
+**Both beat the oracle in this table**, because that oracle bounded *selection among verbatim transfers* and
+this is not one. It is not a rebuttal of §6k — every conclusion there about the four rankers stands, and
+distance genuinely is a weak *ordering* signal on the states this table gave it to rank. What changed is the
+thing being ranked stopped being a fixed cost. Full numbers and the fold-circuit safety result (inadmissible
+11 → 1) in `phases/phase-1-the-number.md` § *A fourth arm*.
+
 ---
 
 ## 7. 10-minute presentation — time budget
@@ -1303,8 +1357,8 @@ results.*
 
 **Act 2 got heavier on 20 Aug and its 55 seconds did not.** Five rows and a concession will not fit at
 speaking pace. Rehearse it against a timer first, and if it overruns, the thing to drop is the *cold* row —
-it is the baseline you already argue against elsewhere, and §6a's "quote the 31%, not the 42%" rule means you
-are not leaning on it anyway. Do not drop the concession; a table with an unexplained winner invites the
+it is the baseline you already argue against elsewhere, and §6a's "lead with 51%" rule means you
+are not leaning on the flat-start comparison anyway. Do not drop the concession; a table with an unexplained winner invites the
 question you did not get to answer.
 
 **The 3:30 slide has to pay for itself in 40 seconds.** Do not narrate the meeting. Three bullets, one of them

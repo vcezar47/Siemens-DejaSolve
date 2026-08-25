@@ -112,6 +112,13 @@ class Archive:
         self.norm = model.normalise(params)
         self.states = np.array([[r["solution"][k] for k in model.STATE_NAMES]
                                 for r in self.records])
+        #: dx*/dp per card, when the sweep recorded one. `None` for a singular
+        #: Jacobian, and `None` for every card in an archive written before
+        #: sensitivities existed -- `model.transfer_start` degrades to the
+        #: verbatim state in both cases, so an old archive still works.
+        self.sensitivity = [
+            None if r.get("sensitivity") is None
+            else np.asarray(r["sensitivity"], dtype=float) for r in self.records]
         self.verifier = verifier.Verifier(self.records)
         #: what kind of model this archive holds. Every record in it came
         #: through the same Case Card schema, so the archive inherits its
@@ -123,6 +130,19 @@ class Archive:
         d = np.linalg.norm(self.norm - q, axis=1)
         j = int(np.argmin(d))
         return j, float(d[j])
+
+    def warm_start(self, j: int, params: dict) -> tuple[np.ndarray, bool]:
+        """The start to hand Newton for query `params`, from archive case `j`.
+
+        First-order when the card carries a tangent, verbatim when it does not.
+        Returns the flag too, because the report says which one it used -- a
+        demo that quietly switches transfer order is the failure mode this
+        project is about.
+        """
+        s = self.sensitivity[j]
+        x0 = model.transfer_start(self.states[j], s, self.records[j]["params"],
+                                  params)
+        return x0, s is not None
 
     def nearest_failure(self, params: dict) -> dict | None:
         """The closest run that *died*, as context -- never as a decision.
@@ -395,7 +415,12 @@ def analyse(text: str, name: str, archive: Archive,
     nom = model.solve(card.params, x0=model.nominal_start(card.params),
                       record_path=True)
     if accepted:
-        warm = model.solve(card.params, x0=archive.states[j], record_path=True)
+        # The retrieved card is not just a state -- it also recorded how its
+        # answer moves with the case parameters, so the start is walked from
+        # the neighbour's operating point toward this one before Newton sees
+        # it. Same candidate, same gate, same answer; fewer iterations.
+        x0, first_order = archive.warm_start(j, card.params)
+        warm = model.solve(card.params, x0=x0, record_path=True)
         chosen, label = warm, "warm"
     else:
         # A warning the engineer left standing should not cost them anything.
@@ -403,6 +428,7 @@ def analyse(text: str, name: str, archive: Archive,
         # does not involve it. Cold remains the last resort if nominal fails --
         # and this is what makes the warning cheap enough to be worth reading.
         warm = None
+        first_order = False
         chosen, label = ((nom, "nominal") if nom["converged"]
                          else (cold, "cold"))
 
@@ -413,7 +439,12 @@ def analyse(text: str, name: str, archive: Archive,
              "start": label}
     if warm is not None:
         solve.update(warm_iterations=warm["iterations"],
-                     warm_status=warm["status"])
+                     warm_status=warm["status"],
+                     #: which transfer order was used. Stated rather than
+                     #: implied: an archive without tangents still warm-starts,
+                     #: just not as well, and the report should not let those
+                     #: two look like the same run.
+                     transfer="first_order" if first_order else "verbatim")
         if cold["converged"] and warm["converged"]:
             dx = np.abs(np.array(cold["x"]) - np.array(warm["x"]))
             solve["agreement"] = float(dx.max())

@@ -175,6 +175,68 @@ def random_floor(result: dict, states: np.ndarray, queries: list[dict],
             "inadmissible": sum(1 for g in picked if not g["admissible"])}
 
 
+def sensitivity_arms(result: dict, states: np.ndarray, queries: list[dict],
+                     records: list[dict]) -> dict:
+    """The two arms that use what the archived card knows about its own slope.
+
+    Every arm above transfers the chosen state **verbatim**, which is why they
+    all land on top of each other: they differ only in *which* answer to copy,
+    and copying is the part that costs the iterations. That makes this file's
+    original conclusion -- "nothing beats distance" -- true of the arms it had
+    and false in general, so the arms that break it belong here rather than in
+    a footnote somewhere else.
+
+    Reported as two arms because they are two separate claims:
+
+      * **first_order** -- distance picks the candidate, exactly as today, and
+        only the *transfer* changes. Isolates what the tangent alone is worth.
+      * **sensitivity** -- the tangent also does the *ranking*, by predicted
+        start error. Isolates what it is worth as a ranking signal, on top.
+
+    The second is the one that matters for this file's question. Distance asks
+    "how different is this case?"; predicted start error asks "how far will
+    this card's answer actually move over that difference" -- which is the
+    question the ranking was always a proxy for. A card sitting right at its
+    relief valve's cracking point moves a great deal over a small parameter
+    step; a card far from it barely moves at all. Distance cannot see that.
+    """
+    def transferred(p: dict, j: int) -> dict:
+        s = records[j].get("sensitivity")
+        r = model.solve(p, x0=model.transfer_start(
+            states[j], None if s is None else np.asarray(s, dtype=float),
+            records[j]["params"], p))
+        ok = r["converged"] and verifier.Verifier.check_solution(r["x"], p).admit
+        return {"iterations": r["iterations"], "converged": r["converged"],
+                "admissible": bool(ok), "x": r["x"]}
+
+    def score(c: dict, p: dict) -> float:
+        s = records[c["index"]].get("sensitivity")
+        return model.predicted_start_error(
+            None if s is None else np.asarray(s, dtype=float),
+            records[c["index"]]["params"], p)
+
+    picks: dict[str, list] = {"first_order": [], "sensitivity": []}
+    chose_nearest = 0
+    for row, p in zip(result["rows"], queries):
+        if not row["any_admitted"]:
+            picks["first_order"].append(row["distance"])
+            picks["sensitivity"].append(row["distance"])
+            continue
+        adm = [c for c in row["shortlist"] if c["admitted"]]
+        picks["first_order"].append(transferred(p, adm[0]["index"]))
+        best = min(adm, key=lambda c: score(c, p))
+        chose_nearest += int(best["index"] == adm[0]["index"])
+        picks["sensitivity"].append(transferred(p, best["index"]))
+
+    out = {name: {
+        "total_iterations": int(sum(g["iterations"] for g in got)),
+        "mean_iterations": float(np.mean([g["iterations"] for g in got])),
+        "inadmissible": sum(1 for g in got if not g["admissible"]),
+    } for name, got in picks.items()}
+    out["sensitivity"]["agreed_with_distance"] = chose_nearest
+    return out
+
+
 def physics_rank(result: dict, states: np.ndarray, queries: list[dict]) -> dict:
     """Rank the admitted candidates by *estimated regime match*, not by distance.
 
@@ -240,6 +302,27 @@ def report_ceiling(payload: dict) -> None:
                / max(a["distance"]["total_iterations"], 1))
         print(f"  headroom for ANY ranker             : "
               f"{r['headroom_iterations']} iterations ({pct:.1f}%)")
+
+        # Printed under the headroom line on purpose: these two arms are not
+        # inside it. The ceiling above is the ceiling on *choosing* among
+        # verbatim transfers, and these change what a transfer is, so they are
+        # allowed to sit below a bound that was never about them.
+        if "sensitivity_arms" in r:
+            sa = r["sensitivity_arms"]
+            print(f"\n  the bound above is on picking a state to copy. "
+                  f"Not copying it:")
+            print(f"  {'arm':<14}{'mean iters':>12}{'total':>9}{'inadmissible':>14}")
+            print(f"  {'first_order':<14}{sa['first_order']['mean_iterations']:>12.2f}"
+                  f"{sa['first_order']['total_iterations']:>9}"
+                  f"{sa['first_order']['inadmissible']:>14}"
+                  f"   <- distance picks, tangent transfers")
+            se = sa["sensitivity"]
+            print(f"  {'sensitivity':<14}{se['mean_iterations']:>12.2f}"
+                  f"{se['total_iterations']:>9}{se['inadmissible']:>14}"
+                  f"   <- tangent also ranks")
+            print(f"  ranked the nearest candidate first in "
+                  f"{se['agreed_with_distance']}/"
+                  f"{r['queries_with_an_admitted_candidate']} queries")
 
 
 # --- the model arm ----------------------------------------------------------
@@ -381,14 +464,17 @@ def run_deterministic(archive_path: Path, n_query: int, seed: int,
     }
     qs = {"base": sample_cases(n_query, seed),
           "fold": fold.fold_cases(n_query, seed=77)}
-    st = {"base": load_archive(archive_path)[2]}
+    base_records, _bn, base_states = load_archive(archive_path)
+    st = {"base": base_states}
     recs, _rej, _stats = fold.sweep_fold(n_fold_archive, seed=11)
     st["fold"] = np.array([[r["solution"][kk] for kk in model.STATE_NAMES]
                            for r in recs])
+    rc = {"base": base_records, "fold": recs}
     for r in payload["results"]:
         c = r["circuit"]
         r["random"] = random_floor(r, st[c], qs[c])
         r["physics"] = physics_rank(r, st[c], qs[c])
+        r["sensitivity_arms"] = sensitivity_arms(r, st[c], qs[c], rc[c])
 
     if out is not None:
         # the per-query shortlists are what the model arm consumes; they are

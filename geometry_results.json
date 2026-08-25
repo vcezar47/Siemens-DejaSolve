@@ -1,0 +1,159 @@
+{
+  "generated_utc": "2026-08-25T08:13:41+00:00",
+  "circuit": "geometry",
+  "unknowns": 12,
+  "parameters": {
+    "total": 18,
+    "geometric": 10
+  },
+  "archive": {
+    "n": 300,
+    "kept": 297,
+    "failed": 3
+  },
+  "n_queries": 200,
+  "arms": {
+    "cold": {
+      "mean_iterations": 8.35678391959799,
+      "total_iterations": 1663,
+      "failures": 1
+    },
+    "nominal": {
+      "mean_iterations": 7.265,
+      "total_iterations": 1453,
+      "failures": 0
+    },
+    "warm": {
+      "mean_iterations": 6.225,
+      "total_iterations": 1245,
+      "failures": 0
+    }
+  },
+  "iteration_reduction_vs_nominal_pct": 14.315209910529935,
+  "iteration_reduction_vs_cold_pct": 25.13529765484065,
+  "agreement_max_dp_bar": 4.625468363883556e-08,
+  "neighbour_distance": {
+    "mean": 1.0408170090504387,
+    "max": 1.2761284644128381
+  },
+  "example_lines": [
+    {
+      "line": "supply",
+      "length_m": 2.8175171136069617,
+      "bore_mm": 20.422081568891848,
+      "dp_bar": 0.8087695072877636,
+      "q_lmin": 60.32090485171025,
+      "reynolds": 995.9681822419368,
+      "regime": "laminar"
+    },
+    {
+      "line": "line_a",
+      "length_m": 1.4736766152959886,
+      "bore_mm": 19.06192679392445,
+      "dp_bar": 0.3901153007453786,
+      "q_lmin": 45.22310455384719,
+      "reynolds": 799.965392397303,
+      "regime": "laminar"
+    },
+    {
+      "line": "line_b",
+      "length_m": 1.8060801554349268,
+      "bore_mm": 18.410266192569942,
+      "dp_bar": 0.1403178505503604,
+      "q_lmin": 15.097800297862495,
+      "reynolds": 276.52298217554994,
+      "regime": "laminar"
+    },
+    {
+      "line": "ret_a",
+      "length_m": 1.4433632982746696,
+      "bore_mm": 16.13497923737015,
+      "dp_bar": 0.7838404013826832,
+      "q_lmin": 45.22310455384818,
+      "reynolds": 945.0822045207786,
+      "regime": "laminar"
+    },
+    {
+      "line": "ret_b",
+      "length_m": 0.4322506731211032,
+      "bore_mm": 15.425514529965106,
+      "dp_bar": 0.07076658692023052,
+      "q_lmin": 15.097800297863092,
+      "reynolds": 330.0286483362358,
+      "regime": "laminar"
+    }
+  ],
+  "example_case": {
+    "params": {
+      "Q_nom": 63.52036468955171,
+      "A_valve_a": 8.156780685417969,
+      "A_valve_b": 1.727339988990463,
+      "c_load_a": 1.7592496055493757e-05,
+      "c_load_b": 9.915421155946378e-06,
+      "p_crack": 217.1450314211737,
+      "rho": 830.0201422440332,
+      "mu": 0.05223599558865813,
+      "L_supply": 2.8175171136069617,
+      "D_supply": 20.422081568891848,
+      "L_line_a": 1.4736766152959886,
+      "D_line_a": 19.06192679392445,
+      "L_line_b": 1.8060801554349268,
+      "D_line_b": 18.410266192569942,
+      "L_ret_a": 1.4433632982746696,
+      "D_ret_a": 16.13497923737015,
+      "L_ret_b": 0.4322506731211032,
+      "D_ret_b": 15.425514529965106
+    },
+    "solution": {
+      "p0": 199.96623986503764,
+      "p1": 199.15747035774987,
+      "p1a": 198.7673550570045,
+      "p2a": 126.4498839391659,
+      "p3a": 48.89887491989213,
+      "p4a": 48.11503451850945,
+      "w_a": 1364.7526366707023,
+      "p1b": 199.0171525071995,
+      "p2b": 19.28252596162102,
+      "p3b": 5.4335149108090715,
+      "p4b": 5.362748323888841,
+      "w_b": 463.1506274014663
+    },
+    "relief_open": false
+  },
+  "retrieval": {
+    "archive": 297,
+    "n_queries": 200,
+    "arms": {
+      "all 18 params": {
+        "total_iterations": 1245,
+        "vs_nominal_pct": 14.315209910529935,
+        "found_oracle_pick": 48
+      },
+      "7 lumped only": {
+        "total_iterations": 1338,
+        "vs_nominal_pct": 7.91465932553338,
+        "found_oracle_pick": 26
+      },
+      "11 geometry+fluid": {
+        "total_iterations": 1316,
+        "vs_nominal_pct": 9.428768066070203,
+        "found_oracle_pick": 22
+      },
+      "nominal": {
+        "total_iterations": 1453,
+        "vs_nominal_pct": null,
+        "found_oracle_pick": null
+      },
+      "random archived state": {
+        "total_iterations": 1494,
+        "vs_nominal_pct": -2.821748107364064,
+        "found_oracle_pick": null
+      },
+      "oracle": {
+        "total_iterations": 869,
+        "vs_nominal_pct": 40.19270474879559,
+        "found_oracle_pick": null
+      }
+    }
+  }
+}

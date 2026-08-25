@@ -29,6 +29,7 @@ import numpy as np
 
 import model
 import verifier
+import sweep
 from sweep import sample_cases
 
 D_FOLD = 5.0          # cm^3/rev -- a small motor, ordinary hardware
@@ -202,6 +203,12 @@ def sweep_fold(n: int, seed: int) -> tuple[list[dict], list[dict], dict]:
             "params": params,
             "solution": dict(zip(model.STATE_NAMES, r["x"])),
             "regime": model.regime(r["x"], p),
+            #: the same tangent `sweep.py` records on the base circuit. It
+            #: matters more here: on a circuit with three roots the transfer
+            #: decides which one Newton walks to, and a start that lands
+            #: closer to the *admissible* root is not only cheaper, it is
+            #: right more often.
+            "sensitivity": sweep.sensitivity_of(r["x"], p),
             "solve": {"start": "cold", "status": r["status"],
                       "iterations": r["iterations"],
                       "residual_inf": r["residual_inf"]},

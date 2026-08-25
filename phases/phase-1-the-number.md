@@ -210,3 +210,42 @@ This is a smaller claim than the one Phase 1 originally closed on. It is also
 the one that holds up when someone in the room has read the literature — and
 "here is the baseline that killed half my headline, here is what was left"
 is a better answer to that question than being asked it cold.
+
+## A fourth arm: transferring first-order instead of verbatim (25 Aug)
+
+The `warm` arm above still asserts the neighbour's converged state *as* the
+query's answer — a zeroth-order transfer. That is why the selection-ranking
+work in Phase 2d dead-ends at a modest ceiling (§ agent_select): choosing a
+*better* neighbour cannot fix a transfer that discards everything except the
+endpoint. The archived run also knows the tangent of its own solution —
+`dx*/dp = -J⁻¹ ∂F/∂p` by the implicit function theorem, one linear solve per
+card, computed once and stored (`sensitivity` in every `cases.jsonl` record).
+The start becomes `x0 = x_j + S_j (p - p_j)` instead of `x0 = x_j`.
+
+| | cold (flat) | nominal | warm (verbatim) | + sensitivity | + ranked, k=5 |
+|---|---|---|---|---|---|
+| mean Newton iterations | 8.3 | 7.1 | 4.9 | **3.8** | **3.4** |
+| vs nominal | — | — | 31.1% | **47.1%** | **51.5%** |
+
+**0 answers differ from the verbatim column** across all 196 compared cases;
+agreement holds to 3e-08 bar, same as every other arm. `selftest.py` gained a
+fourth invariant — the analytic `∂F/∂p` against central differences, worst
+relative error 2.96e-08 — for the same reason the Jacobian check exists: a
+wrong entry would not crash, it would quietly change the iteration count this
+phase reports.
+
+**The phase-1 summary hash is unchanged: `830da3e6a4480676`.** Cold, nominal
+and warm are bit-identical; the archive only gained a field, and the two new
+arms sit outside everything the hash covers. This is additive, not a
+re-measurement — which is also why the 31% stays the number quoted everywhere
+else in this project that was measured against it (the surrogate comparison,
+the dimensionality table, the wide-parameter sweep): changing the baseline
+there would mean re-running all of them, and none of them have been.
+
+**It matters more on the fold circuit than it costs here.** Phase 2d's k=5
+gated shortlist, re-run with the tangent transferring instead of copying:
+mean iterations 7.95 → 5.13, and — the number that actually matters on a
+circuit with three roots — **inadmissible answers 11 → 1**. A start that
+lands closer to the true operating point is a start less likely to overshoot
+into an unstable one, so cost and correctness move together instead of
+trading off. Full numbers in `agent_select_results.json`.

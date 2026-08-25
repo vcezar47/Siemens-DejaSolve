@@ -40,6 +40,32 @@ def sample_cases(n: int, seed: int) -> list[dict]:
     return [dict(zip(model.PARAM_NAMES, row)) for row in scaled]
 
 
+def sensitivity_of(x, p: dict) -> list[list[float]] | None:
+    """The solution's tangent in parameter space, or None if there isn't one.
+
+    A singular Jacobian at a converged solution is rare but not a crash: the
+    case is still solved and still worth archiving, it just cannot say how its
+    answer moves. Recording that as an explicit `null` keeps the distinction
+    between "no tangent" and "zero tangent", which are very different claims.
+    """
+    try:
+        return model.solution_sensitivity(x, p).tolist()
+    except np.linalg.LinAlgError:
+        return None
+
+
+def hessian_of(x, p: dict) -> list[list[list[float]]] | None:
+    """The solution's curvature in parameter space, or None.
+
+    Computed by central-differencing the first-order sensitivity over each
+    parameter direction.  Costs ~14 perturbed solves per card, but runs once
+    offline and adds ~50 ms per card.  A card whose hessian is ``null`` still
+    transfers first-order; the second-order correction simply does not apply.
+    """
+    H = model.solution_hessian(x, p)
+    return None if H is None else H.tolist()
+
+
 def run_sweep(n: int, seed: int, out_dir: Path) -> dict:
     cases = sample_cases(n, seed)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -58,6 +84,17 @@ def run_sweep(n: int, seed: int, out_dir: Path) -> dict:
                 "params": {k: float(v) for k, v in p.items()},
                 "solution": dict(zip(model.STATE_NAMES, res["x"])),
                 "regime": model.regime(res["x"], p),
+                #: dx*/dp at this solution -- what makes the transfer
+                #: first-order instead of verbatim. Stored rather than
+                #: recomputed on load because retrieval has to work without
+                #: the model: once the archive is a database rather than a
+                #: file, the service answering a query holds Case Cards, not
+                #: a residual it can differentiate.
+                #: `null` when the Jacobian is singular here -- a solved case
+                #: with no usable tangent is still a usable case, and
+                #: `model.transfer_start` falls back to the verbatim state.
+                "sensitivity": sensitivity_of(res["x"], p),
+                "hessian": hessian_of(res["x"], p),
                 "solve": {
                     "start": "cold",
                     "status": res["status"],
@@ -112,6 +149,8 @@ def run_sweep(n: int, seed: int, out_dir: Path) -> dict:
         },
         "wall_s": wall_s,
         "relief_open_share": float(np.mean([r["regime"]["relief_open"] for r in records])),
+        "with_sensitivity": sum(1 for r in records if r["sensitivity"] is not None),
+        "with_hessian": sum(1 for r in records if r["hessian"] is not None),
     }
     (out_dir / "sweep_summary.json").write_text(json.dumps(summary, indent=2),
                                                 encoding="utf-8")
@@ -122,6 +161,10 @@ def run_sweep(n: int, seed: int, out_dir: Path) -> dict:
     print(f"  cold iterations: mean {iters.mean():.1f}  median "
           f"{np.median(iters):.0f}  max {iters.max()}")
     print(f"  relief valve open in {100 * summary['relief_open_share']:.0f}% of the archive")
+    print(f"  solution sensitivity recorded on {summary['with_sensitivity']}"
+          f"/{len(records)} cards")
+    print(f"  solution hessian recorded on {summary['with_hessian']}"
+          f"/{len(records)} cards")
     print(f"  -> {out_dir / 'cases.jsonl'}  ({len(failures)} failures -> "
           f"{out_dir / 'failures.jsonl'})")
     return summary

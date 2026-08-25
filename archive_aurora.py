@@ -84,6 +84,14 @@ class AuroraArchive(dejasolve.Archive):
         self.norm = model.normalise(params)
         self.states = np.array([[r["solution"][k] for k in model.STATE_NAMES]
                                 for r in self.records])
+        #: same rule as dejasolve.Archive: `record` is the whole JSON blob
+        #: `sync_archive_to_aurora.py` upserted, so a card synced before
+        #: sensitivities existed simply has none, and `warm_start` (inherited
+        #: from `dejasolve.Archive`, not overridden here) degrades to the
+        #: verbatim transfer for it rather than raising.
+        self.sensitivity = [
+            None if r.get("sensitivity") is None
+            else np.asarray(r["sensitivity"], dtype=float) for r in self.records]
         self.verifier = verifier.Verifier(self.records)
         self.domain = casecard.DOMAIN
 

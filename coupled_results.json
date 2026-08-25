@@ -1,0 +1,107 @@
+{
+  "generated_utc": "2026-08-25T12:22:16+00:00",
+  "widths": [
+    {
+      "branches": 2,
+      "unknowns": 8,
+      "parameters": 26,
+      "archive": 500,
+      "n_queries": 200,
+      "distinct_configurations": 1,
+      "arms": {
+        "flat": {
+          "mean": 11.662921348314606,
+          "failures": 111
+        },
+        "decomposed": {
+          "mean": 5.02,
+          "failures": 0
+        },
+        "warm": {
+          "mean": 6.717948717948718,
+          "failures": 5
+        }
+      },
+      "warm_vs_decomposed_pct": -33.8100102145046,
+      "warm_vs_flat_pct": 40.50632911392405,
+      "configuration_hit": {
+        "decomposed": [
+          159,
+          200
+        ],
+        "warm": [
+          159,
+          200
+        ]
+      }
+    },
+    {
+      "branches": 3,
+      "unknowns": 11,
+      "parameters": 35,
+      "archive": 500,
+      "n_queries": 200,
+      "distinct_configurations": 1,
+      "arms": {
+        "flat": {
+          "mean": 12.795918367346939,
+          "failures": 151
+        },
+        "decomposed": {
+          "mean": 5.115,
+          "failures": 0
+        },
+        "warm": {
+          "mean": 7.3076923076923075,
+          "failures": 5
+        }
+      },
+      "warm_vs_decomposed_pct": -42.78557114228456,
+      "warm_vs_flat_pct": 44.338118022328544,
+      "configuration_hit": {
+        "decomposed": [
+          164,
+          200
+        ],
+        "warm": [
+          164,
+          200
+        ]
+      }
+    },
+    {
+      "branches": 4,
+      "unknowns": 14,
+      "parameters": 44,
+      "archive": 499,
+      "n_queries": 200,
+      "distinct_configurations": 2,
+      "arms": {
+        "flat": {
+          "mean": 13.446428571428571,
+          "failures": 144
+        },
+        "decomposed": {
+          "mean": 5.106060606060606,
+          "failures": 2
+        },
+        "warm": {
+          "mean": 7.875,
+          "failures": 8
+        }
+      },
+      "warm_vs_decomposed_pct": -54.128440366972484,
+      "warm_vs_flat_pct": 38.48314606741573,
+      "configuration_hit": {
+        "decomposed": [
+          155,
+          198
+        ],
+        "warm": [
+          155,
+          198
+        ]
+      }
+    }
+  ]
+}

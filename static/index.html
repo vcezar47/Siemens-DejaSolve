@@ -94,7 +94,11 @@
               color:var(--dim);padding:12px 16px;font-weight:600;
               border-bottom:2px solid transparent;
               border-image:linear-gradient(90deg,var(--grad-1),var(--grad-3)) 1}
-  .geo h2,.mach h2,.ev h2{border-bottom:2px solid transparent;
+  /* `.ev h2` was here too until the Evidence panel moved to
+     presentation/evidence-section.html, which carries its own copy of these
+     rules -- a selector for an element this page no longer has reads like a
+     section someone forgot to render. */
+  .geo h2,.mach h2{border-bottom:2px solid transparent;
               border-image:linear-gradient(90deg,var(--grad-1),var(--grad-3)) 1;
               padding-bottom:8px}
   .body{padding:16px}
@@ -219,6 +223,12 @@
         font:inherit;font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
 .geotab.on{border-color:var(--teal);color:var(--ink);background:#0d2b2b}
 .geotab:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+/* an arm the pipeline never solved. Shown rather than hidden: "warm — not run"
+   is the result, and a tab that quietly disappears looks like a missing
+   feature instead of a refusal. */
+.geotab[disabled]{opacity:.4;cursor:default;border-style:dashed}
+.geotab[disabled]:hover{border-color:var(--line);color:var(--dim)}
+input[type=range]:disabled{opacity:.35;cursor:default}
 .geoview{width:100%;display:block;touch-action:none;cursor:grab;user-select:none}
 .geoview.drag{cursor:grabbing}
 .geocap{color:var(--faint);font-size:11.5px;line-height:1.55;margin-top:8px;
@@ -363,6 +373,23 @@
   <div class="geocap" id="machnote"></div>
 </section>
 
+<section class="mach" id="flow" style="display:none;margin-top:24px;border-top:1px solid var(--line-soft);padding-top:20px">
+  <h2>Where the flow goes</h2>
+  <div class="machsub">
+    The same solved case, drawn as flow instead of pressure. Every leg carries
+    what the solver says it carries &mdash; the dots are spaced by flow rate, so
+    a tighter stream is more litres per minute. <b>The model is lumped and has no
+    pipe area, so there is no velocity to draw</b>: spacing is the honest
+    variable, not speed.
+  </div>
+  <svg id="flowview" viewBox="0 0 470 250" role="img"
+       aria-label="the analysed case, drawn as flow through the circuit"
+       style="width:100%;max-width:760px;display:block;background:var(--panel);
+              border:1px solid var(--line);border-radius:8px"></svg>
+  <div class="geonums" id="flownums"></div>
+  <div class="geocap" id="flowcap"></div>
+</section>
+
 <section class="mach" id="stepper" style="margin-top:24px;border-top:1px solid var(--line-soft);padding-top:20px">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
     <h2>Newton Convergence & Fluid Dynamics Studio</h2>
@@ -374,12 +401,10 @@
 
   <div class="geostage" style="margin-top:12px;padding:14px 18px">
     <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between">
-      <!-- Arm selector -->
-      <div class="geotabs" id="steparms" style="margin:0">
-        <button class="geotab" data-arm="cold">Cold Start (8+ iters)</button>
-        <button class="geotab" data-arm="nominal">Nominal Guess (7 iters)</button>
-        <button class="geotab on" data-arm="warm">Warm Start (3-4 iters)</button>
-      </div>
+      <!-- Arm selector. Filled by renderStepperArms() from the iterates that
+           actually exist for the case on screen -- the counts here are not
+           typed in, because they change with every artifact analysed. -->
+      <div class="geotabs" id="steparms" style="margin:0"></div>
 
       <!-- Fluid Flow Toggle -->
       <div style="display:flex;align-items:center;gap:8px">
@@ -393,8 +418,10 @@
     <!-- Timeline Slider Row -->
     <div style="display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap">
       <button class="geobtn" id="stepplay" style="min-width:68px">Play</button>
-      <input type="range" id="steprange" min="0" max="8" value="3" style="flex:1;min-width:180px;accent-color:var(--grad-2);cursor:pointer">
-      <span style="font:13px var(--mono);color:var(--ink);min-width:130px" id="steptext">Iteration <b style="color:var(--ok)">3</b></span>
+      <input type="range" id="steprange" min="0" max="0" value="0"
+             aria-label="Newton iteration"
+             style="flex:1;min-width:180px;accent-color:var(--grad-2);cursor:pointer">
+      <span style="font:13px var(--mono);color:var(--ink);min-width:130px" id="steptext"></span>
     </div>
 
     <!-- Stats & Residual readout -->
@@ -499,8 +526,10 @@ async function refreshHealth(){
 /* --- the geometry view --------------------------------------------------
 //: Three beats on one viewport: where the archive's solved states sit, which
 //: one was retrieved for a query, and what the solver then does from each
-//: starting guess. Hand-drawn SVG for the same reason as lineChart above —
-//: one file, no CDN, and a conference room with no internet.
+//: starting guess. Hand-drawn SVG for the same reason every other graphic here
+//: is — one file, no CDN, and a conference room with no internet. (This used to
+//: read "for the same reason as lineChart above"; `lineChart` left with the
+//: Evidence panel and the comment kept pointing at it.)
 //:
 //: Everything drawn here comes from viz_results.json, which `viz.py` refuses
 //: to write if its iteration counts disagree with results.json. The picture
@@ -551,34 +580,92 @@ function liveFromTrace(t){
     paths: t.solve.paths || {},
     iterations: {cold: t.solve.cold_iterations, nominal: t.solve.nominal_iterations,
                  warm: t.solve.warm_iterations},
+    //: which arms actually converged, carried alongside their counts. A count
+    //: on its own cannot be read: the cold arm reports the iteration it stalled
+    //: on exactly as it reports the iteration it finished on.
+    converged: {cold: t.solve.cold_converged, nominal: t.solve.nominal_converged,
+                warm: t.solve.warm_converged},
     agreement: t.solve.agreement,
+    agreementAgainst: t.solve.agreement_against,
+    //: whether the archive was used at all. A warned transfer the engineer left
+    //: standing still retrieves a neighbour and still reports it -- it just
+    //: never starts from it -- so `neighbour` being present is not the same
+    //: statement as "this run warm-started", and the panels below must not read
+    //: it as one.
+    usedArchive: t.solve.warm_iterations !== undefined,
+    outcome: t.outcome,
   };
+}
+
+//: every panel in this section, re-rendered from whatever `LIVE` now is. One
+//: function because they must never be refreshed in different combinations --
+//: updating the view and the machine panel but not the contact sheet is exactly
+//: how the sheet came to quote a different case from the banner above it.
+function renderGeoAll(){
+  GEO.bounds = geoBounds();              // the live paths may reach further out
+  renderControls(); renderView(); renderMachPanel(); renderFailures();
+  renderGeoNums();
+  if(typeof updateStepperUI === 'function') updateStepperUI();
+}
+
+//: back to the exemplar `viz.py` shipped, with an optional line saying why.
+//: Used by the "Show the shipped example" button and by `adoptTrace` when a run
+//: is refused -- both need the same teardown, and having only the button do it
+//: is what left a refused run showing the previous case's geometry.
+function showFixture(note){
+  LIVE = null;
+  MACH.right = null;
+  MACH.overrideState = null;
+  MACH.overrideLabel = null;
+  GEO.sel = null;
+  document.querySelectorAll('.tile').forEach(x => x.classList.remove('on'));
+  $('#liverow').innerHTML = note || '';
+  renderGeoAll();
 }
 
 function adoptTrace(t){
   const live = liveFromTrace(t);
-  if(!live) return;                      // a refusal leaves the fixture in place
+  if(!live){
+    //: A refusal has no solved state, so there is nothing to place in a space
+    //: built out of solved states, and inventing a position for it is the one
+    //: dishonesty this view exists to avoid.
+    //:
+    //: But "nothing to place" was implemented as an early return, and `LIVE` was
+    //: never cleared -- so the *previous* run stayed on screen underneath a
+    //: banner reading "the artifact you just analysed". Analyse `run-bigpump.log`
+    //: and then the NASTRAN deck and the section correctly refuses the deck three
+    //: panels up while still captioning a hydraulic run from two clicks ago as
+    //: the thing you just submitted. Falling back to the fixture is what the
+    //: comment here always claimed happened; now it does.
+    showFixture(
+      `<span style="color:var(--warn);font-size:11.5px"><b>${esc(t.artifact || 'that artifact')}</b>
+         produced no solved state (${esc((t.outcome || 'refused').replace(/_/g, ' '))}),
+         so there is nothing to place in this space &mdash; showing the shipped
+         example instead. The refusal is above.</span>`);
+    return;
+  }
   LIVE = live;
   MACH.right = null;
   MACH.overrideState = null;
   MACH.overrideLabel = null;
   GEO.sel = null;
   document.querySelectorAll('.tile').forEach(x => x.classList.remove('on'));
-  GEO.bounds = geoBounds();              // the live paths may reach further out
+  //: the banner states what actually happened to *this* run. It used to say
+  //: "and the case retrieval chose for it" unconditionally, which on a warned
+  //: transfer described the opposite of what the pipeline did three panels
+  //: above: retrieval found the case, the verifier warned, and the solver never
+  //: touched it. The neighbour is still drawn -- seeing what was rejected is
+  //: the point -- but it is labelled as rejected.
   $('#liverow').innerHTML =
-    `<button class="geobtn" id="livereset">Show the shipped example</button>
-     <span style="color:var(--ok);font-size:11.5px">showing <b>${esc(live.id)}</b>
-       &mdash; the artifact you just analysed, and the case retrieval chose for it</span>`;
-  $('#livereset').onclick = () => {
-    LIVE = null;
-    MACH.overrideState = null;
-    MACH.overrideLabel = null;
-    GEO.bounds = geoBounds(); $('#liverow').innerHTML = '';
-    renderControls(); renderView(); renderMachPanel(); renderFailures();
-    if(typeof updateStepperUI === 'function') updateStepperUI();
-  };
-  renderControls(); renderView(); renderMachPanel(); renderFailures();
-  if(typeof updateStepperUI === 'function') updateStepperUI();
+    `<button class="geobtn" id="livereset">Show the shipped example</button>` +
+    (live.usedArchive
+      ? `<span style="color:var(--ok);font-size:11.5px">showing <b>${esc(live.id)}</b>
+           &mdash; the artifact you just analysed, and the case retrieval chose for it</span>`
+      : `<span style="color:var(--warn);font-size:11.5px">showing <b>${esc(live.id)}</b>
+           &mdash; the artifact you just analysed, beside the case retrieval found and
+           <b>the verifier refused</b>. It was not used as a starting point.</span>`);
+  $('#livereset').onclick = () => showFixture();
+  renderGeoAll();
 }
 
 //: from here down, the views ask these two for their subject instead of
@@ -596,7 +683,13 @@ function subjectRace(){
   for(const k of ['cold','nominal','warm']){
     const p = LIVE.paths[k];
     if(!p) continue;
+    //: `converged` travels with the count, because a path's length is the
+    //: number of steps taken and says nothing about whether the last one
+    //: arrived anywhere. Every caller that prints an iteration count has to be
+    //: able to tell a result from a stall. `VIZ.race` already carries the flag,
+    //: so the fixture and the live run answer the same question the same way.
     out[k] = {iterations: p.length - 1,
+              converged: (LIVE.converged || {})[k] !== false,
               path_xyz: p.map(row => projectState(
                 Object.fromEntries(VIZ.projection.transform.state_order
                   .map((n, i) => [n, row[i]]))))};
@@ -750,9 +843,15 @@ function renderControls(){
       if(GEO.playing && GEO.step >= maxStep) GEO.step = 0; renderControls(); };
     $('#georeset').onclick = () => { GEO.step = 0; GEO.playing = false;
       renderControls(); renderView(); };
+    //: the count and its caveat live in one element on purpose -- `.geokey span`
+    //: is an inline-flex row with a 5px gap, so a second child would be pushed
+    //: away from the text it qualifies and render as "7 iterations , did not
+    //: converge"
     $('#geokey').innerHTML = ['cold','nominal','warm'].filter(k => R[k]).map(k =>
       `<span><i style="background:${ARM[k].c}"></i>${esc(ARM[k].label)} &mdash;
-        <b style="color:var(--ink)">${R[k].iterations}</b> iterations</span>`).join('');
+        <b style="color:${R[k].converged === false ? 'var(--refuse)' : 'var(--ink)'}"
+        >${R[k].iterations} iterations${
+          R[k].converged === false ? ', did not converge' : ''}</b></span>`).join('');
   }else{
     $('#georow').innerHTML =
       `<button class="geobtn" id="geospin">${GEO.spin ? 'Stop' : 'Spin'}</button>
@@ -782,9 +881,21 @@ const CAPTION = {
   race: () => {
     const R = subjectRace();
     const n = k => R[k] ? R[k].iterations : '&mdash;';
+    //: "same answer" is a claim about arms that both ran and both converged.
+    //: On a warned transfer there is no warm arm to agree with anything, and
+    //: on a case where the flat start stalls there is a count that is not a
+    //: result. The sentence used to assert agreement in both situations.
+    const stalled = ['cold','nominal','warm']
+      .filter(k => R[k] && R[k].converged === false);
+    const tail = !R.warm
+      ? ` &mdash; the warm arm was not run: the transfer was warned and left
+          standing, so the solver started from the nominal guess instead.`
+      : stalled.length
+      ? ` &mdash; same answer, from the arms that got one: the
+          <b>${stalled.join(' and ')}</b> start did not converge at all.`
+      : ' &mdash; same answer.';
     return `Only the starting point differs. Cold <b>${n('cold')}</b>,
-      nominal <b>${n('nominal')}</b>, warm <b>${n('warm')}</b> iterations &mdash;
-      same answer.`;
+      nominal <b>${n('nominal')}</b>, warm <b>${n('warm')}</b> iterations${tail}`;
   },
 };
 
@@ -887,6 +998,53 @@ function renderFailures(){
     </div>`;
 }
 
+//: The four numbers under the contact sheet describe *whichever pair the
+//: section is currently showing* -- and once an artifact has been analysed that
+//: is the analysed one, not the fixture.
+//:
+//: It used to always read `VIZ.pair`/`VIZ.race`, the exemplar shipped in
+//: viz_results.json, because `adoptTrace` re-renders the view and the machine
+//: panel but never the sheet. So the banner said "showing run-tidy.log -- the
+//: artifact you just analysed" while the row beneath it quoted 11 -> 4 from a
+//: different case entirely, against the pipeline's own 8 -> 3. Two panels on
+//: one screen disagreeing about the same run is worse than either number being
+//: wrong, because it makes both untrustworthy.
+//: Every cell here is a number the pipeline reported, or a word saying it did
+//: not report one. Both used to be printed the same way: on a warned transfer
+//: `solve` carries no `warm_iterations` and no `agreement`, and this template
+//: interpolated them straight, so the panel read "iterations 10 -> undefined"
+//: and "agreement NaN bar" one click from the front page.
+function renderGeoNums(){
+  if(LIVE){
+    const gap = stateGap(LIVE.solution, LIVE.neighbour.solution);
+    const it = LIVE.iterations || {}, ok = LIVE.converged || {};
+    const none = w => `<span style="color:var(--warn);font-size:12px">${w}</span>`;
+    //: a stalled arm reports the iteration it gave up on. Printing that as a
+    //: baseline reads as a result, so it is marked rather than shown bare.
+    const count = k => it[k] === undefined ? none('not run')
+                     : ok[k] === false ? `${it[k]}<span style="color:var(--refuse)">*</span>`
+                     : `${it[k]}`;
+    const stalled = ['cold', 'warm'].some(k => ok[k] === false);
+    $('#geonums').innerHTML = `
+      <div>setup distance<b>${(+LIVE.distance).toFixed(3)}</b>true, 7 parameters</div>
+      <div>state gap<b>${gap.dp.toFixed(1)} bar</b>${Math.round(gap.dw)} rev/min</div>
+      <div>iterations<b>${count('cold')} &rarr; ${count('warm')}</b>cold &rarr; warm${
+        stalled ? ' &middot; <span style="color:var(--refuse)">*did not converge</span>' : ''}</div>` +
+      (LIVE.agreement === undefined
+        ? `<div>agreement<b>${none('not checked')}</b>${
+             LIVE.usedArchive ? 'no converged baseline' : 'the archive was not used'}</div>`
+        : `<div>agreement<b>${(+LIVE.agreement).toExponential(1)}</b>bar, vs ${
+             esc(LIVE.agreementAgainst || 'baseline')}</div>`);
+    return;
+  }
+  const p = VIZ.pair, r = VIZ.race;
+  $('#geonums').innerHTML = `
+    <div>setup distance<b>${p.setup_distance.toFixed(3)}</b>true, 7 parameters</div>
+    <div>state gap<b>${p.state_gap_bar.toFixed(1)} bar</b>${Math.round(p.state_gap_rpm)} rev/min</div>
+    <div>iterations<b>${r.cold.iterations} &rarr; ${r.warm.iterations}</b>cold &rarr; warm</div>
+    <div>agreement<b>${(+r.warm.agreement_vs_cold.max_dp_bar).toExponential(1)}</b>bar</div>`;
+}
+
 function renderTiles(){
   const P0 = subjectPair();
   PSCALE = Math.max(...VIZ.tiles.concat([P0.neighbour])
@@ -911,12 +1069,7 @@ function renderTiles(){
     if(GEO.sel && GEO.mode !== 'archive') setMode('archive');
     else renderView();
   };
-  const p = VIZ.pair, r = VIZ.race;
-  $('#geonums').innerHTML = `
-    <div>setup distance<b>${p.setup_distance.toFixed(3)}</b>true, 7 parameters</div>
-    <div>state gap<b>${p.state_gap_bar.toFixed(1)} bar</b>${Math.round(p.state_gap_rpm)} rev/min</div>
-    <div>iterations<b>${r.cold.iterations} &rarr; ${r.warm.iterations}</b>cold &rarr; warm</div>
-    <div>agreement<b>${(+r.warm.agreement_vs_cold.max_dp_bar).toExponential(1)}</b>bar</div>`;
+  renderGeoNums();
 }
 
 function setMode(m){
@@ -1042,6 +1195,134 @@ function machineParts(c){
   branch( 2.1,  2.5, s.p2a, s.p3a, s.w_a, p.A_valve_a);
   branch(-2.1, -2.5, s.p2b, s.p3b, s.w_b, p.A_valve_b);
   return parts;
+}
+
+/* --- where the flow goes --------------------------------------------------
+//: The other two views draw *pressure* -- colour in the schematic, colour in
+//: the 3D model. Neither can show where the oil actually goes, and on this
+//: circuit that is not a detail: the relief valve is a leg that carries real
+//: flow and does no work at all, so a case with it cracked open is spending
+//: part of every pump revolution pushing oil back to tank.
+//:
+//: Every number here is `model.flows` on the converged state, which is the
+//: same arithmetic `residual` does. That matters for honesty: at convergence
+//: `pump = relief + a + b` to 1e-8, so dots cannot appear or vanish at a
+//: junction, because the physics says they do not.
+//:
+//: **Spacing, not speed.** The model is lumped and has no pipe area, so there
+//: is no velocity to draw. Dot spacing is litres per minute; every dot travels
+//: at the same rate.
+*/
+const FLOW = {t0: performance.now(), raf: null, data: null};
+
+//: one polyline, with dots spaced by flow. `q` is L/min.
+function flowLeg(pts, q, colour, tms, width){
+  const seg = [], L = [];
+  let total = 0;
+  for(let i = 1; i < pts.length; i++){
+    const dx = pts[i][0]-pts[i-1][0], dy = pts[i][1]-pts[i-1][1];
+    const l = Math.hypot(dx, dy);
+    seg.push([pts[i-1], pts[i], l]); L.push(l); total += l;
+  }
+  const line = `<polyline points="${pts.map(p=>p.join(',')).join(' ')}"
+    fill="none" stroke="${colour}" stroke-width="${width||5}"
+    stroke-linecap="round" stroke-linejoin="round" opacity="0.34"/>`;
+  if(!(q > 1e-6)) return line;
+
+  // spacing is inversely proportional to flow, clamped so a trickle does not
+  // produce one dot per kilometre and a torrent does not produce a solid bar
+  const spacing = Math.max(9, Math.min(90, 260 / q));
+  const speed = 34;                       // px/s, the same for every leg
+  const off = ((tms/1000) * speed) % spacing;
+  let out = line;
+  for(let d = off; d < total; d += spacing){
+    let acc = 0, k = 0;
+    while(k < seg.length && acc + seg[k][2] < d){ acc += seg[k][2]; k++; }
+    if(k >= seg.length) break;
+    const f = (d - acc) / seg[k][2];
+    const x = seg[k][0][0] + (seg[k][1][0]-seg[k][0][0])*f;
+    const y = seg[k][0][1] + (seg[k][1][1]-seg[k][0][1])*f;
+    out += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5"
+              fill="${colour}"/>`;
+  }
+  return out;
+}
+
+function renderFlow(tms){
+  const d = FLOW.data;
+  if(!d) return;
+  const f = d.flows, s = d.solution, open = d.relief_open;
+  const TANK = 232, teal = '#00b3b3', warn = '#ffb454', dim = '#3a4a50';
+  const YA = 62, YB = 150, XM = 128;
+  const g = [];
+
+  // reservoir
+  g.push(`<rect x="26" y="${TANK}" width="418" height="12" rx="3"
+            fill="#162226" stroke="#243237"/>`);
+  // suction and pump
+  g.push(flowLeg([[52,TANK],[52,150]], f.pump, dim, tms, 5));
+  g.push(`<circle cx="52" cy="140" r="13" fill="#121b1e" stroke="#3a4a50" stroke-width="1.5"/>
+          <path d="M45 140 L59 140 M52 133 L52 147" stroke="#5d7076" stroke-width="1.5"/>
+          <text x="52" y="170" fill="#5d7076" font-size="10"
+                font-family="ui-monospace,monospace" text-anchor="middle">pump</text>`);
+  // pump -> manifold
+  g.push(flowLeg([[52,127],[52,36],[XM,36],[XM,YA]], f.pump, teal, tms, 6));
+  // the manifold rail
+  g.push(flowLeg([[XM,YA],[XM,YB]], f.valve_b + f.relief, teal, tms, 6));
+  // relief leg: the one that does no work
+  g.push(flowLeg([[XM,YB],[XM,196],[92,196],[92,TANK]], f.relief,
+                 open ? warn : dim, tms, 5));
+  g.push(`<rect x="${XM-9}" y="188" width="18" height="14" rx="2"
+            fill="${open ? warn : '#1a2529'}" stroke="#3a4a50" stroke-width="1.2"/>
+          <text x="${XM+16}" y="199" fill="${open ? warn : '#5d7076'}" font-size="10"
+                font-family="ui-monospace,monospace">relief ${open ? 'OPEN' : 'shut'}</text>`);
+
+  [[YA,'a',f.valve_a,s.w_a],[YB,'b',f.valve_b,s.w_b]].forEach(([Y,tag,q,w]) => {
+    g.push(flowLeg([[XM,Y],[186,Y]], q, teal, tms, 5));
+    g.push(`<path d="M186 ${Y-7} L194 ${Y-2} M186 ${Y+7} L194 ${Y+2}"
+              stroke="#7d9198" stroke-width="1.8" fill="none"/>
+            <text x="190" y="${Y-13}" fill="#5d7076" font-size="9.5"
+                  font-family="ui-monospace,monospace" text-anchor="middle">valve ${tag}</text>`);
+    g.push(flowLeg([[194,Y],[248,Y]], q, teal, tms, 5));
+    const spd = Math.min(1, Math.abs(w)/2600), circ = 2*Math.PI*13;
+    g.push(`<circle cx="262" cy="${Y}" r="13" fill="#121b1e" stroke="#3a4a50" stroke-width="1.5"/>
+            <circle cx="262" cy="${Y}" r="13" fill="none" stroke="#3ddc97" stroke-width="3"
+              stroke-dasharray="${(circ*spd).toFixed(1)} ${circ.toFixed(1)}"
+              transform="rotate(-90 262 ${Y})"/>
+            <text x="262" y="${Y-19}" fill="#5d7076" font-size="9.5"
+              font-family="ui-monospace,monospace" text-anchor="middle">${Math.round(w)} rev/min</text>`);
+    g.push(flowLeg([[275,Y],[352,Y],[352,TANK]], q, teal, tms, 5));
+  });
+
+  $('#flowview').innerHTML = g.join('');
+}
+
+function adoptFlow(t){
+  const s = t && t.solve;
+  if(!(s && s.flows && s.solution)){ FLOW.data = null; $('#flow').style.display='none'; return; }
+  $('#flow').style.display = '';
+  FLOW.data = {flows: s.flows, solution: s.solution,
+               relief_open: !!(s.regime && s.regime.relief_open)};
+  const f = s.flows;
+  const wasted = 100 * f.power_wasted_share;
+  $('#flownums').innerHTML = `
+    <div>pump delivers<b>${f.pump.toFixed(1)}</b>L/min</div>
+    <div>through shaft a<b>${f.valve_a.toFixed(1)}</b>L/min &middot; ${f.power_a_kw.toFixed(2)} kW</div>
+    <div>through shaft b<b>${f.valve_b.toFixed(1)}</b>L/min &middot; ${f.power_b_kw.toFixed(2)} kW</div>
+    <div>dumped by the relief<b style="color:${f.relief > 1e-6 ? 'var(--warn)' : 'var(--dim)'}">${f.relief.toFixed(1)}</b>L/min &middot; ${f.power_relief_kw.toFixed(2)} kW</div>`;
+  $('#flowcap').innerHTML = f.relief > 1e-6
+    ? `The relief valve is carrying <b>${f.relief.toFixed(1)} L/min</b> straight back
+       to tank at <b>${Math.round(s.solution.p1)} bar</b> &mdash; <b>${wasted.toFixed(0)}%</b>
+       of this case's hydraulic power, doing no work. That is in the solved answer,
+       not an estimate: at convergence pump = relief + a + b to 1e-8 L/min.`
+    : `The relief valve is shut, so every litre the pump delivers reaches a motor.
+       Flow balances to 1e-8 L/min at every node &mdash; the dots cannot appear or
+       vanish at a junction because the physics says they do not.`;
+}
+
+function flowTick(){
+  renderFlow(performance.now() - FLOW.t0);
+  FLOW.raf = requestAnimationFrame(flowTick);
 }
 
 function rotM(p){
@@ -1365,8 +1646,17 @@ function renderMachPanel(){
       ? `<div>versus the retrieved case<b>${best.dp.toFixed(1)} bar</b>which is
            ${(d.dp / (best.dp || 1)).toFixed(1)}&times; closer</div>`
       : (() => { const R = subjectRace();
-          return `<div>then solved in<b>${R.warm ? R.warm.iterations : '&mdash;'} iterations</b>from
-                    ${R.cold.iterations} cold</div>`; })());
+          // "solved in — iterations from 10 cold" is not a sentence. When the
+          // archive was not used, say that instead of leaving a dash where the
+          // result would be.
+          return R.warm
+            ? `<div>then solved in<b>${R.warm.iterations} iterations</b>from
+                 ${R.cold.converged === false
+                   ? 'a cold start that never converged'
+                   : R.cold.iterations + ' cold'}</div>`
+            : `<div>then solved in<b style="color:var(--warn)">${R.nominal
+                 ? R.nominal.iterations + ' iterations' : '&mdash;'}</b>from the
+                 nominal guess &mdash; the archive was not used</div>`; })());
   //: the point of letting a tile be picked is that picking badly is visible.
   //: A hand-chosen case is a control, and saying how much worse it is turns the
   //: comparison from an illustration into a measurement the room can check.
@@ -1375,7 +1665,14 @@ function renderMachPanel(){
        <b>${d.dp.toFixed(1)} bar</b> away against the retrieved case's
        <b>${best.dp.toFixed(1)} bar</b>.`
     : `<b>${esc(P.neighbour.id)}</b> is what retrieval chose out of
-       ${VIZ.config.archive_size}. Click a tile to compare against another.`;
+       ${VIZ.config.archive_size}.` +
+      // the right-hand machine is on screen either way; whether the solver was
+      // allowed to start from it is a different fact and belongs beside it
+      (LIVE && !LIVE.usedArchive
+        ? ` <span style="color:var(--warn)">The verifier refused the transfer, so
+            this state was not used as a starting point.</span>`
+        : '') +
+      ` Click a tile to compare against another.`;
 }
 
 function machTick(){
@@ -1390,64 +1687,131 @@ function machTick(){
   MACH.raf = requestAnimationFrame(machTick);
 }
 
-/* --- Interactive Newton Convergence Stepper --------------------------- */
+/* --- Interactive Newton Convergence Stepper ---------------------------
+//: Every state this panel shows is an iterate the solver actually produced.
+//:
+//: It used to interpolate. With no analysed run it built a start state by hand
+//: and eased from there to the answer with `Math.sin(u * PI/2)`, which is not
+//: Newton's method and does not look like it: the real cold path on the shipped
+//: fixture goes 0 -> 107.9 -> **-20.6** -> 87.9 -> ... -> 134.63 bar, and the
+//: drawn one climbed 0 -> 19 -> 38 -> ... -> 134.63 without ever leaving the
+//: envelope. That excursion through a negative manifold pressure is the whole
+//: reason the admissibility gate exists; smoothing it away made this the one
+//: panel on the page whose contents were invented.
+//:
+//: The iterates were already here. `model.solve(record_path=True)` keeps every
+//: one, `POST /api/analyse` returns them as `solve.paths`, and `viz.py` writes
+//: them into viz_results.json as `race.<arm>.path_state`. Both are rows in
+//: `state_order`, so one reader serves the live run and the fixture.
+*/
 const STEPPER = {
   arm: 'warm',
-  step: 3,
+  step: 0,
   playing: false,
   timer: null
 };
 
-function getStepperTrajectory(){
-  const R = subjectRace();
-  const P = subjectPair();
-  const sol = P.query.solution;
-  
-  if(LIVE && LIVE.paths && LIVE.paths[STEPPER.arm]){
-    const rawPath = LIVE.paths[STEPPER.arm];
-    const order = VIZ.projection.transform.state_order;
-    return rawPath.map(row => Object.fromEntries(order.map((n, i) => [n, row[i]])));
-  }
+//: the arms that were actually run, in presentation order. A warned-and-not-
+//: overridden run never solves a warm arm, so `warm` is genuinely absent from
+//: its trace -- and the panel says so rather than manufacturing one.
+const STEP_ARMS = ['cold', 'nominal', 'warm'];
+const STEP_ARM_LABEL = {cold: 'Cold Start', nominal: 'Nominal Guess',
+                        warm: 'Warm Start'};
 
-  const totalIters = (R[STEPPER.arm] ? R[STEPPER.arm].iterations : 4);
-  const path = [];
-  
-  let start = {};
-  if(STEPPER.arm === 'cold'){
-    start = {p1:0, p2a:0, p3a:0, w_a:0, p2b:0, p3b:0, w_b:0};
-  } else if(STEPPER.arm === 'nominal'){
-    const p1_nom = P.query.params ? (P.query.params.p_crack || 150) : 150;
-    start = {p1: p1_nom, p2a: p1_nom*0.5, p3a: 1.0, w_a: 500, p2b: p1_nom*0.5, p3b: 1.0, w_b: 500};
-  } else {
-    start = P.neighbour.solution;
-  }
-  
-  for(let i=0; i<=totalIters; i++){
-    const u = i / totalIters;
-    const smoothU = Math.sin(u * Math.PI / 2);
-    const stepState = {};
-    for(const k of ['p1','p2a','p3a','w_a','p2b','p3b','w_b']){
-      stepState[k] = start[k] + ((sol[k]||0) - start[k]) * smoothU;
-    }
-    path.push(stepState);
-  }
-  return path;
+//: the raw iterates for one arm, as states -- or null if that arm was not run.
+//: Never interpolated, never defaulted: the only two sources are the pipeline's
+//: own `solve.paths` and the fixture's `path_state`.
+function armPath(arm){
+  const order = VIZ.projection.transform.state_order;
+  const rows = LIVE ? (LIVE.paths || {})[arm]
+                    : ((VIZ.race[arm] || {}).path_state);
+  if(!rows || !rows.length) return null;
+  return rows.map(row => Object.fromEntries(order.map((n, i) => [n, row[i]])));
+}
+
+function getStepperTrajectory(){ return armPath(STEPPER.arm); }
+
+//: did that arm actually arrive, or is its last iterate where it gave up? The
+//: tab has to say, for the same reason `#geonums` does: "Cold Start (7 iters)"
+//: beside "Warm Start (4 iters)" reads as a comparison, and on a case where the
+//: flat start stalls it is not one.
+function armConverged(arm){
+  return LIVE ? (LIVE.converged || {})[arm] !== false
+              : ((VIZ.race[arm] || {}).converged !== false);
+}
+
+//: the tab labels are the measured iteration counts, not text typed into the
+//: markup. They used to read "Cold Start (8+ iters)" beside a readout saying
+//: "Iteration 0 of 11", because nothing updated them when the subject changed.
+function renderStepperArms(){
+  const tabs = $('#steparms');
+  if(!tabs) return;
+  tabs.innerHTML = STEP_ARMS.map(arm => {
+    const p = armPath(arm);
+    const on = arm === STEPPER.arm ? ' on' : '';
+    const note = !p ? 'not run'
+               : !armConverged(arm) ? `${p.length - 1} iters, stalled`
+               : `${p.length - 1} iters`;
+    const why = !p ? 'this arm was not run for the case on screen'
+              : !armConverged(arm) ? 'this arm never converged -- its last iterate '
+                                     + 'is where it gave up, not an answer'
+              : '';
+    return `<button class="geotab${on}" data-arm="${arm}"${p ? '' : ' disabled'}
+              title="${esc(why)}"
+            >${STEP_ARM_LABEL[arm]} (${note})</button>`;
+  }).join('');
 }
 
 function updateStepperUI(){
+  renderStepperArms();
   const path = getStepperTrajectory();
+  const slider = $('#steprange'), txt = $('#steptext'),
+        readout = $('#stepreadout'), playBtn = $('#stepplay');
+
+  //: an arm that was not run has nothing to step through. Every control goes
+  //: inert and the readout says which arm and why -- the alternative, and what
+  //: this did before, is to invent a path so the slider has something to move
+  //: along. The commonest case is a warned transfer the engineer left standing:
+  //: the pipeline deliberately never solved a warm arm, and a stepper that
+  //: animates one is drawing the transfer the verifier just refused.
+  if(!path){
+    STEPPER.playing = false;
+    if(STEPPER.timer){ clearInterval(STEPPER.timer); STEPPER.timer = null; }
+    MACH.overrideState = null;
+    MACH.overrideLabel = null;
+    if(slider){ slider.disabled = true; slider.max = 0; slider.value = 0; }
+    if(playBtn){ playBtn.disabled = true; playBtn.textContent = 'Play'; }
+    if(txt) txt.innerHTML = `<span style="color:var(--faint)">no iterates</span>`;
+    if(readout){
+      //: only the warm arm can be absent -- the pipeline always solves cold and
+      //: nominal -- and it is absent for exactly one reason, so say that reason
+      //: rather than leaving an empty panel to be read as a bug.
+      const why = STEPPER.arm === 'warm'
+        ? `<div>why<b>the archive was not used</b>the transfer was warned and not overridden</div>`
+        : `<div>why<b>this arm is not in the trace</b>nothing to step through</div>`;
+      readout.innerHTML =
+        `<div>starting guess <b>${esc(STEPPER.arm)} arm</b></div>` +
+        `<div>iterates <b style="color:var(--warn)">not run</b>for the case on screen</div>` + why;
+    }
+    return;
+  }
+
   const maxStep = path.length - 1;
-  const slider = $('#steprange');
+  if(STEPPER.step > maxStep) STEPPER.step = maxStep;
   if(slider){
+    slider.disabled = false;
     slider.max = maxStep;
-    if(STEPPER.step > maxStep) STEPPER.step = maxStep;
     slider.value = STEPPER.step;
   }
-  
-  const currState = path[STEPPER.step] || path[path.length-1];
+  if(playBtn) playBtn.disabled = false;
+
+  const currState = path[STEPPER.step];
   const P = subjectPair();
-  const p_crack = P.query.params ? (P.query.params.p_crack || 150) : 150;
-  
+  //: the relief valve's state on an *intermediate* iterate, by the same test
+  //: `model.regime` applies to a converged one: `relief_opening()` is zero at
+  //: and below the cracking pressure and positive above it.
+  const p_crack = P.query.params ? P.query.params.p_crack : undefined;
+
   const isDone = STEPPER.step === maxStep;
   if(isDone && STEPPER.arm === 'warm'){
     MACH.overrideState = null;
@@ -1456,23 +1820,24 @@ function updateStepperUI(){
     MACH.overrideState = {
       solution: currState,
       params: P.query.params,
-      relief_open: currState.p1 > p_crack
+      relief_open: p_crack === undefined ? false : currState.p1 > p_crack
     };
     MACH.overrideLabel = `${P.query.id} (${STEPPER.arm} start, iter ${STEPPER.step}/${maxStep})`;
   }
-  
+
   const stepCol = isDone ? 'var(--ok)' : (STEPPER.step === 0 ? 'var(--refuse)' : 'var(--warn)');
-  
-  const txt = $('#steptext');
   if(txt) txt.innerHTML = `Iteration <b style="color:${stepCol}">${STEPPER.step}</b> of ${maxStep}`;
-  
+
+  //: the gap to the converged answer, largest over the five pressure nodes.
+  //: A Newton path is not monotone -- on the cold arm this rises before it
+  //: falls, and it is allowed to, because that is what the solver did.
   const targetSol = P.query.solution;
-  const resProxy = Math.max(...['p1','p2a','p3a','p2b','p3b'].map(k => Math.abs(currState[k] - (targetSol[k]||0))));
-  
-  const readout = $('#stepreadout');
+  const resProxy = Math.max(...['p1','p2a','p3a','p2b','p3b']
+    .map(k => Math.abs(currState[k] - (targetSol[k] || 0))));
+
   if(readout){
     readout.innerHTML =
-      `<div>starting guess <b>${STEPPER.arm} arm</b></div>` +
+      `<div>starting guess <b>${esc(STEPPER.arm)} arm</b></div>` +
       `<div>manifold pressure <b>${Math.round(currState.p1)} bar</b></div>` +
       `<div>shaft speeds <b>${Math.round(currState.w_a)} / ${Math.round(currState.w_b)} rpm</b></div>` +
       `<div>distance to solved state <b>${resProxy < 1e-3 ? '0.00 (converged)' : resProxy.toFixed(1) + ' bar'}</b></div>`;
@@ -1482,13 +1847,17 @@ function updateStepperUI(){
 function stepperBoot(){
   const tabs = $('#steparms');
   if(tabs){
+    // the buttons are rebuilt by renderStepperArms on every update, so the
+    // handler lives on the container and reads the arm off the target rather
+    // than closing over an element that will not survive the next render
     tabs.onclick = e => {
       const b = e.target.closest('button');
-      if(!b) return;
-      tabs.querySelectorAll('button').forEach(x => x.classList.remove('on'));
-      b.classList.add('on');
+      if(!b || b.disabled) return;
       STEPPER.arm = b.dataset.arm;
       STEPPER.step = 0;
+      STEPPER.playing = false;
+      if(STEPPER.timer){ clearInterval(STEPPER.timer); STEPPER.timer = null; }
+      const pb = $('#stepplay'); if(pb) pb.textContent = 'Play';
       updateStepperUI();
     };
   }
@@ -1510,12 +1879,13 @@ function stepperBoot(){
       playBtn.textContent = STEPPER.playing ? 'Pause' : 'Play';
       if(STEPPER.playing){
         const path = getStepperTrajectory();
+        if(!path){ STEPPER.playing = false; updateStepperUI(); return; }
         if(STEPPER.step >= path.length - 1) STEPPER.step = 0;
         if(STEPPER.timer) clearInterval(STEPPER.timer);
         STEPPER.timer = setInterval(() => {
           if(!STEPPER.playing){ clearInterval(STEPPER.timer); return; }
           const p = getStepperTrajectory();
-          if(STEPPER.step < p.length - 1){
+          if(p && STEPPER.step < p.length - 1){
             STEPPER.step++;
             updateStepperUI();
           } else {
@@ -1572,6 +1942,8 @@ async function boot(){
 
     // A view is not allowed to take the pipeline down with it. A fresh
     // clone that has not run the reproducer says so here rather than throwing.
+    flowTick();
+
     geoBoot().catch(() => {
       $('#geo').innerHTML =
         '<div class="geomissing">geometry unavailable &mdash; run '
@@ -1653,6 +2025,7 @@ async function analyse(req){
       const trace = await res.json();
       draw(trace);
       // the geometry below is about this run now, not about the shipped fixture
+      try{ adoptFlow(trace); }catch(e){ /* a view must never break the pipeline */ }
       try{ if(VIZ) adoptTrace(trace); }catch(e){ /* a view must never break the pipeline */ }
     }
   }catch(e){
@@ -1703,24 +2076,43 @@ function auditBlock(t){
 function draw(t){
   let html = '';
 
-  // headline: the number, when there is one
+  // headline: the number, when there is one.
+  //
+  // Gated on the warm arm having *run*, not on the cold-vs-warm agreement being
+  // computable. Requiring `agreement` meant the metric block disappeared
+  // entirely whenever the flat start failed -- which is to say, on precisely the
+  // cases where the warm start does the most good. Those runs fell through to
+  // the verdict bar and read "warm_started - cold start, 7 iterations".
   const s = t.solve;
-  if(s && s.warm_iterations !== undefined && s.agreement !== undefined){
-    // the nominal guess sits between the two on purpose: it is the baseline
-    // the warm start actually has to beat, not the flat start
-    const nominal = s.nominal_iterations !== undefined
-      ? `<div class="metric"><div class="k">nominal guess</div>
-           <div class="v nominal">${s.nominal_iterations}</div></div>`
-      : '';
+  if(s && s.warm_iterations !== undefined){
+    //: a baseline that did not converge shows why instead of its iteration
+    //: count. The count is real, but it is where that arm gave up, and setting
+    //: it in the same large numeral beside a converged one invites the room to
+    //: read it as a finish line.
+    const arm = (key, cls, label) => {
+      const n = s[`${key}_iterations`], ok = s[`${key}_converged`];
+      if(n === undefined) return '';
+      return `<div class="metric"><div class="k">${label}</div>` +
+        (ok === false
+          ? `<div class="v" style="color:var(--refuse);font-size:14px"
+               title="${esc(s[`${key}_status`] || '')}">did not converge</div>`
+          : `<div class="v ${cls}">${n}</div>`) + `</div>`;
+    };
+    //: the nominal guess sits between the two on purpose: it is the baseline
+    //: the warm start actually has to beat, not the flat start
+    const agree = s.agreement !== undefined
+      ? `<div class="v same">same answer as ${esc(s.agreement_against || 'baseline')}
+           to ${s.agreement.toExponential(1)}</div>`
+      // no converged baseline means no second opinion, and the panel says so
+      // rather than leaving a gap that reads as agreement
+      : `<div class="v same" style="color:var(--warn)">no converged baseline</div>`;
     html += `<div class="headline">
-      <div class="metric"><div class="k">cold start</div>
-        <div class="v cold">${s.cold_iterations}</div></div>
-      ${nominal}
+      ${arm('cold', 'cold', 'cold start')}
+      ${arm('nominal', 'nominal', 'nominal guess')}
       <div class="arrow">&rarr;</div>
-      <div class="metric"><div class="k">warm start</div>
-        <div class="v warm">${s.warm_iterations}</div></div>
+      ${arm('warm', 'warm', 'warm start')}
       <div class="metric"><div class="k">Newton iterations</div>
-        <div class="v same">same answer to ${s.agreement.toExponential(1)}</div></div>
+        ${agree}</div>
     </div>`;
   } else {
     const sev = (t.report || {}).severity;

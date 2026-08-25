@@ -1,0 +1,171 @@
+{
+  "generated_utc": "2026-08-25T11:45:13+00:00",
+  "archive": 400,
+  "queries": 200,
+  "widths": [
+    {
+      "branches": 2,
+      "unknowns": 12,
+      "parameters": 36,
+      "archive": 379,
+      "n_queries": 200,
+      "arms": {
+        "cold": {
+          "mean": 9.067708333333334,
+          "total": 1741,
+          "failures": 8,
+          "vs_nominal_pct": -19.821059876118376
+        },
+        "nominal": {
+          "mean": 7.265,
+          "total": 1453,
+          "failures": 0,
+          "vs_nominal_pct": null
+        },
+        "warm": {
+          "mean": 6.945,
+          "total": 1389,
+          "failures": 0,
+          "vs_nominal_pct": 4.404679972470749
+        },
+        "first_order": {
+          "mean": 6.96,
+          "total": 1392,
+          "failures": 0,
+          "vs_nominal_pct": 4.198210598761188
+        },
+        "ranked": {
+          "mean": 6.535,
+          "total": 1307,
+          "failures": 0,
+          "vs_nominal_pct": 10.048176187198898
+        }
+      },
+      "neighbour_distance_mean": 1.7445124402946166,
+      "max_disagreement": 2.0123229660384823e-07
+    },
+    {
+      "branches": 3,
+      "unknowns": 17,
+      "parameters": 49,
+      "archive": 357,
+      "n_queries": 200,
+      "arms": {
+        "cold": {
+          "mean": 8.994505494505495,
+          "total": 1637,
+          "failures": 18,
+          "vs_nominal_pct": -8.338848444738577
+        },
+        "nominal": {
+          "mean": 7.555,
+          "total": 1511,
+          "failures": 0,
+          "vs_nominal_pct": null
+        },
+        "warm": {
+          "mean": 6.688442211055277,
+          "total": 1331,
+          "failures": 1,
+          "vs_nominal_pct": 11.912640635340832
+        },
+        "first_order": {
+          "mean": 7.275,
+          "total": 1455,
+          "failures": 0,
+          "vs_nominal_pct": 3.7061548643282594
+        },
+        "ranked": {
+          "mean": 6.743718592964824,
+          "total": 1342,
+          "failures": 1,
+          "vs_nominal_pct": 11.18464592984778
+        }
+      },
+      "neighbour_distance_mean": 2.1660028443502553,
+      "max_disagreement": 305.7949190626839
+    },
+    {
+      "branches": 4,
+      "unknowns": 22,
+      "parameters": 62,
+      "archive": 323,
+      "n_queries": 200,
+      "arms": {
+        "cold": {
+          "mean": 9.29746835443038,
+          "total": 1469,
+          "failures": 42,
+          "vs_nominal_pct": 3.291639236339694
+        },
+        "nominal": {
+          "mean": 8.079787234042554,
+          "total": 1519,
+          "failures": 12,
+          "vs_nominal_pct": null
+        },
+        "warm": {
+          "mean": 7.382978723404255,
+          "total": 1388,
+          "failures": 12,
+          "vs_nominal_pct": 8.624094799210003
+        },
+        "first_order": {
+          "mean": 8.302702702702703,
+          "total": 1536,
+          "failures": 15,
+          "vs_nominal_pct": -1.1191573403555033
+        },
+        "ranked": {
+          "mean": 7.132978723404255,
+          "total": 1341,
+          "failures": 12,
+          "vs_nominal_pct": 11.718235681369327
+        }
+      },
+      "neighbour_distance_mean": 2.529650662681438,
+      "max_disagreement": 388.9618934201802
+    },
+    {
+      "branches": 6,
+      "unknowns": 32,
+      "parameters": 88,
+      "archive": 275,
+      "n_queries": 200,
+      "arms": {
+        "cold": {
+          "mean": 10.096,
+          "total": 1262,
+          "failures": 75,
+          "vs_nominal_pct": 12.603878116343491
+        },
+        "nominal": {
+          "mean": 9.691275167785236,
+          "total": 1444,
+          "failures": 51,
+          "vs_nominal_pct": null
+        },
+        "warm": {
+          "mean": 8.571428571428571,
+          "total": 1260,
+          "failures": 53,
+          "vs_nominal_pct": 12.742382271468145
+        },
+        "first_order": {
+          "mean": 9.664429530201343,
+          "total": 1440,
+          "failures": 51,
+          "vs_nominal_pct": 0.27700831024930483
+        },
+        "ranked": {
+          "mean": 8.629139072847682,
+          "total": 1303,
+          "failures": 49,
+          "vs_nominal_pct": 9.76454293628809
+        }
+      },
+      "neighbour_distance_mean": 3.155721094225685,
+      "max_disagreement": 481.3015222875545
+    }
+  ]
+}

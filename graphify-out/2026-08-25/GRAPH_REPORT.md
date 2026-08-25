@@ -1,16 +1,16 @@
 # Graph Report - Siemens-DejaSolve  (2026-08-25)
 
 ## Corpus Check
-- 64 files · ~219,695 words
+- 56 files · ~195,131 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 811 nodes · 1375 edges · 49 communities (48 shown, 1 thin omitted)
+- 676 nodes · 1085 edges · 42 communities (41 shown, 1 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3bf1694b`
+- Built from commit: `7bc01903`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -57,25 +57,18 @@
 - [[_COMMUNITY_6i. Measured results — 25 real parameters, 20 Aug|6i. Measured results — 25 real parameters, 20 Aug]]
 - [[_COMMUNITY_6k. Measured results — the selection agent, declined, 20 Aug|6k. Measured results — the selection agent, declined, 20 Aug]]
 - [[_COMMUNITY_8b. The engineer interview — accept, then prepare ✅ held 19 Aug|8b. The engineer interview — accept, then prepare ✅ **held 19 Aug**]]
-- [[_COMMUNITY_Circuit|Circuit]]
-- [[_COMMUNITY_Minor|Minor]]
-- [[_COMMUNITY_CaseCard|CaseCard]]
-- [[_COMMUNITY_casecard.py|casecard.py]]
-- [[_COMMUNITY_Phase 1f — does the result scale with complexity|Phase 1f — does the result scale with complexity?]]
-- [[_COMMUNITY_Phase 1g — the baseline that beats the archive, and what survives it|Phase 1g — the baseline that beats the archive, and what survives it]]
-- [[_COMMUNITY_ingest_worker.py|ingest_worker.py]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Circuit` - 30 edges
-2. `Déjà Solve — Plan (Siemens Summer School 2026)` - 25 edges
-3. `Circuit` - 22 edges
-4. `sample_cases()` - 21 edges
-5. `CaseCard` - 18 edges
-6. `Verifier` - 16 edges
-7. `load_archive()` - 14 edges
-8. `jacobian()` - 14 edges
-9. `run_bench()` - 13 edges
-10. `Minor` - 13 edges
+1. `Déjà Solve — Plan (Siemens Summer School 2026)` - 25 edges
+2. `sample_cases()` - 21 edges
+3. `CaseCard` - 18 edges
+4. `Verifier` - 16 edges
+5. `load_archive()` - 14 edges
+6. `jacobian()` - 14 edges
+7. `run_bench()` - 12 edges
+8. `analyse()` - 12 edges
+9. `Déjà Solve` - 12 edges
+10. `Phase 3 — Ingest and the end-to-end run` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Archive` --uses--> `CaseCard`  [INFERRED]
@@ -84,39 +77,39 @@
   agent_select.py → verifier.py
 - `evaluate_ceiling()` --calls--> `Verifier`  [EXTRACTED]
   agent_select.py → verifier.py
-- `base_circuit()` --calls--> `load_archive()`  [EXTRACTED]
-  agent_select.py → bench.py
-- `run_deterministic()` --calls--> `load_archive()`  [EXTRACTED]
-  agent_select.py → bench.py
+- `base_circuit()` --calls--> `sample_cases()`  [EXTRACTED]
+  agent_select.py → sweep.py
+- `run_deterministic()` --calls--> `sample_cases()`  [EXTRACTED]
+  agent_select.py → sweep.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (49 total, 1 thin omitted)
+## Communities (42 total, 1 thin omitted)
 
 ### Community 0 - "model.py"
 Cohesion: 0.07
-Nodes (61): d_friction(), d_load_torque(), d_relief_opening(), df_dp(), dresidual_dp(), dynamic_scales(), f_dp(), flows() (+53 more)
+Nodes (53): d_friction(), d_load_torque(), d_relief_opening(), df_dp(), dresidual_dp(), dynamic_scales(), f_dp(), friction() (+45 more)
 
 ### Community 1 - "bench.py"
-Cohesion: 0.15
-Nodes (20): _arm(), check_against_bench(), main(), ndarray, Path, The second source of a warm start: a *predicted* state instead of a recalled one, The predicted state for one case, as the solver would take it., Walk the ladder, checking each converged answer; take the first legal one. (+12 more)
+Cohesion: 0.07
+Nodes (44): arm_vs_nominal(), _exemplar(), main(), nearest(), nearest_k(), pick_exemplars(), ndarray, Path (+36 more)
 
 ### Community 2 - "ingest.py"
-Cohesion: 0.19
-Nodes (18): compare(), credentials_available(), _first_model_backend(), ingest(), ingest_ollama(), ingest_text(), main(), ollama_available() (+10 more)
+Cohesion: 0.07
+Nodes (41): CaseCard, detect_domain(), normalise_unit(), parse_number(), The Case Card — the structured record every run artifact becomes.  The archive, Convert a value to its canonical unit. Returns (value, unit_as_given)., Parse a number written the way people actually write them.      Handles scient, One run artifact, structured. `params` is always in canonical units. (+33 more)
 
 ### Community 3 - "sample_cases"
-Cohesion: 0.09
-Nodes (25): Generate the messy run artifacts the ingest layer has to cope with.  Every fix, draw(), main(), Path, The Phase 1 gate figure, drawn from results.json — nothing is hard-coded., Regenerate every number and figure in the deck, from scratch, in one command., asymmetric(), central_dresidual_dp() (+17 more)
+Cohesion: 0.08
+Nodes (30): Generate the messy run artifacts the ingest layer has to cope with.  Every fix, draw(), main(), Path, The Phase 1 gate figure, drawn from results.json — nothing is hard-coded., Regenerate every number and figure in the deck, from scratch, in one command., asymmetric(), central_dresidual_dp() (+22 more)
 
 ### Community 4 - "geometry.py"
 Cohesion: 0.11
-Nodes (36): central_jacobian(), check_jacobian(), d_line_flow(), jacobian(), line_coeffs(), line_flow(), line_param_derivs(), line_report() (+28 more)
+Nodes (34): central_jacobian(), check_jacobian(), d_line_flow(), jacobian(), line_coeffs(), line_flow(), line_report(), main() (+26 more)
 
 ### Community 5 - "topk.py"
-Cohesion: 0.06
-Nodes (44): all_roots(), build_archive(), draw(), fold_cases(), guarded_transfer(), main(), naive_transfer(), ndarray (+36 more)
+Cohesion: 0.10
+Nodes (24): base_circuit(), evaluate(), fold_circuit(), main(), ndarray, Path, Walk the archive before abandoning it: k candidates instead of one.  Retrieval, First gate-admitted candidate among the k nearest, else the nominal guess. (+16 more)
 
 ### Community 6 - "agent_select.py"
 Cohesion: 0.13
@@ -124,15 +117,15 @@ Nodes (30): ask_model(), base_circuit(), build_prompt(), evaluate_ceiling(), _fm
 
 ### Community 7 - "dejasolve.py"
 Cohesion: 0.13
-Nodes (18): analyse(), Archive, _audit(), main(), ndarray, Path, End to end: a messy run artifact in, a verified warm-started solve out.  This, The start to hand Newton for query `params`, from archive case `j`.          F (+10 more)
+Nodes (18): analyse(), Archive, _audit(), main(), ndarray, Path, End to end: a messy run artifact in, a verified warm-started solve out.  This is, The start to hand Newton for query `params`, from archive case `j`.          Fir (+10 more)
 
 ### Community 8 - "app.py"
 Cohesion: 0.12
-Nodes (19): analyse(), AnalyseRequest, archive(), evidence(), health(), _load(), _mirror_audit_to_dynamo(), HTTP service + demo UI for Déjà Solve.  A service rather than a notebook-style (+11 more)
+Nodes (19): analyse(), AnalyseRequest, archive(), evidence(), health(), _load(), _mirror_audit_to_dynamo(), HTTP service + demo UI for Déjà Solve.  A service rather than a notebook-style a (+11 more)
 
 ### Community 9 - "fold.py"
-Cohesion: 0.14
-Nodes (22): build_archive(), check_derivatives(), Circuit, _ladder(), main(), ndarray, An N-branch manifold, generated rather than hand-written — the scaling study., One manifold width. Holds the index arithmetic so nothing else has to.      Ev (+14 more)
+Cohesion: 0.16
+Nodes (20): all_roots(), build_archive(), draw(), fold_cases(), guarded_transfer(), main(), naive_transfer(), ndarray (+12 more)
 
 ### Community 10 - "viz.py"
 Cohesion: 0.18
@@ -143,12 +136,12 @@ Cohesion: 0.11
 Nodes (19): 1. Hybrid ingest — parser first, model only for the gaps, 2. An anti-invention check — Layer 1 gets its own verifier, Addendum — 20 Aug: a Case Card is a record *of a kind of model*, End-to-end result, Final measurement, Local models: measured, and the result changed the design, Never invent a value, Phase 3 — Ingest and the end-to-end run (+11 more)
 
 ### Community 12 - "wide_sweep.py"
-Cohesion: 0.11
-Nodes (26): hessian_of(), latin_hypercube(), main(), ndarray, Path, Build the archive: run a parameter sweep and keep what converged.  This is the, Stratified sample in the unit cube — better coverage than plain uniform     for, The solution's tangent in parameter space, or None if there isn't one.      A (+18 more)
+Cohesion: 0.16
+Nodes (18): latin_hypercube(), ndarray, Stratified sample in the unit cube — better coverage than plain uniform     for, _arm(), main(), make_cases(), make_variants(), ndarray (+10 more)
 
 ### Community 13 - "dimensionality.py"
-Cohesion: 0.08
-Nodes (43): arm_vs_nominal(), _exemplar(), hessians(), load_archive(), main(), nearest(), nearest_k(), pick_exemplars() (+35 more)
+Cohesion: 0.22
+Nodes (16): cdist(), contrast(), coverage_radius_in(), crossover(), draw(), main(), nuisance(), ndarray (+8 more)
 
 ### Community 14 - "failure_zone.py"
 Cohesion: 0.18
@@ -191,7 +184,7 @@ Cohesion: 0.22
 Nodes (9): 1. It degrades gracefully — it does not collapse, 2. Retrieval stops working long before it stops helping, 3. The distance gate cannot see any of it — and this is the result, Measured, Phase 1c — Retrieval at hundreds of parameters, Rejected, The setup, and the assumption that makes it fair, Three findings, in increasing order of importance (+1 more)
 
 ### Community 25 - "Phase 1e — what if the model *did* have geometry?"
-Cohesion: 0.25
+Cohesion: 0.22
 Nodes (8): Phase 1e — what if the model *did* have geometry?, Results, The bug the invariant caught, and the real flaw underneath it, The disclaimer this started from, The retrieval question this was actually built for, What is worth keeping from it, What was built, Why it is not adopted, and what the disclaimer should say instead
 
 ### Community 26 - "0b. Engineer interview — 19 Aug 2026, and what it changes"
@@ -199,7 +192,7 @@ Cohesion: 0.25
 Nodes (8): 0b. Engineer interview — 19 Aug 2026, and what it changes, Backlog — wanted, not scheduled, Q — "How often does a run fail, and what do you do?" → the answer that validates the Phase 1 pivot, Q — "Is this done internally?" → No, with one pointer that must be named first, Q — "Refuse when unsure, or warn?" → **warn**, and this is now implemented, Still unanswered — and deliberately left that way (decided 19 Aug), The extras — unasked-for, and two of them change the deck, What did *not* change
 
 ### Community 27 - "Phase 2d — The selection agent, and four rankers that all lose"
-Cohesion: 0.29
+Cohesion: 0.25
 Nodes (7): Four rankers, k = 5, the verifier holding the veto throughout, Phase 2d — The selection agent, and four rankers that all lose, Rejected, Say it this way, The model arm is not bit-reproducible, and that is stated rather than hidden, The order of operations was the design decision, What it says
 
 ### Community 28 - "6e. Measured results — the surrogate arm, 20 Aug"
@@ -211,7 +204,7 @@ Cohesion: 0.29
 Nodes (7): Phase 1d — 25 real parameters, and a latent bug in the hardware rule, Rejected, selftest.py — built before the change, not after, The bug that found, and the fix, The finding: recording hardware makes the index separate machines by itself, What was promoted, wide_sweep.py — and the realistic archive is not 400 unique machines
 
 ### Community 30 - "Phase 2c — Top-k retrieval, measured and declined"
-Cohesion: 0.33
+Cohesion: 0.29
 Nodes (6): Measured — fold circuit, 200 queries, Phase 2c — Top-k retrieval, measured and declined, Rejected, The finding, What it opens up, Why this is worth having as a null
 
 ### Community 31 - "Phase 2b — The failure archive"
@@ -258,36 +251,8 @@ Nodes (3): 6k. Measured results — the selection agent, declined, 20 Aug, The f
 Cohesion: 0.67
 Nodes (3): 8b. The engineer interview — accept, then prepare ✅ **held 19 Aug**, Reply to send (today, short, no hedging), The 8 questions (ordered — if they only answer three, these are the three)
 
-### Community 42 - "Circuit"
-Cohesion: 0.13
-Nodes (14): check_jacobian(), Circuit, destroke(), main(), ndarray, The circuit that does not decompose — a load-sensing pump.  Built to answer an, Swashplate fraction: 1 at full stroke, 0 once the margin is exceeded., N branches on one load-sensing pump. 1 + 3N unknowns. (+6 more)
-
-### Community 43 - "Minor"
-Cohesion: 0.08
-Nodes (24): C1 — The Newton stepper fabricates the convergence path it claims to show, C2 — Selecting the Ollama backend disables foreign-domain detection, Critical, Known bugs, M1 — A warm-started run whose cold arm failed is reported as a cold start, M2 — `undefined` and `NaN` on screen after a warned-but-not-overridden run, M3 — After a refusal, the geometry section keeps claiming to show the run you just analysed, M4 — Stepper arm labels are hardcoded and contradict the data beside them (+16 more)
-
-### Community 44 - "CaseCard"
-Cohesion: 0.15
-Nodes (9): CaseCard, One run artifact, structured. `params` is always in canonical units., Physical-plausibility complaints. Empty list means nothing looks wrong., ingest_hybrid(), ingest_llm(), Extract via Claude with a structured-output schema.      Raises RuntimeError w, Drop any field whose quoted source cannot be found in the artifact.      Measu, Deterministic parser first, model only for what it could not read.      The me (+1 more)
-
-### Community 45 - "casecard.py"
-Cohesion: 0.20
-Nodes (11): detect_domain(), normalise_unit(), parse_number(), The Case Card — the structured record every run artifact becomes.  The archive, Convert a value to its canonical unit. Returns (value, unit_as_given)., Parse a number written the way people actually write them.      Handles scient, Which kind of model produced this artifact, and what can be read of it.      R, Read what is legible in a foreign artifact without pretending to use it. (+3 more)
-
-### Community 46 - "Phase 1f — does the result scale with complexity?"
-Cohesion: 0.22
-Nodes (8): Phase 1f — does the result scale with complexity?, Result 1 — the scaling claim is false, Result 2 — it was never about parameter count, The check had to change, and the reason is worth keeping, The honest comparison, and a caveat on it, The question, and the tempting wrong answer, What to say, What was built
-
-### Community 47 - "Phase 1g — the baseline that beats the archive, and what survives it"
-Cohesion: 0.33
-Nodes (5): Phase 1g — the baseline that beats the archive, and what survives it, Recommendation, The objection nobody had made yet, Three attempts to find a circuit that does not decompose, What actually survives, and it is measurable
-
-### Community 48 - "ingest_worker.py"
-Cohesion: 0.67
-Nodes (3): main(), _process(), SQS consumer for Layer 1 at scale -- the queue in data.yaml, an ECS Fargate serv
-
 ## Knowledge Gaps
-- **196 isolated node(s):** `Q3 — "does this already exist?" → **Not a kill switch, but the claim must be sharpened**`, `Q1 — which Simcenter product lines at Brașov? → **Free choice: "toate sunt folosite, alege ce vrei"**`, `Q2 — why would an engineer *not* want this? → **She didn't answer. She offered an engineer.**`, `Q — "Is this done internally?" → No, with one pointer that must be named first`, `Q — "How often does a run fail, and what do you do?" → the answer that validates the Phase 1 pivot` (+191 more)
+- **166 isolated node(s):** `Q3 — "does this already exist?" → **Not a kill switch, but the claim must be sharpened**`, `Q1 — which Simcenter product lines at Brașov? → **Free choice: "toate sunt folosite, alege ce vrei"**`, `Q2 — why would an engineer *not* want this? → **She didn't answer. She offered an engineer.**`, `Q — "Is this done internally?" → No, with one pointer that must be named first`, `Q — "How often does a run fail, and what do you do?" → the answer that validates the Phase 1 pivot` (+161 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -295,16 +260,16 @@ Nodes (3): main(), _process(), SQS consumer for Layer 1 at scale -- the queue in
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Déjà Solve — Plan (Siemens Summer School 2026)` connect `Déjà Solve — Plan (Siemens Summer School 2026)` to `6f. Measured results — the failure archive, 20 Aug`, `6g. Measured results — hundreds of parameters, 20 Aug`, `6h. The 3D artifact — the boundary, demonstrated rather than promised, 20 Aug`, `0. Mentor feedback — 12 Aug 2026, and what it changes`, `3. What it is — 4 layers`, `6a. Measured results — Phase 1, 16 Aug`, `6i. Measured results — 25 real parameters, 20 Aug`, `6k. Measured results — the selection agent, declined, 20 Aug`, `8b. The engineer interview — accept, then prepare ✅ **held 19 Aug**`, `README.md`, `0b. Engineer interview — 19 Aug 2026, and what it changes`, `6e. Measured results — the surrogate arm, 20 Aug`?**
-  _High betweenness centrality (0.039) - this node is a cross-community bridge._
+  _High betweenness centrality (0.056) - this node is a cross-community bridge._
+- **Why does `sample_cases()` connect `sample_cases` to `bench.py`, `topk.py`, `agent_select.py`, `fold.py`, `wide_sweep.py`, `dimensionality.py`, `failure_zone.py`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **Why does `Verifier` connect `topk.py` to `fold.py`, `agent_select.py`?**
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **What connects `Can anything rank the candidates better than distance can?  `topk.py` found th`, `The k nearest, each with the gate's verdict already attached.      The gate ru`, `Distance against the best possible pick. No model involved.` to the rest of the system?**
-  _381 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _325 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `model.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.06504494976203067 - nodes in this community are weakly interconnected._
-- **Should `sample_cases` be split into smaller, more focused modules?**
-  _Cohesion score 0.0907258064516129 - nodes in this community are weakly interconnected._
-- **Should `geometry.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.10510510510510511 - nodes in this community are weakly interconnected._
-- **Should `topk.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.06219426974143955 - nodes in this community are weakly interconnected._
-- **Should `agent_select.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07197763801537387 - nodes in this community are weakly interconnected._
+- **Should `bench.py` be split into smaller, more focused modules?**
+  _Cohesion score 0.07294117647058823 - nodes in this community are weakly interconnected._
+- **Should `ingest.py` be split into smaller, more focused modules?**
+  _Cohesion score 0.06887755102040816 - nodes in this community are weakly interconnected._

@@ -1,0 +1,170 @@
+[
+  {
+    "branches": 2,
+    "unknowns": 12,
+    "parameters": 36,
+    "effective_dim": 6,
+    "variants": 20,
+    "archive": 475,
+    "n_queries": 200,
+    "arms": {
+      "cold": {
+        "mean": 9.195876288659793,
+        "failures": 6,
+        "vs_nominal_pct": -83.91752577319586,
+        "n_compared": 194
+      },
+      "nominal": {
+        "mean": 5.0,
+        "failures": 0,
+        "vs_nominal_pct": 0.0,
+        "n_compared": 200
+      },
+      "warm": {
+        "mean": 5.46,
+        "failures": 0,
+        "vs_nominal_pct": -9.200000000000008,
+        "n_compared": 200
+      },
+      "first_order": {
+        "mean": 4.385,
+        "failures": 0,
+        "vs_nominal_pct": 12.3,
+        "n_compared": 200
+      },
+      "ranked": {
+        "mean": 4.145,
+        "failures": 0,
+        "vs_nominal_pct": 17.100000000000005,
+        "n_compared": 200
+      }
+    },
+    "neighbour_distance_mean": 0.5115039843379899
+  },
+  {
+    "branches": 4,
+    "unknowns": 22,
+    "parameters": 62,
+    "effective_dim": 10,
+    "variants": 20,
+    "archive": 424,
+    "n_queries": 200,
+    "arms": {
+      "cold": {
+        "mean": 9.191358024691358,
+        "failures": 38,
+        "vs_nominal_pct": -83.60049321824907,
+        "n_compared": 162
+      },
+      "nominal": {
+        "mean": 5.005102040816326,
+        "failures": 4,
+        "vs_nominal_pct": 0.0,
+        "n_compared": 196
+      },
+      "warm": {
+        "mean": 5.6735751295336785,
+        "failures": 7,
+        "vs_nominal_pct": -13.020833333333325,
+        "n_compared": 192
+      },
+      "first_order": {
+        "mean": 5.416666666666667,
+        "failures": 8,
+        "vs_nominal_pct": -8.333333333333325,
+        "n_compared": 192
+      },
+      "ranked": {
+        "mean": 4.52972972972973,
+        "failures": 15,
+        "vs_nominal_pct": 9.503239740820735,
+        "n_compared": 185
+      }
+    },
+    "neighbour_distance_mean": 0.8137297505092141
+  },
+  {
+    "branches": 6,
+    "unknowns": 32,
+    "parameters": 88,
+    "effective_dim": 14,
+    "variants": 20,
+    "archive": 328,
+    "n_queries": 200,
+    "arms": {
+      "cold": {
+        "mean": 10.307692307692308,
+        "failures": 70,
+        "vs_nominal_pct": -88.47402597402598,
+        "n_compared": 117
+      },
+      "nominal": {
+        "mean": 5.6644736842105265,
+        "failures": 48,
+        "vs_nominal_pct": 0.0,
+        "n_compared": 152
+      },
+      "warm": {
+        "mean": 6.856115107913669,
+        "failures": 61,
+        "vs_nominal_pct": -19.999999999999996,
+        "n_compared": 124
+      },
+      "first_order": {
+        "mean": 6.972027972027972,
+        "failures": 57,
+        "vs_nominal_pct": -22.302158273381288,
+        "n_compared": 127
+      },
+      "ranked": {
+        "mean": 5.673076923076923,
+        "failures": 44,
+        "vs_nominal_pct": 0.26954177897574594,
+        "n_compared": 136
+      }
+    },
+    "neighbour_distance_mean": 1.0848618804110728
+  },
+  {
+    "branches": 8,
+    "unknowns": 42,
+    "parameters": 114,
+    "effective_dim": 18,
+    "variants": 20,
+    "archive": 233,
+    "n_queries": 200,
+    "arms": {
+      "cold": {
+        "mean": 12.857142857142858,
+        "failures": 123,
+        "vs_nominal_pct": -95.44072948328268,
+        "n_compared": 55
+      },
+      "nominal": {
+        "mean": 6.927083333333333,
+        "failures": 104,
+        "vs_nominal_pct": 0.0,
+        "n_compared": 96
+      },
+      "warm": {
+        "mean": 7.867469879518072,
+        "failures": 117,
+        "vs_nominal_pct": -13.623978201634879,
+        "n_compared": 58
+      },
+      "first_order": {
+        "mean": 8.7,
+        "failures": 100,
+        "vs_nominal_pct": -21.464646464646474,
+        "n_compared": 64
+      },
+      "ranked": {
+        "mean": 6.9907407407407405,
+        "failures": 92,
+        "vs_nominal_pct": 0.4405286343612369,
+        "n_compared": 69
+      }
+    },
+    "neighbour_distance_mean": 1.3650063651464222
+  }
+]

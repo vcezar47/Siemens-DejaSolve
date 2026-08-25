@@ -131,6 +131,38 @@ def d_line_flow(dp, L: float, D: float, rho: float, mu: float):
     return dq_ds * (dp * dp) / (s * s) + q * DP_REG_LINE ** 2 / s ** 3
 
 
+def line_param_derivs(dp, L: float, D: float, rho: float, mu: float
+                      ) -> tuple[float, float, float, float]:
+    """d(line_flow)/d(L, D, rho, mu) — the geometry half of dF/dp.
+
+    Both coefficients are pure power laws in the four, which is what makes this
+    tractable analytically rather than another finite difference:
+
+        G  ~  D^4 / (mu L)                 laminar, Hagen-Poiseuille
+        K  ~  D^(19/7) mu^(-1/7) rho^(-3/7) L^(-4/7)     Blasius, inverted
+
+    so every derivative is the coefficient times a constant over the variable.
+    The flow then depends on the two through
+    ``dQ/dG = Q^2 dp / (G^2 s^2)`` and ``dQ/dK = Q^2 dp / (K^2 s^(m+1))``,
+    both of which fall out of ``1/Q = 1/A + 1/B``.
+    """
+    g, k = line_coeffs(L, D, rho, mu)
+    s = np.sqrt(dp * dp + DP_REG_LINE * DP_REG_LINE)
+    a = g * s
+    b = k * s ** M_TURB
+    qm = a * b / (a + b)
+
+    # d(flow)/d(coefficient), sharing the qm^2 factor
+    dq_dg = qm * qm / (g * g * s) * (dp / s)
+    dq_dk = qm * qm / (k * k * s ** M_TURB) * (dp / s)
+
+    dq_dL = dq_dg * (-g / L) + dq_dk * (-M_TURB * k / L)
+    dq_dD = dq_dg * (4.0 * g / D) + dq_dk * ((2.0 + 5.0 / 7.0) * k / D)
+    dq_drho = dq_dk * (-(3.0 / 7.0) * k / rho)          # G carries no rho
+    dq_dmu = dq_dg * (-g / mu) + dq_dk * (-(1.0 / 7.0) * k / mu)
+    return float(dq_dL), float(dq_dD), float(dq_drho), float(dq_dmu)
+
+
 def reynolds(q_lmin, D: float, rho: float, mu: float) -> float:
     """Reynolds number of `q_lmin` in a bore of `D` mm — reported, never solved on.
 

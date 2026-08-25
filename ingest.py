@@ -185,6 +185,42 @@ describe that figure, they do not withdraw it.
 - A corrupted or placeholder value (####, NaN, ---) is missing, not zero."""
 
 
+def foreign_card(text: str, artifact: str, case_id: str,
+                 which: str) -> CaseCard | None:
+    """A Case Card for an artifact from another domain, or None if it is ours.
+
+    **The domain check belongs to the pipeline, not to one backend.** It used to
+    live only in ``ingest_rules``: the two model backends built their CaseCard
+    without ``domain`` or ``foreign``, so both defaulted to :data:`casecard.DOMAIN`
+    and ``card.foreign_domain`` was always False. Choosing "Ollama only" in the
+    UI therefore switched the check off, and the NASTRAN fixture came back with
+    ``rho = 2700`` -- the MAT1 aluminium density -- recorded as the hydraulic
+    fluid density, which is the precise failure ``casecard.FOREIGN_DOMAINS``
+    exists to prevent. A refusal that depends on which extractor the operator
+    happened to pick is not a refusal.
+
+    Checked *before* the model is called, for the reason ``ingest_hybrid``
+    already checks it there: there is nothing in a structural deck for the
+    extractor to find, and asking anyway is how a language model gets talked
+    into inventing seven parameters. It also saves a minutes-long inference on
+    a file that was never going to produce a Case Card.
+    """
+    domain, foreign = casecard.detect_domain(text)
+    if domain == casecard.DOMAIN:
+        return None
+    return CaseCard(
+        case_id=case_id,
+        source={"artifact": artifact,
+                "ingested_by": f"{which} (foreign domain, model not asked)",
+                "ingested_utc": datetime.now(timezone.utc).isoformat(timespec="seconds")},
+        params={},
+        provenance={},
+        missing=[p for p in model.PARAM_NAMES],
+        domain=domain,
+        foreign=foreign,
+    )
+
+
 def ingest_llm(text: str, artifact: str, case_id: str,
                effort: str = "medium") -> CaseCard:
     """Extract via Claude with a structured-output schema.
@@ -192,6 +228,10 @@ def ingest_llm(text: str, artifact: str, case_id: str,
     Raises RuntimeError with an actionable message when the SDK or credentials
     are unavailable, so callers can fall back to `rules` rather than crash.
     """
+    other = foreign_card(text, artifact, case_id, f"llm:{MODEL_ID}")
+    if other is not None:
+        return other
+
     try:
         import anthropic
     except ImportError as exc:                                  # pragma: no cover
@@ -218,7 +258,20 @@ def ingest_llm(text: str, artifact: str, case_id: str,
         raise RuntimeError("the request was declined by safety classifiers")
 
     payload = json.loads(next(b.text for b in response.content if b.type == "text"))
-    params = {k: float(v) for k, v in payload.get("params", {}).items()}
+    # The same coercion `ingest_ollama` does, and for the same reason: the schema
+    # says number, a model may still answer null or a string, and an unknown key
+    # would have raised KeyError in `verify_provenance` below. None of those are
+    # RuntimeError, so they escaped `dejasolve.analyse`'s handler and surfaced as
+    # an HTTP 500 instead of a pipeline stage with a reason. A field we cannot
+    # read as a number is missing, which is the honest outcome, not zero.
+    params: dict[str, float] = {}
+    for key, value in (payload.get("params") or {}).items():
+        if key not in model.PARAM_NAMES or value is None:
+            continue
+        try:
+            params[key] = float(value)
+        except (TypeError, ValueError):
+            continue
     return CaseCard(
         case_id=case_id,
         source={"artifact": artifact, "ingested_by": f"llm:{MODEL_ID}",
@@ -226,9 +279,10 @@ def ingest_llm(text: str, artifact: str, case_id: str,
                 "usage": {"input_tokens": response.usage.input_tokens,
                           "output_tokens": response.usage.output_tokens}},
         params=params,
-        provenance=payload.get("provenance", {}),
+        provenance={k: str(v) for k, v in (payload.get("provenance") or {}).items()
+                    if k in model.PARAM_NAMES},
         missing=[p for p in model.PARAM_NAMES if p not in params],
-        notes=payload.get("notes", ""),
+        notes=str(payload.get("notes", "")),
     )
 
 
@@ -274,6 +328,10 @@ def ingest_ollama(text: str, artifact: str, case_id: str,
     import urllib.request
 
     name = model_name or OLLAMA_MODEL
+    other = foreign_card(text, artifact, case_id, f"ollama:{name}")
+    if other is not None:
+        return other
+
     ok, detail = ollama_available()
     if not ok:
         raise RuntimeError(detail)

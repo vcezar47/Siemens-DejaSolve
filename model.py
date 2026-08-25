@@ -801,6 +801,58 @@ def shaft_regime(w: float) -> str:
     return "viscous"
 
 
+def flows(x, p: dict) -> dict:
+    """Flow [L/min] in each segment of a converged circuit.
+
+    Every one of these is a term the residual already computes -- this is the
+    same arithmetic, kept instead of differenced away. `residual` asks whether
+    the flows into a node balance the flows out; this reports what they *were*.
+
+    Which makes one thing visible that no other view in this project shows:
+    the relief valve is a leg of the circuit that carries real flow and does no
+    work. A case with the relief cracked open is spending part of every pump
+    revolution pushing oil back to tank, and that share is in the solved answer
+    rather than being an estimate.
+
+    At convergence `pump == relief + branch_a + branch_b` and, within a branch,
+    `valve == motor == return`, to solver tolerance. Both are worth stating
+    because they are what makes an animation drawn from these numbers honest:
+    the dots cannot appear or vanish at a junction, because the physics says
+    they do not.
+    """
+    p1, p2a, p3a, wa, p2b, p3b, wb = x
+    rho = p["rho"]
+    h = hardware(p)
+    ha, hb = shaft_hw(h, "a"), shaft_hw(h, "b")
+
+    q_pump = p["Q_nom"] - p1 / h["R_leak"]
+    q_rel = (orifice_gain(h["A_relief_max"], rho, h["cd"])
+             * relief_opening(p1, p["p_crack"], h["relief_band"])
+             * f_dp(p1 - P_TANK))
+    q_va = orifice_gain(p["A_valve_a"], rho, h["cd"]) * f_dp(p1 - p2a)
+    q_vb = orifice_gain(p["A_valve_b"], rho, h["cd"]) * f_dp(p1 - p2b)
+    q_ma = ha["D_mot"] / 1000.0 * wa + ha["leak_mot"] * (p2a - p3a)
+    q_mb = hb["D_mot"] / 1000.0 * wb + hb["leak_mot"] * (p2b - p3b)
+    q_ra = orifice_gain(ha["A_ret"], rho, h["cd"]) * f_dp(p3a - P_TANK)
+    q_rb = orifice_gain(hb["A_ret"], rho, h["cd"]) * f_dp(p3b - P_TANK)
+
+    #: hydraulic power actually delivered across each motor, in kW:
+    #: 1 bar * 1 L/min = 1/600 kW
+    pwr_a = (p2a - p3a) * q_ma / 600.0
+    pwr_b = (p2b - p3b) * q_mb / 600.0
+    pwr_rel = p1 * q_rel / 600.0
+    return {
+        "pump": float(q_pump), "relief": float(q_rel),
+        "valve_a": float(q_va), "motor_a": float(q_ma), "return_a": float(q_ra),
+        "valve_b": float(q_vb), "motor_b": float(q_mb), "return_b": float(q_rb),
+        "relief_share": float(q_rel / q_pump) if q_pump else 0.0,
+        "power_a_kw": float(pwr_a), "power_b_kw": float(pwr_b),
+        "power_relief_kw": float(pwr_rel),
+        "power_wasted_share": (float(pwr_rel / (pwr_a + pwr_b + pwr_rel))
+                               if (pwr_a + pwr_b + pwr_rel) > 0 else 0.0),
+    }
+
+
 def regime(x, p: dict) -> dict:
     """Qualitative operating regime of a converged solution.
 

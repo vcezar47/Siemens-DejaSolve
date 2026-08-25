@@ -434,12 +434,20 @@ def analyse(text: str, name: str, archive: Archive,
 
     solve = {"cold_iterations": cold["iterations"],
              "cold_status": cold["status"],
+             #: stated as a flag as well as a status string, because every
+             #: consumer of this record has to know whether an iteration count
+             #: is a result or the point at which an arm gave up. Reading
+             #: `cold_iterations` without reading this is how a stalled arm's
+             #: count came to be quoted as the baseline the warm start beat.
+             "cold_converged": cold["converged"],
              "nominal_iterations": nom["iterations"],
              "nominal_status": nom["status"],
+             "nominal_converged": nom["converged"],
              "start": label}
     if warm is not None:
         solve.update(warm_iterations=warm["iterations"],
                      warm_status=warm["status"],
+                     warm_converged=warm["converged"],
                      #: which transfer order was used. Stated rather than
                      #: implied: an archive without tangents still warm-starts,
                      #: just not as well, and the report should not let those
@@ -447,12 +455,31 @@ def analyse(text: str, name: str, archive: Archive,
                      transfer="first_order" if first_order else "verbatim")
         if cold["converged"] and warm["converged"]:
             dx = np.abs(np.array(cold["x"]) - np.array(warm["x"]))
-            solve["agreement"] = float(dx.max())
-            solve["saved"] = cold["iterations"] - warm["iterations"]
+            solve["agreement_vs_cold"] = float(dx.max())
+            solve["saved_vs_cold"] = cold["iterations"] - warm["iterations"]
         if nom["converged"] and warm["converged"]:
             dn = np.abs(np.array(nom["x"]) - np.array(warm["x"]))
             solve["agreement_vs_nominal"] = float(dn.max())
             solve["saved_vs_nominal"] = nom["iterations"] - warm["iterations"]
+        # "same answer" is the claim that carries this whole project, and making
+        # it needs a *converged* arm to compare against. The flat start is the
+        # one to use when it has one -- it shares nothing with the warm start
+        # except the equations. But it fails on four of the 200 benchmark cases,
+        # and when it does there is still the nominal guess; only when neither
+        # converged is there no independent check, and then the claim is not
+        # made at all rather than made against nothing.
+        #
+        # `agreement` used to be set only in the cold branch, so a run whose cold
+        # arm stalled had no `agreement`, fell out of the headline chain below,
+        # and was reported as "cold start, N iterations" -- naming the arm that
+        # failed and hiding the one that worked, on exactly the cases where the
+        # warm start earns its keep.
+        for other in ("cold", "nominal"):
+            if f"agreement_vs_{other}" in solve:
+                solve["agreement"] = solve[f"agreement_vs_{other}"]
+                solve["saved"] = solve[f"saved_vs_{other}"]
+                solve["agreement_against"] = other
+                break
     # What follows is for the geometry view, and it is the same data the stages
     # above already computed -- no extra solve, no second retrieval. Without it
     # the page can only ever draw the fixture `viz.py` shipped, and the case the
@@ -463,6 +490,12 @@ def analyse(text: str, name: str, archive: Archive,
         # the relief valve's state is part of the answer, not of the setup, so
         # the drawing of this case cannot be derived from the Case Card alone
         solve["regime"] = model.regime(chosen["x"], card.params)
+        # what each leg of the circuit is actually carrying. Same arithmetic
+        # the residual does, kept rather than differenced away -- it is what
+        # lets the page draw where the oil goes instead of only what pressure
+        # it is at, and it is the only view that shows the relief valve
+        # spending pump flow on nothing.
+        solve["flows"] = model.flows(chosen["x"], card.params)
     solve["paths"] = {
         name: [[float(v) for v in row] for row in arm["path"]]
         for name, arm in (("cold", cold), ("nominal", nom), ("warm", warm))
@@ -483,11 +516,29 @@ def analyse(text: str, name: str, archive: Archive,
                 "there is no answer to report on, warned or otherwise")
         return trace
 
-    if warm is not None and "saved" in solve:
-        base = (f"{solve['cold_iterations']} cold / {solve['nominal_iterations']} nominal"
-                if nom["converged"] else f"{solve['cold_iterations']} cold")
-        headline = (f"{base} -> {solve['warm_iterations']} warm iterations, "
-                    f"same answer to {solve['agreement']:.1e}")
+    # The headline names the arm that produced the answer, and it is selected on
+    # *which arm ran*, not on which comparisons happened to be available. The
+    # previous form keyed the warm branch off `"saved" in solve` -- a field that
+    # exists only when the cold arm also converged -- so a run that warm-started
+    # in 4 iterations after the flat start stalled fell through to the last
+    # branch and was reported as "cold start, 7 iterations".
+    if warm is not None:
+        # A baseline that failed is named as a failure. Quoting its iteration
+        # count beside a converged one would present the moment it gave up as
+        # though it were a finish line, which flatters the warm start with a
+        # number that means something else entirely.
+        base = " / ".join(
+            f"{r['iterations']} {n}" if r["converged"] else f"{n} {r['status']}"
+            for n, r in (("cold", cold), ("nominal", nom)))
+        headline = f"{base} -> {solve['warm_iterations']} warm iterations"
+        if "agreement" in solve:
+            headline += (f", same answer as {solve['agreement_against']} "
+                         f"to {solve['agreement']:.1e}")
+        else:
+            # Both baselines failed, so nothing independent solved this case and
+            # there is no second answer to agree with. Saying so is the point:
+            # an unchecked answer and a corroborated one must not read alike.
+            headline += " -- no converged baseline to check the answer against"
     elif label == "nominal":
         headline = (f"nominal guess, {nom['iterations']} iterations "
                     f"(archive not used -- warned, not overridden)")

@@ -103,7 +103,34 @@ CANONICAL_UNITS = {
     "rho": "kg/m^3",
 }
 
-#: multiply a value in this unit by the factor to reach the canonical unit
+#: units for the 18 promoted hardware constants (§0b, `model.HARDWARE`) --
+#: circuit properties a case may *state* instead of inheriting the default.
+#: Unlike the seven above, a card that states none of these is still
+#: complete: `model.PARAM_NAMES` -- what `complete` and `missing` check
+#: against -- was never widened to include them, on purpose. They are an
+#: override, not a measurement the artifact is expected to report.
+HARDWARE_UNITS = {
+    "cd": "",                       # dimensionless
+    "R_leak": "bar/(L/min)",
+    "A_relief_max": "mm^2",
+    "relief_band": "bar",
+    "D_mot_a": "cm^3/rev", "D_mot_b": "cm^3/rev",
+    "A_ret_a": "mm^2", "A_ret_b": "mm^2",
+    "leak_mot_a": "L/min/bar", "leak_mot_b": "L/min/bar",
+    "t_coul_a": "Nm", "t_coul_b": "Nm",
+    "t_stat_a": "Nm", "t_stat_b": "Nm",
+    "w_strib_a": "rev/min", "w_strib_b": "rev/min",
+    "b_visc_a": "Nm/(rev/min)", "b_visc_b": "Nm/(rev/min)",
+}
+
+#: both together, for the code that treats a Case Card's up-to-25 possible
+#: fields uniformly and does not care which of the two groups a name is from
+#: -- ingest's extraction schema, and `validate`'s unit-error message.
+ALL_UNITS = {**CANONICAL_UNITS, **HARDWARE_UNITS}
+
+#: multiply a value in this unit by the factor to reach the canonical unit.
+#: "bara" is deliberately absent -- see UNIT_OFFSETS below, it is not a
+#: multiplicative conversion.
 UNIT_FACTORS = {
     # flow -> L/min
     "l/min": 1.0, "lpm": 1.0, "l/m": 1.0, "litre/min": 1.0,
@@ -114,21 +141,50 @@ UNIT_FACTORS = {
     "cm2": 100.0, "cm^2": 100.0, "cm²": 100.0,
     "m2": 1.0e6, "m^2": 1.0e6, "m²": 1.0e6,
     # pressure -> bar
-    "bar": 1.0, "bara": 1.0, "barg": 1.0,
+    "bar": 1.0, "barg": 1.0,
     "pa": 1.0e-5, "kpa": 1.0e-2, "mpa": 10.0, "psi": 0.0689476,
     # density -> kg/m^3
     "kg/m3": 1.0, "kg/m^3": 1.0, "kg/m³": 1.0,
     "g/cm3": 1000.0, "g/cm^3": 1000.0, "kg/l": 1000.0, "kg/dm3": 1000.0,
 }
 
+#: units needing an *additive* correction, applied instead of (never in
+#: addition to) UNIT_FACTORS. Just one: "bara" is bar *absolute*, and this
+#: model works in gauge pressure throughout (P_TANK = 0.0 bar gauge, model.py).
+#: Absolute and gauge differ by local atmospheric pressure, not by a scale
+#: factor -- folding "bara" into UNIT_FACTORS at 1.0, what this used to do,
+#: silently read every absolute-pressure artifact about one bar too high.
+#: Standard atmosphere (1.01325 bar) is the conventional reference absent a
+#: stated local value.
+UNIT_OFFSETS = {"bara": -1.01325}
+
+#: '^2'/'2' and '³'/'3' are the same unit written two ways ("kg/dm^3" vs
+#: "kg/dm3", "m^3/h" vs "m3/h"), and a table entry for only one spelling used
+#: to mean the other one fell through `normalise_unit`'s "unrecognised -> pass
+#: through unconverted" branch -- accepted silently, at the wrong scale,
+#: which is precisely the failure the Units gate downstream exists to catch.
+#: Matching on a normalised key closes every such gap at once rather than
+#: hardcoding each missing sibling as it is found.
+_SUPERSCRIPTS = str.maketrans({"²": "2", "³": "3", "^": ""})
+
+
+def _norm_unit_key(key: str) -> str:
+    return key.translate(_SUPERSCRIPTS)
+
+
+_UNIT_FACTORS_NORM = {_norm_unit_key(k): v for k, v in UNIT_FACTORS.items()}
+_UNIT_OFFSETS_NORM = {_norm_unit_key(k): v for k, v in UNIT_OFFSETS.items()}
+
 
 def normalise_unit(value: float, unit: str | None) -> tuple[float, str | None]:
     """Convert a value to its canonical unit. Returns (value, unit_as_given)."""
     if not unit:
         return value, None
-    key = unit.strip().lower()
-    if key in UNIT_FACTORS:
-        return value * UNIT_FACTORS[key], unit
+    key = _norm_unit_key(unit.strip().lower())
+    if key in _UNIT_OFFSETS_NORM:
+        return value + _UNIT_OFFSETS_NORM[key], unit
+    if key in _UNIT_FACTORS_NORM:
+        return value * _UNIT_FACTORS_NORM[key], unit
     return value, unit
 
 
@@ -181,16 +237,26 @@ class CaseCard:
         This is a sanity gate on *ingest*, distinct from the transfer verifier:
         it catches a mis-parsed unit (an area of 7.8e-06 because m^2 was read as
         mm^2) before the number ever reaches retrieval.
+
+        Checks the 18 promoted hardware constants too, against
+        ``model.HARDWARE_BOUNDS`` rather than ``PARAM_BOUNDS`` -- they were
+        unreachable here before ingest could put them on a card at all, which
+        is a gap worth naming: a stated ``relief_band = 0`` or ``cd = 0`` would
+        have sailed through this gate and then divided by zero in
+        ``relief_opening()`` / ``orifice_gain()`` the first time the case was
+        solved.
         """
         problems = []
         for name, value in self.params.items():
-            if name not in model.PARAM_BOUNDS:
+            bounds = model.PARAM_BOUNDS.get(name, model.HARDWARE_BOUNDS.get(name))
+            if bounds is None:
                 continue
-            lo, hi = model.PARAM_BOUNDS[name]
+            lo, hi = bounds
             if not (lo / 100 <= value <= hi * 100):
+                unit = f" {ALL_UNITS[name]}" if ALL_UNITS[name] else ""
                 problems.append(
-                    f"{name} = {value:.6g} {CANONICAL_UNITS[name]} is off by orders "
-                    f"of magnitude (sweep range {lo:g} to {hi:g}) -- likely a unit error")
+                    f"{name} = {value:.6g}{unit} is off by orders of magnitude "
+                    f"(plausible range {lo:g} to {hi:g}) -- likely a unit error")
         return problems
 
     def to_dict(self) -> dict:

@@ -115,6 +115,24 @@ def estimate_regime(p: dict) -> dict:
     fixes the torque available to break the shafts away, and bounds the flow
     the branches can absorb once turning — which in turn says whether the
     relief valve has to stay open. Both are inequalities, not predictions.
+
+    The top-level ``stall_torque_Nm`` / ``can_break_away`` / ``breakaway_margin``
+    treat the motor and friction constants as shared across both branches --
+    true of every case in this archive before the 18 hardware constants were
+    promoted (§0b), and left exactly as they were computed then: this is what
+    `agent_select.py`'s physics ranker reads, and changing what these three
+    keys mean would silently move an already-measured result out from under it.
+
+    ``breakaway`` is the per-shaft version gate 1 below actually needs. Since
+    the promotion, the two branches can have independent motors (``D_mot_a`` /
+    ``D_mot_b``), independent breakaway torque (``t_stat_a`` / ``t_stat_b``)
+    and independent Coulomb friction (``t_coul_a`` / ``t_coul_b``) -- so a
+    single circuit-wide "can it break away" is a category error the moment
+    shaft a and shaft b would answer it differently, which is exactly the case
+    the gate below used to refuse unconditionally: whichever shaft disagreed
+    with the shared estimate failed its comparison, so a source case with one
+    shaft turning and one stuck could never be admitted no matter what
+    ``can_break_away`` said.
     """
     k_torque, k_disp = model.motor_constants(p)
     p_stall = min(p["p_crack"] + model.RELIEF_BAND, p["Q_nom"] * model.R_LEAK)
@@ -126,6 +144,20 @@ def estimate_regime(p: dict) -> dict:
     q_absorbable = k_disp * (w_ceiling["a"] + w_ceiling["b"])
     q_available = p["Q_nom"] - p_stall / model.R_LEAK
 
+    breakaway = {}
+    for s in ("a", "b"):
+        hs = model.shaft_hw(model.hardware(p), s)
+        k_t_s, _ = model.motor_constants(p, s)
+        tq_s = p_stall * k_t_s
+        surplus_s = max(tq_s - hs["t_coul"], 0.0)
+        breakaway[s] = {
+            "stall_torque_Nm": float(tq_s),
+            "can_break_away": bool(tq_s > hs["t_stat"]),
+            "breakaway_margin": (float(tq_s / hs["t_stat"])
+                                 if hs["t_stat"] else float("inf")),
+            "w_ceiling": float(np.sqrt(surplus_s / p[f"c_load_{s}"])),
+        }
+
     return {
         "stall_pressure_bar": p_stall,
         "stall_torque_Nm": tq_stall,
@@ -133,6 +165,7 @@ def estimate_regime(p: dict) -> dict:
         "breakaway_margin": tq_stall / model.T_STAT,
         "w_ceiling": w_ceiling,
         "relief_must_open": bool(q_absorbable < q_available),
+        "breakaway": breakaway,
     }
 
 
@@ -214,18 +247,26 @@ class Verifier:
                            f"archive's own {self.coverage_radius:.2f} spacing", det)
 
         # -- do the shafts do the same *kind* of thing in both cases?
+        #
+        # Checked per shaft, against that shaft's own breakaway estimate. It
+        # used to compare both shafts against one circuit-wide `can_break_away`,
+        # so a source case with shaft a turning and shaft b stuck failed one of
+        # the two comparisons whatever that shared estimate said -- refusing
+        # every mixed-state transfer unconditionally, not just the ones that
+        # actually disagree.
         for s in ("a", "b"):
+            bw = est["breakaway"][s]
             src_spinning = src_regime[f"shaft_{s}"] != "stuck"
-            if est["can_break_away"] != src_spinning:
+            if bw["can_break_away"] != src_spinning:
                 if src_spinning:
                     return Verdict(False, "breakaway",
                                    f"shaft {s} cannot break away here "
-                                   f"({est['stall_torque_Nm']:.1f} Nm available vs "
-                                   f"{model.T_STAT:.0f} Nm needed), but the source "
-                                   f"case has it turning", det)
+                                   f"({bw['stall_torque_Nm']:.1f} Nm available vs "
+                                   f"{model.shaft_hw(model.hardware(query), s)['t_stat']:.0f} "
+                                   f"Nm needed), but the source case has it turning", det)
                 return Verdict(False, "breakaway",
                                f"shaft {s} breaks away here "
-                               f"({est['stall_torque_Nm']:.1f} Nm available), but the "
+                               f"({bw['stall_torque_Nm']:.1f} Nm available), but the "
                                f"source case has it stuck", det)
 
         # -- same hydraulic regime?

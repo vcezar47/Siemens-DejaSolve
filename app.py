@@ -18,11 +18,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 import dejasolve
@@ -36,9 +38,17 @@ ARCHIVE_PATH = ROOT / "archive" / "cases.jsonl"
 STATIC = ROOT / "static"
 LOGS = ROOT / "logs"
 
+logger = logging.getLogger("dejasolve")
+
 api = FastAPI(title="Déjà Solve", version="0.3.0",
               description="Find the physically-nearest solved case, verify that "
                           "reusing it is legitimate, warm-start the solver.")
+
+#: the page used to be one self-contained file; it is now index.html + app.css +
+#: app.js + a vendored three.js, which needs a real static mount. The "no CDN"
+#: promise is unchanged and now enforced rather than asserted: every byte the
+#: page loads comes off this container, so the demo runs on a dead network.
+api.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 #: "file" (default) reads archive/cases.jsonl exactly as every benchmark does.
 #: "aurora" points the *live demo's* retrieval at the Aurora + pgvector backend
@@ -84,11 +94,20 @@ def _mirror_audit_to_dynamo(trace: dict) -> None:
         for entry in trace["audit"]:
             table.put_item(Item={"case_id": case_id, "recorded_at": entry["at"], **entry})
     except Exception as exc:  # noqa: BLE001 -- see docstring
-        print(f"audit mirror skipped: {exc}")
+        # print() landed on stdout with no level or timestamp under uvicorn,
+        # indistinguishable from any other line in the log -- a logger call
+        # is filterable and timestamped the way an operator actually needs
+        # to find "did the audit trail actually get mirrored" later.
+        logger.warning("audit mirror skipped: %s", exc)
 
 
 class AnalyseRequest(BaseModel):
-    text: str = Field(..., description="the raw run artifact")
+    #: generous relative to any real solver log or note in `logs/` (all under
+    #: a few kB), but bounded: unbounded meant a large-enough paste could run
+    #: the full parser -- and, on the ollama path, an inference that already
+    #: runs close to the 280s timeout on a normal-sized artifact -- against
+    #: however much text a client sent, with nothing here to say no first.
+    text: str = Field(..., description="the raw run artifact", max_length=1_000_000)
     name: str = Field("pasted-artifact.log", description="filename, for the record")
     #: built from ingest.BACKENDS rather than written out -- a hardcoded list
     #: here silently 422s any backend added later, which is how `hybrid` came

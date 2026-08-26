@@ -52,24 +52,10 @@ import numpy as np
 import model
 import verifier
 from sweep import latin_hypercube
-
-#: How far each promoted constant may stray from its default, as a factor. Kept
-#: modest on purpose: these are variants of one machine family, not unrelated
-#: circuits, and a range wide enough to stop cases converging would measure the
-#: sampler rather than the gate.
-HARDWARE_SPREAD = {
-    "cd": (0.85, 1.15),
-    "R_leak": (0.7, 1.4),
-    "A_relief_max": (0.8, 1.25),
-    "relief_band": (0.7, 1.5),
-    "D_mot_a": (0.75, 1.3), "D_mot_b": (0.75, 1.3),
-    "A_ret_a": (0.7, 1.4), "A_ret_b": (0.7, 1.4),
-    "leak_mot_a": (0.5, 1.8), "leak_mot_b": (0.5, 1.8),
-    "t_coul_a": (0.6, 1.5), "t_coul_b": (0.6, 1.5),
-    "t_stat_a": (0.8, 1.4), "t_stat_b": (0.8, 1.4),
-    "w_strib_a": (0.7, 1.4), "w_strib_b": (0.7, 1.4),
-    "b_visc_a": (0.5, 1.8), "b_visc_b": (0.5, 1.8),
-}
+#: moved to model.py, next to the `HARDWARE` defaults it is a spread around --
+#: `casecard.validate()` needed the same numbers for a second purpose (catching
+#: a misread unit on ingest) and a second copy was the wrong way to share them.
+from model import HARDWARE_SPREAD
 
 
 def make_variants(n: int, seed: int) -> list[dict]:

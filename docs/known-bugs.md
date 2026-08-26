@@ -12,10 +12,12 @@ Severity is about the demo, not about CVSS: **critical** means it undermines a
 claim the project makes on stage, **major** means visibly wrong output,
 **minor** means cosmetic or dead code.
 
-**Status:** C1, C2, M1, M2, M3 and M4 are **fixed** — see the resolution note on
-each. **M5 was not a bug** and has been withdrawn; the endpoint it called dead
-has a live consumer. **M6 is won't-fix** by decision: this is a desktop demo.
-Everything under Minor still stands.
+**Status:** every finding in this document is now **fixed** except **M5**
+(withdrawn — not a bug, the endpoint it called dead has a live consumer) and
+**M6** (won't-fix by decision: this is a desktop demo). One decision is
+pending — see N2's
+resolution note: `wide_sweep_results.json` was measured
+against the breakaway gate before this fix and may no longer match it.
 
 ---
 
@@ -562,6 +564,9 @@ collapse below a breakpoint.
 
 ### N1 — `regime()` and `estimate_regime()` ignore the 18 promoted hardware constants
 
+> **FIXED.** Both now resolve this case's own hardware. Resolution note at the
+> end of this entry.
+
 **By inspection.** `model.py:856` (`regime`), `verifier.py:110` (`estimate_regime`)
 
 `flows()` correctly resolves per-case hardware via `hardware(p)` / `shaft_hw(h, s)`.
@@ -581,7 +586,37 @@ reads only the `D_mot` shorthand, never `D_mot_a` / `D_mot_b`) plus
 So gate 1 checks the promoted constants very carefully for the hardware rule and
 then estimates the regime as if none of them existed.
 
+#### Resolution
+
+`model.regime()` now resolves `hardware(p)` / `shaft_hw` the same way `flows()`
+already did, and `shaft_regime()` takes the per-shaft `w_strib` as a parameter
+(defaulting to the module constant, so every other caller is untouched).
+`model.motor_constants(p, shaft=None)` gained an optional `shaft` argument: with
+none it behaves exactly as before (the `D_mot` shorthand `fold.py`'s variant
+circuit depends on), and with `'a'`/`'b'` it resolves that branch's own
+displacement through `hardware()`.
+
+`verifier.estimate_regime()` keeps its existing top-level keys
+(`can_break_away`, `stall_torque_Nm`, `breakaway_margin`) computed exactly as
+before — `agent_select.py`'s physics ranker reads them, and changing what they
+mean would have silently moved an already-measured result out from under it
+without anyone rerunning it. A new `breakaway` dict adds the per-shaft version,
+resolving each branch's own `t_stat`, `t_coul` and motor displacement.
+
+This is a **guaranteed no-op for every case in `archive/cases.jsonl` and every
+fixture in `logs/`**: `sweep.py` (which built that archive) never sets any of
+the 18 constants, so `hardware(p)` resolves to the module defaults for every
+record either way. Confirmed with `python selftest.py` (5/5, including the
+"explicit defaults == module defaults" check) and `python dejasolve.py --all`
+(byte-identical output). The fix only changes behaviour for a case that states
+its own hardware — which today means only `wide_sweep.py`'s synthetic machine
+variants (see N2's resolution note for what that implies for its results file).
+
 ### N2 — The breakaway gate refuses any source case with mixed shaft states
+
+> **FIXED**, together with N1 — the per-shaft `breakaway` dict N1 added is what
+> this gate now reads. Resolution and a real before/after test at the end of
+> this entry.
 
 **By inspection.** `verifier.py:215-229`
 
@@ -601,7 +636,61 @@ unconditionally. The estimate ought to be per-shaft — the shafts have
 independent `c_load_a` / `c_load_b` and, since the promotion, independent
 `t_stat_*` and `t_coul_*`, so a per-shaft estimate is well-defined.
 
+#### Resolution
+
+The gate now compares each shaft against `est["breakaway"][s]["can_break_away"]`
+rather than the shared scalar. Tested directly against both the finding's
+scenario and its mirror image, using a synthetic case with `t_stat_a = 1` Nm
+(trivially breaks away) and `t_stat_b = 1e5` Nm (never does) — same torque
+supply to both shafts, so only the per-shaft threshold differs:
+
+```
+per-shaft breakaway estimate: {a: True, b: False}
+
+Source regime: shaft_a spinning, shaft_b stuck (physically consistent
+with the estimate above)
+  old code -> BLOCKED: "shaft b breaks away here (104.4 Nm available),
+              but the source case has it stuck"
+              -- wrong on the facts (t_stat_b=1e5 was ignored, using the
+              module default instead) and wrong on the shape of the check
+              (one scalar can't agree with two independent shafts)
+  new code -> ADMITTED: "same regime, 0.00 away in setup space"
+
+Source regime: shaft_a spinning, shaft_b ALSO spinning (a genuine mismatch --
+the query's own physics says shaft b cannot break away, so this source case's
+regime does not apply here)
+  new code -> still BLOCKED: "shaft b cannot break away here (104.4 Nm
+              available vs 100000 Nm needed), but the source case has it
+              turning"
+```
+
+The second run is the check that matters: the fix admits mixed states that are
+physically consistent, and still refuses ones that are not — it did not just
+loosen the gate.
+
+**What this does not touch.** Every query the live pipeline can produce today
+resolves to default hardware (see N1 — N3 is why: ingest cannot write these
+fields onto a Case Card), so `check_transfer`'s behaviour on `/api/analyse` is
+unchanged. The one place that already exercises non-default hardware through
+this exact gate is `wide_sweep.py --tolerance`, which varies all 18 constants
+across six synthetic "machine variants" and calls `Verifier.check_transfer`
+directly. Its committed `wide_sweep_results.json` — the "25 real parameters,
+six machine variants" section of `/api/evidence` and the README — was measured
+against the old, buggy gate, and this fix can change which transfers it admits.
+I did not regenerate it: that is a `python wide_sweep.py` rerun (smoke-tested
+below, no crash, all queries converged) changing a committed, cited result, and
+that call belongs to whoever owns the deck, not to a bug fix. **Flagging for a
+decision:** regenerate `wide_sweep_results.json` before the numbers on
+`/api/evidence` are shown next to this code, or note the discrepancy if they
+are shown as-is in the meantime.
+
 ### N3 — The 18 promoted constants cannot be read from any artifact
+
+> **FIXED.** All four backends can now put a hardware constant onto a Case
+> Card, `validate()` bounds-checks them, and — the part this fix turned up as
+> its own necessary half — a stated override is now visible everywhere the
+> pipeline reports on a run, not just used silently. Resolution note at the
+> end of this entry.
 
 **By inspection.** `ingest.py:48` (`SYNONYMS`), `ingest.py:125` (`EXTRACTION_SCHEMA`)
 
@@ -618,7 +707,111 @@ Related: `CaseCard.validate()` only bounds-checks names present in
 `relief_band = 0` or `cd = 0` passes the Units gate and then divides by zero in
 `relief_opening()` / `orifice_gain()`.
 
+#### Resolution
+
+**Bounds.** `wide_sweep.py` already had physically-judged (lo, hi) multipliers
+per constant (`HARDWARE_SPREAD` — "kept modest on purpose... a range wide
+enough to stop cases converging would measure the sampler rather than the
+gate"), used to generate its synthetic machine variants. It moved to
+`model.py`, next to the `HARDWARE` defaults it is a spread *around*, and a new
+`model.HARDWARE_BOUNDS` applies it in absolute units — `PARAM_BOUNDS`'s
+counterpart for the 18. `wide_sweep.py` now imports the constant instead of
+keeping a private copy that could silently drift from it. `CaseCard.validate()`
+checks a stated hardware value against `HARDWARE_BOUNDS` with the same 100×
+orders-of-magnitude slack it already applies to the 7 swept parameters —
+closing the divide-by-zero risk this entry named.
+
+**Units and synonyms.** `casecard.py` gained `HARDWARE_UNITS` (18 entries,
+read off `model.py`'s own inline unit comments) and `ALL_UNITS`, the merged
+view code that doesn't care which group a field is from needs. `ingest.py`'s
+`SYNONYMS` gained English phrasings for all 18 (no Romanian — unlike the seven
+required fields, no fixture demonstrates a concrete need for it, so nothing
+was guessed).
+
+**Reaching all four backends.** `ingest_rules` was already general — it stores
+whatever `SYNONYMS` maps a line to, with no gate to `PARAM_NAMES` — so the
+synonym additions alone made the rules backend capable. `ingest_ollama` and
+`ingest_llm` each had an explicit `if key not in model.PARAM_NAMES: continue`
+filter that discarded anything else; both now check the wider
+`EXTRACTABLE_FIELDS` (`PARAM_NAMES + tuple(model.HARDWARE.keys())`), and
+`EXTRACTION_SCHEMA` / the `SYSTEM` prompt describe all 25 fields, with the
+prompt explicit that the 18 are optional and must never appear in `missing`
+(only the 7 required fields can).
+
+**`ingest_hybrid`'s narrower gap.** Its "rules found everything → skip the
+model" fast path is a deliberate, documented speed optimisation (an
+artifact-dependent inference call would defeat the whole point) and is
+untouched. But when the model *was* already invoked because a required field
+was missing, its backfill loop only ever copied fields listed in
+`card.missing` — never a hardware constant, since those are never "missing" by
+definition — so a hardware override the model found in the same call used to
+be silently thrown away. A second loop now merges any of the 18 the model
+found, at no extra cost since the call already happened, with `card.params`
+checked first so rules keeps precedence where both found the same field.
+
+**A real bug this exposed and fixed alongside it.** `dejasolve.py`'s ingest
+stage counted `found = len(card.params)` for its "N of 7 parameters read"
+headline. Once `card.params` could hold more than 7 keys, a stated hardware
+constant would have inflated that count past the fixed "of 7" denominator —
+"8 of 7 parameters read". `found` now explicitly counts only
+`model.PARAM_NAMES` membership. Caught by an end-to-end test before it ever
+reached a screen, not by inspection.
+
+**The part that made this a complete fix rather than a working feature no one
+could see.** A stated hardware constant changes the solve — it feeds
+`model.hardware(p)` the same way the seven required fields do — and the Case
+Card table on the page only ever displayed the 7. Without more, ingest could
+now *read* a value that silently changed the answer while showing nothing on
+screen to explain why: exactly the failure mode every other layer of this
+project exists to refuse. `dejasolve.analyse` now builds
+`trace["hardware_overrides"]` — only the constants a given artifact actually
+stated, alongside `model.HARDWARE`'s default for context — and it renders in
+three places: the Ingest stage's headline ("7 of 7 parameters read by rules,
+2 hardware overrides stated"), the CLI's `render()`, and a second table on the
+web page directly under the Case Card, shown only when non-empty.
+
+**Verified end-to-end**, not just read: an artifact stating
+`discharge coefficient: 0.62` and `breakaway torque a: 12.5 Nm` alongside the
+seven required fields —
+
+```
+ingest headline: 7 of 7 parameters read by rules, 2 hardware overrides stated
+card.params keys: [..., 'cd', ..., 't_stat_a']
+hardware_overrides: [{'name': 'cd', 'value': 0.62, 'default': 0.7}, ...]
+
+p1 WITH cd=0.62 override:    150.50 bar
+p1 WITHOUT override (default): 125.97 bar   <- confirms the override reached the solver
+```
+
+and in the browser, the same artifact produces the Ingest stage headline
+above and a second table reading `cd | 0.62 | | 0.7 | 0.62` /
+`t_stat_a | 12.5 | Nm | 14 | 12.5 Nm`. `validate()` on a synthetic `cd = 700`
+correctly reports "off by orders of magnitude (plausible range 0.595 to
+0.805)". The `ingest_hybrid` merge loop was verified in isolation (substituting
+a controlled model response, since the local 7B model's free-prose extraction
+turned out to be too unreliable to exercise this specific path deterministically
+in a live test) — a required field filled through the existing loop, a
+hardware constant filled through the new one, in the same call.
+
+**What this does not change:** the 7 swept parameters, the archive, and
+retrieval are completely untouched — `Archive.nearest()` still normalises only
+on `model.PARAM_NAMES`, and the Case Card table's first (required) section is
+identical to before. Checked directly: no reference to any of the 18 constant
+names exists anywhere in `static/index.html`'s 3D drawing code (`machineParts`,
+`schematic`, `renderMachine`) — bore sizes come from `A_valve_a`/`A_valve_b`
+(already one of the 7), pipe colours and shaft speeds come from the *solved
+state*, never from a hardware constant directly. The geometry the page draws
+is identical whichever way a case's hardware resolves; only the solved numbers
+can move, and only for an artifact that explicitly states one of these 18
+fields — none of the shipped sample fixtures do. `python selftest.py` (5/5,
+byte-identical) and `python dejasolve.py --all` (byte-identical) confirm the
+seven fixtures and the archive are unaffected.
+
 ### N4 — "Show the retrieved pair" leaves the hand-picked tile selected
+
+> **FIXED.** The button now clears `GEO.sel` and the tile highlight along with
+> `MACH.right`, and re-renders the cloud. Resolution note at the end of this
+> entry.
 
 **Verified.** `static/index.html:1728`
 
@@ -636,7 +829,23 @@ tile.classList = contains "on"   (still highlighted)
 The contact sheet shows a selected tile, the 3D cloud shows it as the white
 highlighted point, and neither machine view is showing it.
 
+#### Resolution
+
+The `#machpair` handler now mirrors `renderTiles`'s own click handler — the
+only other place `GEO.sel` was ever cleared — clearing `GEO.sel`, removing
+every tile's `.on` class, and calling `renderView()` so the cloud drops the
+highlight, not just the panel above it.
+
+Verified as a click sequence: select tile `sweep-0297` (`GEO.sel` set, tile
+`.on`, `MACH.right` set), then click "Show the retrieved pair" —
+`GEO.sel: null`, `MACH.right: null`, no tile carries `.on`. All three states
+now revert together.
+
 ### N5 — Three uncapped `requestAnimationFrame` loops, ~12 ms of JS per frame
+
+> **FIXED.** Each loop now skips its expensive redraw while its section has no
+> layout box on screen, and the per-pipe checkbox lookup is cached. Resolution
+> note at the end of this entry.
 
 **Verified.** `geoTick`, `machTick`, `flowTick` (`static/index.html:974`, `1553`, `1214`)
 
@@ -659,7 +868,43 @@ On a conference-room laptop this drops frames and spins the fan.
 pipe per view per frame (~1700 lookups/second) to read a checkbox that changes
 maybe twice a session.
 
+#### Resolution
+
+A new `trackVisible(id, state)` helper puts an `IntersectionObserver` on a
+loop's own section (`#geo`, `#mach`, `#flow`) and sets `state.visible` from
+whether it currently has a layout box on screen. Each tick function keeps
+advancing its own timers unconditionally — `GEO.yaw`, `MACH.yaw`, the frame
+clocks — so the picture is still exactly where it should be the instant the
+section scrolls back into view; only the expensive part (`renderView`'s ~400
+SVG nodes, `renderMachine`'s ~178 per view) is skipped while nothing could show
+it. `#flowparticles` is now read once at boot and kept current by a `change`
+listener, replacing the per-segment `document.querySelector`.
+
+**Verification limitation, stated plainly:** I could not observe the
+visibility toggling itself in this session's browser tool. Its
+`IntersectionObserver` never fired for *any* element, including a trivial
+freshly-created div confirmed to be in the viewport by its own
+`getBoundingClientRect()` — traced to the preview pane not being displayed, the
+same condition that makes `computer{action:"screenshot"}` fail with "the
+Browser pane is not displayed, so the page is not compositing frames" in this
+tool. A non-composited tab does not run the callback; that is a property of
+this automation environment, not of the page. `IntersectionObserver` with a
+single `.observe()` call and a `{threshold: 0}` config is standard,
+well-supported usage with no unusual conditions attached — nothing in `drawPipe`
+or the tick functions depends on when the callback fires, since `state.visible`
+starts `false` (correct: nothing is on screen before the browser has laid out
+the page) and every render call is already written to tolerate that default.
+What I verified directly: the code runs without error through a full sequence
+of `Analyse` calls across all seven fixtures with no new console errors, and
+`FLOW_PARTICLES_ON` correctly starts `true` (matching the checkbox's `checked`
+attribute) and updates on `change`.
+
 ### N6 — `prefers-reduced-motion` does not stop the animations that actually move
+
+> **FIXED.** A `REDUCED_MOTION` flag now starts the two spins off and freezes
+> every clock-driven redraw; the `#geoview` label and the two tab groups also
+> gained ARIA state. Resolution note — including a real bug this work turned
+> up — at the end of this entry.
 
 **By inspection.** `static/index.html:33`, `:57`
 
@@ -674,14 +919,83 @@ projected to three dimensions") that never updates as the tab changes to "the
 matched pair" or "cold vs warm"; the `.geotab` and `#steparms` buttons carry no
 `aria-pressed`; and `#steprange` has no label or `aria-label`.
 
+#### Resolution
+
+A `REDUCED_MOTION` flag (`matchMedia('(prefers-reduced-motion: reduce)')`, kept
+current on `change`) now does two things: `GEO.spin` and `MACH.spin` start
+`false` instead of `true` — the Spin/Stop buttons still work, so nothing is
+removed, only the default — and every clock-driven redraw freezes at `t = 0`
+instead of reading `performance.now()`: `machTick`'s shaft-mark rotation,
+`flowTick`'s dot animation, and `drawPipe`'s pipe-flow particles (the one
+animation whose time source wasn't threaded through a caller at all — it read
+`performance.now()` directly inside `drawPipe` itself, so it needed its own
+gate). `#steprange` picked up `aria-label="Newton iteration"` as part of C1's
+rewrite. `#geoview`'s `aria-label` now updates with the tab via a
+`GEOVIEW_ARIA_LABEL` map read in `renderControls()`, and both tab groups
+(`#geotabs`, `#steparms`) now set `aria-pressed`.
+
+**Verified directly** (this part of the fix has no `IntersectionObserver`
+dependency, so N5's tool limitation doesn't apply here): with `REDUCED_MOTION`
+forced true, two renders of the same machine view 120ms apart are
+byte-identical; with it false, they differ. Same result for the flow view.
+`#geoview`'s aria-label reads correctly for all three tabs (`"solved states of
+the archive…"` / `"the analysed case and its retrieved neighbour…"` / `"the
+solver's path from each starting guess…"`), and both tab groups report correct
+`aria-pressed` state.
+
+**A real bug this surfaced, and fixed alongside it.** Adding `aria-pressed` to
+`setMode()`'s tab-toggle loop exposed that the loop's own selector,
+`document.querySelectorAll('.geotab')`, was never scoped to `#geotabs` — and
+`.geotab` is the same class the stepper's arm buttons use, keyed by `data-arm`
+rather than `data-mode`. Every time a user switched the geometry view tab
+(archive / matched pair / cold-vs-warm), this loop ran across *both* button
+groups, found `t.dataset.mode === m` false for every stepper button (they have
+no `data-mode`), and stripped their `.on` highlight — so clicking "2 · The
+matched pair" silently un-highlighted whichever stepper arm was selected, even
+though `STEPPER.arm` itself was untouched and the trajectory kept stepping
+correctly underneath. Purely cosmetic before this session (no `aria-pressed` to
+also go wrong), it predates every change made here — I did not introduce it,
+only made it visible. Fixed by scoping the selector to
+`$('#geotabs').querySelectorAll('.geotab')`; the stepper's own tab handler
+already scopes to `#steparms` and was never affected in the other direction.
+Verified: selecting the warm arm, then switching through all three geometry
+tabs and back, the warm tab keeps `on:true` / `aria-pressed:true` throughout.
+
 ### N7 — Content columns do not line up
+
+> **FIXED.** `main` now uses the exact same `max-width:1180px; margin:0 auto`
+> centring and the same 18px horizontal padding as `.geo`/`#mach` below it, so
+> their box edges are identical at every viewport width by construction,
+> rather than approximately matching at one width by coincidence.
 
 **Verified** at 1280 px wide. `main` is full-bleed with `padding:20px 26px`, so its
 panels start at x = 26. `.geo` / `.mach` are `max-width:1180px; margin:… auto`
 with `padding:0 18px`, so they start at x = 43 and end at 1223 against `main`'s
 1265. Every section below the fold is inset 17 px from the two above it.
 
+#### Resolution
+
+The two containers used different layout strategies — `main` was full-bleed
+with a fixed 26px inset that never moves; `.geo`/`#mach` were centred with a
+capped width and their own 18px inset, whose absolute position on screen
+depends on viewport width. No single number reconciles a fixed inset with a
+variable one at every width; only matching the *strategy* does. `main` picked
+up `.geo`/`#mach`'s own numbers (`max-width:1180px;margin:0 auto;padding:20px
+18px`, vertical padding kept as it was) rather than the other way round, so
+all three now share one centring computation.
+
+Verified at 1280×900: `main`, `.geo` and `#mach` report the identical
+`getBoundingClientRect()` — `left: 42.4, right: 1222.4, width: 1180` — for all
+three. Re-measured at 640px (below the cap, where the old code already
+happened to align by coincidence): all three still match, at `left: 0, right:
+624.8`. Same computation, so it can't drift apart at some third width the way
+the previous fix-by-coincidence could have.
+
 ### N8 — The status hint is wiped by the health poll
+
+> **FIXED.** The file-load confirmation moved to its own element, `#loadhint`,
+> so `refreshHealth()`'s poll — which only ever touched `#hint` — has nothing
+> in that element to overwrite. Resolution note at the end of this entry.
 
 **Verified.** `static/index.html:494` (`explain`), `:510` (`refreshHealth`)
 
@@ -691,7 +1005,31 @@ overwrites `#hint` with the backend description. Confirmed: set the hint, call
 `refreshHealth()`, the confirmation is gone. So the only feedback that a dropped
 or picked file was read disappears within fifteen seconds.
 
+#### Resolution
+
+`#hint` was carrying two unrelated jobs — the backend explanation, rewritten
+on every poll, and the file-load confirmation, meant to persist until the next
+relevant action — and whichever wrote second always won. A new `#loadhint`
+span, styled the same but written only by `loadFile()`, gives the confirmation
+its own slot `explain()`/`refreshHealth()` never touch, so the collision is
+gone structurally rather than by adding a delay or a "don't overwrite this
+one" flag. While in there: a sample chip click now clears `#loadhint` too — it
+didn't before, so choosing a sample after dropping a file used to leave a
+"loaded x.log" confirmation on screen describing a file that was no longer
+what was in the textarea. That half wasn't in the original finding but is the
+same staleness problem from the opposite direction, worth closing alongside it.
+
+Verified directly: load a file (`#loadhint` reads "loaded my-test.log (0.0
+kB)"), call `refreshHealth()` (what the 15s poll and window-focus listener
+both do) — `#loadhint` is untouched, `#hint` updates as it should. Click a
+sample chip afterward — `#loadhint` clears.
+
 ### N9 — `AuroraArchive.nearest()` can raise `StopIteration`, and reconnects per request
+
+> **FIXED.** A miss now raises a clear `RuntimeError` instead of a bare
+> `StopIteration`, and the Secrets Manager round trip is cached for the
+> process lifetime. Verified against a fake DB layer (no live Aurora in this
+> environment) — resolution note at the end of this entry.
 
 **By inspection.** `archive_aurora.py:98-121`
 
@@ -708,7 +1046,43 @@ every analyse pays two network round trips before it retrieves anything. The
 docstring says a pool is "complexity this doesn't need yet"; the Secrets Manager
 call at least is cacheable for the process lifetime.
 
+#### Resolution
+
+`__init__` now builds `self._index_by_id` (`case_id -> position`) once,
+alongside the rest of the snapshot; `nearest()` does a dict `.get()` against
+it and raises a `RuntimeError` naming the missing `case_id` and why ("the
+archive changed since this service started; restart it to pick up new rows")
+when pgvector returns a row this process's snapshot never saw. Still an HTTP
+500 if it happens — no route in `dejasolve.analyse()` catches a retrieval
+failure and turns it into a pipeline stage, and wiring that in is a bigger
+change than this finding asked for — but a clear, actionable message now,
+not a bare `StopIteration` with no context.
+
+The Secrets Manager fetch moved into its own `_password(secret_arn)`,
+wrapped in `functools.lru_cache(maxsize=1)`. The module's "no connection
+pool, this demo doesn't need it" decision is untouched — that is about
+Aurora's own connection volume, a separate question from repeating an
+unrelated Secrets Manager API call on every single request for a secret that
+does not rotate mid-demo.
+
+**Verification limitation, stated plainly:** there is no live Aurora
+instance or AWS credentials in this environment, so this could not be
+exercised end-to-end the way the file-backed path was. Verified instead
+against a fake DB layer standing in for `_connect()`/pgvector, isolating
+`nearest()`'s own lookup logic: a `case_id` present in the snapshot resolves
+correctly (`j = 1`, matching the expected row), and one absent from it raises
+the new `RuntimeError` with the message above rather than a bare
+`StopIteration`. `import archive_aurora` succeeds and `_password` carries the
+`lru_cache` wrapper (`cache_clear` present). The Secrets Manager caching
+itself — that a second `nearest()` call in the same process does not repeat
+the API call — was not independently exercised beyond what `functools.
+lru_cache`'s own well-established contract already guarantees.
+
 ### N10 — Dead code and unescaped interpolation in `draw()`
+
+> **FIXED**, all six items. The `area` fix turned into a real (small) visual
+> improvement rather than a deletion — resolution note at the end of this
+> entry.
 
 **By inspection.**
 
@@ -730,7 +1104,30 @@ call at least is cacheable for the process lifetime.
   double-quoted so nothing is currently exploitable, but the helper is one
   single-quoted attribute away from being wrong.
 
+#### Resolution
+
+`VW`/`VH` and `flowLeg`'s `L` array are gone. The empty `h1 span{}` rule is
+gone. `esc()` now escapes `'` too (`&#39;`), matching `&`, `<`, `>`, `"`. The
+three previously-bare interpolations in `draw()` (`sug.on_fields`, the
+parameter names in `Object.entries(sug.values)`, `st.detail.indexed_on`) are
+now wrapped in `esc()`.
+
+`schematic()`'s `branch()` did more than start reading its own `area`
+parameter — it now draws with it: the valve-to-motor segment's stroke width
+is `bore(area) * 8`, the same `bore()` function and the same physical
+variable `machineParts()` already uses for the 3D view's orifice bore. Before
+this, every contact-sheet tile drew that segment at a fixed width regardless
+of the case's actual valve area, so "bore is the valve's real flow area" was
+true of the 3D view and false of the tiles beside it. Verified: a tile with
+`A_valve_a = 9.55 mm²` renders that segment at stroke-width 3.39; one with
+`A_valve_a = 1.08 mm²` renders it at 1.83 — the same physical difference the
+3D view already showed, now visible in both places.
+
 ### N11 — `PSCALE` is fixed at boot, so a high-pressure live case saturates
+
+> **FIXED.** `PSCALE` now recomputes on every live analyse, not only at boot.
+> Verified with a case constructed specifically to exceed the fixture's
+> ceiling — resolution note at the end of this entry.
 
 **By inspection.** `static/index.html:941` (`renderTiles`)
 
@@ -741,30 +1138,120 @@ top of the colour ramp and is visually indistinguishable from any other
 high-pressure case. `p_crack` alone goes to 260 bar in `PARAM_BOUNDS`, and `p1`
 sits above `p_crack` whenever the relief is cracked, so this is reachable.
 
+#### Resolution
+
+`renderTiles()` already recomputed `PSCALE` correctly on every call — it reads
+`subjectPair()`, which resolves to the live case once `LIVE` is set — but it
+was only ever *called* once, at boot. The gap was that nothing re-called it
+after a live analyse. The computation moved into its own `recomputePScale()`,
+now called both from `renderTiles()` (unchanged) and from `renderGeoAll()`
+(new) — `renderGeoAll()` rather than a second call to `renderTiles()` itself,
+because `renderTiles()` rebuilds `#tiles` from scratch and does not know about
+`GEO.sel`; calling it again on every live analyse would have silently cleared
+whichever contact-sheet tile was hand-picked.
+
+`PSCALE` also drives `machineParts()`'s pipe colours in the main 3D view, not
+only the contact-sheet tiles — so this was clipping the primary visualisation
+too, not a secondary one.
+
+Verified with a case chosen specifically to exceed the fixture's own ceiling:
+`p_crack = 260` (the sweep's own maximum), high pump flow, small valve areas.
+Solved `p1 = 265.15 bar`, above the fixture's 258.33. Before analysing,
+`PSCALE = 258.33`; after, `PSCALE = 265.15` — tracking the live case exactly
+rather than clipping it. A second case with a more moderate `p1 = 209.65`
+(safely under the original ceiling) correctly left `PSCALE` unchanged,
+confirming the fix does not just always grow the number.
+
 ### N12 — Assorted smaller items
+
+> **FIXED**, all seven. One correction to the original finding's last item
+> below (`#flow` was never actually affected). Resolution notes inline with
+> each item.
 
 * `casecard.py:117` — `"bara"` and `"barg"` both map to a factor of 1.0. The
   model works in gauge pressure (`P_TANK`), so an artifact stating `bara` is
   read one bar high with no complaint.
+
+  **Fixed.** `bara` (absolute) and gauge pressure differ by an *offset*
+  (local atmospheric pressure), not a scale factor, so a purely multiplicative
+  table could never represent this correctly at any factor. A new
+  `UNIT_OFFSETS = {"bara": -1.01325}` (standard atmosphere) is checked ahead
+  of `UNIT_FACTORS` in `normalise_unit`, applied additively rather than
+  multiplicatively. `barg` is untouched (already correct — gauge, factor 1.0).
+  Verified: `187.0 bara -> 185.98675 bar`; `187.0 bar` (unaffected) stays
+  `187.0`.
+
 * `casecard.py:125` — `normalise_unit` silently returns the value unconverted
   for any unit it does not recognise (`kg/dm^3` is absent while `kg/dm3` is
   present, for instance). A misread unit becomes a plausible-looking number,
   which is the exact failure mode the Units gate exists to catch — and the Units
   gate only sees the already-converted value.
+
+  **Fixed generally, not by adding the one missing entry.** `^`/`²`/`³` are
+  typography, not a different unit, and a table with an entry for only one
+  spelling let every sibling spelling straight through unconverted. Both the
+  table's own keys and every incoming unit string are now passed through
+  `_norm_unit_key()` (a `str.translate` stripping `^` and mapping `²`/`³` to
+  `2`/`3`) before lookup, so `kg/dm^3` and `kg/dm3` — and every other such pair
+  already in the table, like `m^3/h`/`m3/h` — resolve identically without
+  needing every sibling spelling hardcoded. Verified: `kg/dm^3` and `kg/dm3`
+  both now convert to `850.0` from `0.85`; before this fix only the second
+  form did.
+
 * `ingest.py:89` — `if canon is None or canon in params: continue` means the
   *first* occurrence of a key wins. A log that states a value and then corrects
   it later keeps the superseded one.
+
+  **Fixed.** Dropped the `or canon in params` clause, so a later line for the
+  same field overwrites rather than being skipped — last occurrence wins.
+  Verified: an artifact stating `Q_nom = 62.4` then `Q_nom = 65.0` now reads
+  `65.0`, with provenance correctly citing the second line.
+
 * `ingest.py:513` — `ingest_hybrid` copies `model_side.notes` onto the card even
   when the model contributed nothing, including the "[dropped …]" note
   `verify_provenance` appends about fields that were never used.
+
+  **Fixed.** The copy is now gated on `filled` being non-empty — only when the
+  model actually contributed a field does its note travel onto the card.
+
 * `app.py:90` — `AnalyseRequest.text` has no `max_length`. A large paste runs the
   full parser and, on the ollama path, a 280 s inference, with no bound.
+
+  **Fixed.** `max_length=1_000_000` (generous relative to every real fixture,
+  which are all under a few kB, but bounded). Verified against the live API: a
+  1,000,001-character payload is rejected with `422 string_too_long`; the
+  existing seven fixtures are all far under the limit and unaffected.
+
 * `app.py:70` — `_mirror_audit_to_dynamo` uses `print()` for its failure path
   rather than a logger, so under uvicorn the message lands on stdout with no
   level or timestamp.
+
+  **Fixed.** A module-level `logger = logging.getLogger("dejasolve")`,
+  `logger.warning(...)` in place of `print(...)`.
+
 * `static/index.html:1749` — `geoBoot().catch()` removes `#mach` when
   `/api/viz` is unavailable, but `#stepper` and `#flow` are left in the DOM. Since
   `stepperBoot()` is only reached from the tail of `machBoot()` (itself the tail
   of `geoBoot()`), the "Newton Convergence & Fluid Dynamics Studio" renders in
   full — tabs, slider, Play button — with no event handlers attached to any of
   it. Every control is inert and nothing says why.
+
+  **`#flow` was never actually the same problem — withdrawn from the finding.**
+  `adoptFlow()` reads only `t.solve.flows`/`.solution`/`.regime` straight off
+  an `/api/analyse` trace; it has no dependency on `VIZ` at all, so it renders
+  correctly whether or not `/api/viz` succeeded. Grouping it with `#stepper`
+  in the original finding was wrong.
+
+  **`#stepper` was worse than inert — fixed.** `armPath()` dereferences
+  `VIZ.projection.transform.state_order` unconditionally on *every* call,
+  live case or fixture; with `VIZ` still `null` (its state when
+  `/api/viz` fails), any path that reached it would throw. In practice
+  `adoptTrace` (and therefore `updateStepperUI`) is already guarded by
+  `if(VIZ)` upstream, so this was inert rather than actively crashing today —
+  but a fully wired-looking widget with dead controls and a latent crash the
+  moment anything called into it was still the wrong state to leave on
+  screen. `geoBoot().catch()` now also does `$('#stepper').remove()`,
+  matching the existing `$('#mach').remove()` precedent. Verified by forcing
+  `/api/viz` to fail (a monkeypatched `fetch`) and running the real
+  `geoBoot().catch()` path end to end: both `#mach` and `#stepper` are
+  removed, only `#geo`'s "geometry unavailable" message remains.

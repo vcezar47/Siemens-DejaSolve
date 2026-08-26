@@ -249,7 +249,24 @@ def analyse(text: str, name: str, archive: Archive,
          "value": card.params.get(f), "raw": card.provenance.get(f, "")}
         for f in model.PARAM_NAMES
     ]
-    found = len(card.params)
+    #: hardware constants *this artifact stated* -- almost always none, since
+    #: they are optional overrides on `model.HARDWARE`'s defaults, not part of
+    #: the seven required fields above. Listed only when present: eighteen
+    #: rows all reading "default" would be noise, but a stated override that
+    #: changes the physics and shows up nowhere on screen is exactly the
+    #: silent wrongness the rest of this pipeline exists to refuse -- so
+    #: whatever *was* stated is not allowed to be invisible.
+    trace["hardware_overrides"] = [
+        {"name": k, "unit": casecard.HARDWARE_UNITS[k], "value": card.params[k],
+         "raw": card.provenance.get(k, ""), "default": model.HARDWARE[k]}
+        for k in model.HARDWARE if k in card.params
+    ]
+    # counts only the seven required fields -- `card.params` can now also
+    # hold hardware overrides (see `trace["hardware_overrides"]` above), and
+    # this feeds "N of 7 parameters read" below. Counting all of `card.params`
+    # would let a stated hardware constant read as an eighth required
+    # parameter and print "8 of 7".
+    found = sum(1 for f in model.PARAM_NAMES if f in card.params)
     foreign_label = casecard.FOREIGN_DOMAINS.get(card.domain, {}).get(
         "label", card.domain)
     if card.foreign_domain:
@@ -263,11 +280,19 @@ def analyse(text: str, name: str, archive: Archive,
             f"none of them this schema's",
             {"foreign": card.foreign, "domain": card.domain}))
     else:
+        n_hw = len(trace["hardware_overrides"])
+        # named in the headline the pipeline stage shows, not only in the
+        # table further down the page -- the count that changed is the one
+        # number an operator glancing at the pipeline should not have to
+        # scroll past the Case Card to notice.
+        hw_note = f", {n_hw} hardware override{'s' if n_hw != 1 else ''} stated" \
+                 if n_hw else ""
         stages.append(_stage(
             "ingest", "ok" if found else "blocked",
             f"{found} of {len(model.PARAM_NAMES)} parameters read"
-            f" by {card.source.get('ingested_by', '?')}",
-            {"missing": card.missing, "notes": card.notes}))
+            f" by {card.source.get('ingested_by', '?')}{hw_note}",
+            {"missing": card.missing, "notes": card.notes,
+             "hardware_overrides": trace["hardware_overrides"]}))
 
     # -- is this even the right kind of model? -----------------------------
     # Before the unit gate on purpose: a value's plausibility is judged against
@@ -592,6 +617,17 @@ def render(trace: dict) -> str:
             raw = f"   <- {f['raw']!r}" if f["raw"] else ""
             out.append(f"  {f['name']:11} {f['value']:>12.6g} "
                        f"{f['unit']:<16}{raw}")
+    # Almost always empty, and skipped entirely when it is -- eighteen "not
+    # stated" rows would just be noise beside the seven required fields above.
+    # Printed when it is not empty for the same reason the fields above are
+    # printed unconditionally: a value that changed the solve and left no
+    # trace on screen is the one thing this project refuses to do.
+    if trace.get("hardware_overrides"):
+        out.append("\n  hardware stated (overrides model default):")
+        for f in trace["hardware_overrides"]:
+            raw = f"   <- {f['raw']!r}" if f["raw"] else ""
+            out.append(f"  {f['name']:11} {f['value']:>12.6g} "
+                       f"{f['unit']:<16} (default {f['default']:g}){raw}")
     for st in trace["stages"]:
         if st["state"] == "skipped":
             continue

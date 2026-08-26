@@ -64,6 +64,48 @@ SYNONYMS: dict[str, str] = {
     "cracking pressure": "p_crack", "relief": "p_crack",
     "rho": "rho", "density": "rho", "working fluid density": "rho",
     "fluid density": "rho", "densitate": "rho", "densitatea": "rho",
+    # the 18 promoted hardware constants (§0b) -- overrides on
+    # model.HARDWARE's defaults, optional the way the seven above are not:
+    # a card that states none of these is still complete. English only --
+    # unlike the seven above, no fixture states any of these in Romanian, so
+    # there is no concrete phrasing to work from yet rather than one guessed.
+    "cd": "cd", "discharge coefficient": "cd",
+    "orifice discharge coefficient": "cd",
+    "r_leak": "R_leak", "pump leakage": "R_leak",
+    "pump leakage resistance": "R_leak", "leakage resistance": "R_leak",
+    "a_relief_max": "A_relief_max", "relief valve area": "A_relief_max",
+    "relief area": "A_relief_max", "relief valve max area": "A_relief_max",
+    "relief_band": "relief_band", "relief band": "relief_band",
+    "relief valve band": "relief_band",
+    "cracking to full open band": "relief_band",
+    "d_mot_a": "D_mot_a", "motor a displacement": "D_mot_a",
+    "shaft a displacement": "D_mot_a", "displacement a": "D_mot_a",
+    "d_mot_b": "D_mot_b", "motor b displacement": "D_mot_b",
+    "shaft b displacement": "D_mot_b", "displacement b": "D_mot_b",
+    "a_ret_a": "A_ret_a", "return line a": "A_ret_a",
+    "return restriction a": "A_ret_a",
+    "a_ret_b": "A_ret_b", "return line b": "A_ret_b",
+    "return restriction b": "A_ret_b",
+    "leak_mot_a": "leak_mot_a", "motor a leakage": "leak_mot_a",
+    "cross-port leakage a": "leak_mot_a", "cross port leakage a": "leak_mot_a",
+    "leak_mot_b": "leak_mot_b", "motor b leakage": "leak_mot_b",
+    "cross-port leakage b": "leak_mot_b", "cross port leakage b": "leak_mot_b",
+    "t_coul_a": "t_coul_a", "coulomb friction a": "t_coul_a",
+    "kinetic friction a": "t_coul_a", "coulomb torque a": "t_coul_a",
+    "t_coul_b": "t_coul_b", "coulomb friction b": "t_coul_b",
+    "kinetic friction b": "t_coul_b", "coulomb torque b": "t_coul_b",
+    "t_stat_a": "t_stat_a", "breakaway torque a": "t_stat_a",
+    "static friction a": "t_stat_a", "stiction a": "t_stat_a",
+    "t_stat_b": "t_stat_b", "breakaway torque b": "t_stat_b",
+    "static friction b": "t_stat_b", "stiction b": "t_stat_b",
+    "w_strib_a": "w_strib_a", "stribeck velocity a": "w_strib_a",
+    "stribeck speed a": "w_strib_a",
+    "w_strib_b": "w_strib_b", "stribeck velocity b": "w_strib_b",
+    "stribeck speed b": "w_strib_b",
+    "b_visc_a": "b_visc_a", "viscous drag a": "b_visc_a",
+    "viscous friction a": "b_visc_a",
+    "b_visc_b": "b_visc_b", "viscous drag b": "b_visc_b",
+    "viscous friction b": "b_visc_b",
 }
 
 #: `key <separator> value <unit>` -- tolerates dot-leaders and ASCII banners
@@ -86,7 +128,12 @@ def ingest_rules(text: str, artifact: str, case_id: str) -> CaseCard:
             continue
         key = re.sub(r"[.\s]+$", "", m.group("key").strip().lower())
         canon = SYNONYMS.get(key) or SYNONYMS.get(key.replace(" ", ""))
-        if canon is None or canon in params:
+        # The *last* match for a field wins, not the first. A log that states
+        # a value and later restates or corrects it -- "actually, make that
+        # 62.4" -- kept the superseded one under a first-wins rule; nothing
+        # in this format distinguishes an initial value from a correction
+        # except which one appears later.
+        if canon is None:
             continue
         value = parse_number(m.group("value"))
         if value is None:
@@ -122,17 +169,29 @@ def ingest_rules(text: str, artifact: str, case_id: str) -> CaseCard:
 
 # --- backend: llm -----------------------------------------------------------
 
+#: the full set of names a Case Card can carry: the seven required swept
+#: parameters plus the eighteen optional hardware overrides (§0b). Defined
+#: here, ahead of EXTRACTION_SCHEMA below, because both the schema and
+#: `foreign_card`/`ingest_ollama`/`ingest_llm` need the same combined list --
+#: `ingest_rules` was always this general (it stores whatever `SYNONYMS` maps
+#: a line to, with no gate to `model.PARAM_NAMES`), but the JSON-schema
+#: backends' prompt only ever asked for the seven, so the eighteen were
+#: unreachable from any artifact regardless of which backend read it.
+EXTRACTABLE_FIELDS = model.PARAM_NAMES + tuple(model.HARDWARE.keys())
+
 EXTRACTION_SCHEMA = {
     "type": "object",
     "properties": {
         "params": {
             "type": "object",
             "description": "Only the parameters the artifact actually states. "
-                           "Omit anything not present; never estimate.",
+                           "Omit anything not present; never estimate. The 18 "
+                           "hardware fields are optional overrides -- omitting "
+                           "one is the default, not a gap to explain.",
             "properties": {
                 name: {"type": "number",
-                       "description": f"{name} in {casecard.CANONICAL_UNITS[name]}"}
-                for name in model.PARAM_NAMES
+                       "description": f"{name} in {casecard.ALL_UNITS[name]}"}
+                for name in EXTRACTABLE_FIELDS
             },
             "additionalProperties": False,
         },
@@ -140,15 +199,18 @@ EXTRACTION_SCHEMA = {
             "type": "object",
             "description": "For each extracted parameter, the exact substring of "
                            "the artifact it came from, including the original unit.",
-            "properties": {name: {"type": "string"} for name in model.PARAM_NAMES},
+            "properties": {name: {"type": "string"} for name in EXTRACTABLE_FIELDS},
             "additionalProperties": False,
         },
         "missing": {
             "type": "array",
-            "description": "Parameters the artifact states no number for. A "
-                           "qualitative phrase such as 'the standard fan curves' "
-                           "is NOT a value; a number described in words "
-                           "('roughly 2 mm2') IS one.",
+            "description": "The 7 required operating parameters the artifact "
+                           "states no number for. A qualitative phrase such as "
+                           "'the standard fan curves' is NOT a value; a number "
+                           "described in words ('roughly 2 mm2') IS one. Never "
+                           "list a hardware field here -- absent hardware "
+                           "fields simply are not in `params`, they are not "
+                           "'missing'.",
             "items": {"type": "string", "enum": list(model.PARAM_NAMES)},
         },
         "notes": {
@@ -165,22 +227,37 @@ hydraulic manifold model. Artifacts are heterogeneous: machine-written solver \
 logs, older banner-style logs, and free-text notes or emails written by \
 engineers in English or Romanian.
 
-Extract these parameters, converting to the canonical unit given:
+Extract these 7 required operating parameters, converting to the canonical \
+unit given -- every artifact should state all of these, and any it does not \
+belongs in `missing`:
 {chr(10).join(f'  {n} -- {casecard.CANONICAL_UNITS[n]}' for n in model.PARAM_NAMES)}
+
+The circuit also has 18 optional hardware constants -- properties of the \
+physical machine (a discharge coefficient, a breakaway torque, a cross-port \
+leakage) rather than of the run being simulated. Almost no artifact states \
+any of these; that is normal, not incomplete, and none of them belongs in \
+`missing` when absent -- `missing` is only ever the 7 required fields above. \
+Extract one only when the artifact states an explicit number for it:
+{chr(10).join(f'  {n} -- {casecard.HARDWARE_UNITS[n]}' for n in model.HARDWARE)}
 
 Rules:
 - Convert units. m3/h -> L/min, m^2 -> mm^2, g/cm3 -> kg/m^3, Pa -> bar.
 - A European decimal comma means a decimal point: "4,5" is 4.5.
-- If the artifact does not state a parameter, list it in `missing`. Do not \
-estimate, infer from context, or carry a value over from a similar case. A \
-qualitative description of a load ("the standard fan curves", "sarcina e mica") \
-is not a coefficient -- that parameter is missing.
+- If the artifact does not state one of the 7 required parameters, list it in \
+`missing`. Do not estimate, infer from context, or carry a value over from a \
+similar case. A qualitative description of a load ("the standard fan curves", \
+"sarcina e mica") is not a coefficient -- that parameter is missing.
 - But a stated number is still a value when it is hedged or wrapped in \
 description. "roughly 2 mm2", "about 55 lpm", "left wide at 11 mm2", "call it \
 890", "pe la 70 l/min" all state their parameter -- extract the number and quote \
 the phrase. A parameter is missing only when no number is given for it at all: \
 words like "barely", "roughly" or "deliberately restrictive" beside a figure \
 describe that figure, they do not withdraw it.
+- The same rule applies to the 18 hardware constants for whether a stated \
+number counts, but they are never "missing": an artifact silent on a hardware \
+constant is the overwhelmingly common case, not an incomplete one. Extract a \
+hardware constant only when it is unambiguously that constant, never as a \
+guess at what a typical machine of this kind would have.
 - `provenance` must quote the artifact verbatim, not paraphrase it.
 - A corrupted or placeholder value (####, NaN, ---) is missing, not zero."""
 
@@ -266,7 +343,10 @@ def ingest_llm(text: str, artifact: str, case_id: str,
     # read as a number is missing, which is the honest outcome, not zero.
     params: dict[str, float] = {}
     for key, value in (payload.get("params") or {}).items():
-        if key not in model.PARAM_NAMES or value is None:
+        # widened from `model.PARAM_NAMES` -- the schema now offers all 25
+        # extractable fields, and a model that used one of the 18 optional
+        # hardware constants should not have it silently discarded here.
+        if key not in EXTRACTABLE_FIELDS or value is None:
             continue
         try:
             params[key] = float(value)
@@ -280,7 +360,7 @@ def ingest_llm(text: str, artifact: str, case_id: str,
                           "output_tokens": response.usage.output_tokens}},
         params=params,
         provenance={k: str(v) for k, v in (payload.get("provenance") or {}).items()
-                    if k in model.PARAM_NAMES},
+                    if k in EXTRACTABLE_FIELDS},
         missing=[p for p in model.PARAM_NAMES if p not in params],
         notes=str(payload.get("notes", "")),
     )
@@ -378,7 +458,9 @@ def ingest_ollama(text: str, artifact: str, case_id: str,
     # number is missing, which is the honest outcome, not zero.
     params: dict[str, float] = {}
     for key, value in (data.get("params") or {}).items():
-        if key not in model.PARAM_NAMES or value is None:
+        # widened from `model.PARAM_NAMES` -- see the matching comment in
+        # `ingest_llm`.
+        if key not in EXTRACTABLE_FIELDS or value is None:
             continue
         try:
             params[key] = float(value)
@@ -392,7 +474,7 @@ def ingest_ollama(text: str, artifact: str, case_id: str,
                 "local": True},
         params=params,
         provenance={k: str(v) for k, v in (data.get("provenance") or {}).items()
-                    if k in model.PARAM_NAMES},
+                    if k in EXTRACTABLE_FIELDS},
         missing=[p for p in model.PARAM_NAMES if p not in params],
         notes=str(data.get("notes", "")),
     )
@@ -440,7 +522,10 @@ def verify_provenance(card: CaseCard, text: str) -> list[str]:
 
         # 1. Physically impossible values are inventions whatever the citation.
         #    Observed: the model answered "the standard fan curves" with 0.0.
-        lo, hi = model.PARAM_BOUNDS[field]
+        #    `field` can now be one of the 18 hardware constants too, which
+        #    `PARAM_BOUNDS` has never covered -- falls back to
+        #    `HARDWARE_BOUNDS`, the counterpart N3 added for exactly this.
+        lo, hi = model.PARAM_BOUNDS.get(field) or model.HARDWARE_BOUNDS[field]
         if not (lo / 1000 <= abs(value) <= hi * 1000):
             dropped.append(field)
             card.params.pop(field, None)
@@ -562,12 +647,32 @@ def ingest_hybrid(text: str, name: str, case_id: str,
             card.provenance[field] = model_side.provenance.get(field, "")
             filled.append(field)
 
+    # Hardware constants (§0b) are never "missing" -- they are optional
+    # overrides, so the loop above never looks for them. But the model was
+    # already called to fill a required field, at no further cost, and if it
+    # also found one of the 18 in the same pass, discarding it here would be
+    # the same gap N3 closed for the ollama/llm-only backends, reappearing in
+    # the one path that reaches the model conditionally. `card.params` is
+    # checked first so rules keeps precedence over the model where both
+    # found the same field, consistent with "parser first" everywhere else.
+    for field in model.HARDWARE:
+        if field not in card.params and field in model_side.params:
+            card.params[field] = model_side.params[field]
+            card.provenance[field] = model_side.provenance.get(field, "")
+            filled.append(field)
+
     card.missing = [p for p in model.PARAM_NAMES if p not in card.params]
     card.source["ingested_by"] = (
         f"rules + {model_side.source['ingested_by']}" if filled
         else f"rules (+{which}, nothing added)")
     card.source["filled_by_model"] = filled
-    if model_side.notes:
+    # Only when the model actually contributed something -- previously
+    # unconditional, so a model note about fields it dropped (verify_provenance's
+    # "[dropped ...]: the cited source text is not in the artifact]") could land
+    # on the card even when none of those fields, or anything else the model
+    # found, ended up in `card.params` at all. A note describing a contribution
+    # that was not made is not context, it's noise attributed to the wrong card.
+    if model_side.notes and filled:
         card.notes = model_side.notes
     return card
 

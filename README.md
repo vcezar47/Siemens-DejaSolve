@@ -48,7 +48,7 @@ Requires Python 3.11+, numpy and matplotlib (`pip install -r requirements.txt`).
 | `ingest.py` | Turns a run artifact into a Case Card — deterministic parser, a local model via Ollama, or Claude, all behind one interface |
 | `make_logs.py` | Seven messy artifacts — five with exact ground truth, plus two built to trip the verifier |
 | `dejasolve.py` | The pipeline: `analyse()` returns a structured trace; the CLI and the service both render it |
-| `app.py` + `static/index.html` | **The demo UI** — FastAPI service, single self-contained page |
+| `app.py` + `static/` | **The demo UI** — FastAPI service and the page: `index.html` (markup), `app.css`, `app.js`, and a vendored three.js for the WebGL machine view. Nothing is fetched from a CDN, so it runs offline |
 | `plot_convergence.py` | Draws the Phase 1 figure from `results.json` |
 | `run_all.py` | All of it, in order |
 

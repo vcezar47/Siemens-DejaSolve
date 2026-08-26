@@ -1,2209 +1,287 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Déjà Solve</title>
-<style>
-  :root{
-    --bg:#0e1416; --panel:#141d20; --panel-2:#1a2529;
-    /* outlines read as near-black on purpose -- the colour budget goes to the
-       gradient below, and a bright border would compete with it everywhere
-       it appears. --line-soft is for internal hairlines that should recede
-       (table rows, the panel/section divider) rather than read as a frame. */
-    --line:#070b0c; --line-soft:#1c282c;
-    --ink:#e6eef0; --dim:#8fa3a9; --faint:#5d7076;
-    --teal:#00b3b3; --teal-dim:#0a6b6b;
-    --ok:#3ddc97; --refuse:#ff6b5e; --warn:#ffb454; --skip:#3a4a50;
-    /* the brand gradient: petrol teal through cyan into a cooler blue. Used as
-       flowing text (the wordmark), a moving accent bar (header), and the
-       primary action -- three places, not everywhere, so it still reads as an
-       accent rather than wallpaper. Everywhere else keeps --teal. */
-    --grad-1:#00d9a3; --grad-2:#00b7d8; --grad-3:#1a90e8;
-    --grad: linear-gradient(90deg, var(--grad-1), var(--grad-2), var(--grad-3),
-                            var(--grad-2), var(--grad-1));
-    --mono:ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,monospace;
-  }
-  @keyframes gradflow{0%{background-position:0% 50%}
-                      100%{background-position:300% 50%}}
-  .gradtext{background:var(--grad);background-size:300% 100%;
-            -webkit-background-clip:text;background-clip:text;color:transparent;
-            -webkit-text-fill-color:transparent;
-            animation:gradflow 10s linear infinite}
-  @media(prefers-reduced-motion: reduce){
-    .gradtext,.run,header::after{animation:none!important}
-  }
-  *{box-sizing:border-box}
-  body{margin:0;color:var(--ink);
-       font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;
-       /* the gradient as the page's own atmosphere rather than a UI accent:
-          three soft blooms of the brand hues, oversized and slowly drifting
-          behind everything. Panels stay fully opaque (--panel/--panel-2), so
-          this is only ever visible in the canvas and the gutters between
-          cards -- it never sits behind a table, a status colour, or a wire
-          diagram, which is where legibility actually lives on this page. */
-       background:
-         radial-gradient(58% 50% at 20% 34%, rgba(0,217,163,.20), transparent 70%),
-         radial-gradient(52% 50% at 84% 26%, rgba(26,144,232,.20), transparent 70%),
-         radial-gradient(60% 55% at 55% 108%, rgba(0,183,216,.15), transparent 70%),
-         var(--bg);
-       background-size:220% 220%,220% 220%,220% 220%,auto;
-       background-repeat:no-repeat;
-       animation:bgflow 34s ease-in-out infinite alternate}
-  @keyframes bgflow{
-    0%  {background-position:8% 6%,   92% 4%,  40% 100%, 0 0}
-    100%{background-position:26% 26%, 76% 26%, 58% 84%,  0 0}
-  }
-  @media(prefers-reduced-motion: reduce){ body{animation:none} }
-  header{position:relative;padding:38px 26px 26px;
-         border-bottom:1px solid var(--line);background:var(--panel);
-         overflow:hidden;display:flex;flex-direction:column;gap:20px}
-  /* a hero glow local to the header -- stronger and closer than the page wash
-     below it, so the title reads as the brightest thing on screen without the
-     header having to compete with the body's own drifting blooms */
-  header::before{content:'';position:absolute;inset:0;pointer-events:none;
-                background:
-                  radial-gradient(60% 160% at 6% -10%, rgba(0,217,163,.16), transparent 62%),
-                  radial-gradient(55% 160% at 96% -10%, rgba(26,144,232,.16), transparent 62%)}
-  header::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
-                background:var(--grad);background-size:300% 100%;
-                animation:gradflow 7s linear infinite}
-  .hero{position:relative}
-  h1{margin:0;font-size:clamp(32px,4.6vw,52px);letter-spacing:-.01em;
-     font-weight:750;line-height:1.04}
-  h1 span{}
-  .tagline{position:relative;color:var(--dim);font-size:15px;margin-top:8px;
-           max-width:56ch}
-  .badges{position:relative;display:flex;gap:12px;flex-wrap:wrap}
-  /* availability is a status, so it gets status colour, not just a suffix.
-     Option colours render in the popup on Chromium/Firefox; the closed select
-     is coloured directly so the state is visible without opening it. */
-  select option.on{color:var(--ok)}
-  select option.off{color:var(--refuse)}
-  select.on{color:var(--ok)} select.off{color:var(--refuse)}
-  .badge{display:inline-flex;align-items:baseline;gap:7px;
-         font:13px var(--mono);color:var(--dim);background:var(--panel-2);
-         border:1px solid var(--line);border-left:3px solid var(--badge-accent,var(--line));
-         border-radius:8px;padding:9px 15px;white-space:nowrap}
-  .badge b{color:var(--ink);font-weight:700;font-size:16px}
-  main{display:grid;grid-template-columns:minmax(320px,1fr) minmax(420px,1.35fr);
-       gap:20px;padding:20px 26px;align-items:start}
-  @media(max-width:900px){main{grid-template-columns:1fr}}
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .panel > h2{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.9px;
-              color:var(--dim);padding:12px 16px;font-weight:600;
-              border-bottom:2px solid transparent;
-              border-image:linear-gradient(90deg,var(--grad-1),var(--grad-3)) 1}
-  /* `.ev h2` was here too until the Evidence panel moved to
-     presentation/evidence-section.html, which carries its own copy of these
-     rules -- a selector for an element this page no longer has reads like a
-     section someone forgot to render. */
-  .geo h2,.mach h2{border-bottom:2px solid transparent;
-              border-image:linear-gradient(90deg,var(--grad-1),var(--grad-3)) 1;
-              padding-bottom:8px}
-  .body{padding:16px}
-  .samples{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
-  button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--line);
-         background:var(--panel-2);color:var(--ink);padding:7px 12px;transition:.14s}
-  button:hover{border-color:var(--teal-dim);color:var(--teal)}
-  button.chip{font:12px/1 var(--mono);padding:7px 10px}
-  button.chip.on{border-color:var(--grad-2);color:var(--grad-2);background:#0d2426}
-  textarea{width:100%;height:260px;resize:vertical;background:var(--bg);color:var(--ink);
-           border:1px solid var(--line);border-radius:8px;padding:12px;
-           font:12.5px/1.55 var(--mono);tab-size:2}
-  textarea:focus{outline:none;border-color:var(--grad-2)}
-  .row{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
-  .run{background:var(--grad);background-size:300% 100%;border-color:transparent;
-       color:#03211d;font-weight:650;padding:9px 20px;
-       animation:gradflow 9s linear infinite}
-  .run:hover{filter:brightness(1.12)}
-  .run:disabled{opacity:.5;cursor:default;animation-play-state:paused}
-  select{font:13px var(--mono);background:var(--panel-2);color:var(--ink);
-         border:1px solid var(--line);border-radius:7px;padding:8px 10px}
-  .hint{color:var(--faint);font-size:12px}
-
-  /* pipeline */
-  .stage{display:grid;grid-template-columns:26px 128px 1fr;gap:12px;align-items:start;
-         padding:13px 16px;border-bottom:1px solid var(--line-soft);
-         opacity:0;transform:translateY(5px);animation:in .32s ease forwards}
-  @keyframes in{to{opacity:1;transform:none}}
-  .stage:last-child{border-bottom:none}
-  .dot{width:19px;height:19px;border-radius:50%;display:grid;place-items:center;
-       font-size:11px;font-weight:700;margin-top:1px}
-  .ok .dot{background:rgba(61,220,151,.14);color:var(--ok);border:1px solid var(--ok)}
-  /* warned and blocked are different statements, so they get different colour:
-     amber is a risk the engineer may accept, red is a fact they cannot. */
-  .warned .dot{background:rgba(255,180,84,.14);color:var(--warn);border:1px solid var(--warn)}
-  .blocked .dot{background:rgba(255,107,94,.14);color:var(--refuse);border:1px solid var(--refuse)}
-  .skipped .dot{background:transparent;color:var(--skip);border:1px dashed var(--skip)}
-  .stage .name{font-weight:600;font-size:13.5px}
-  .stage .sub{color:var(--faint);font-size:11.5px}
-  .stage .msg{font:12.8px/1.5 var(--mono);color:var(--dim);padding-top:1px}
-  .ok .msg{color:var(--ink)}
-  .warned .msg{color:var(--warn)}
-  .blocked .msg{color:var(--refuse)}
-  .skipped .name,.skipped .sub,.skipped .msg{color:var(--skip)}
-  .note{margin-top:8px;padding:9px 11px;border-left:2px solid var(--refuse);
-        background:rgba(255,107,94,.06);color:var(--dim);font-size:12.5px;line-height:1.5}
-  .sugg{margin-top:8px;font:12px/1.6 var(--mono);color:var(--dim)}
-  .foreign{margin-top:8px;font:11.8px/1.7 var(--mono);color:var(--dim);
-           border-left:2px solid var(--teal-dim);padding-left:10px}
-  .foreign .fk{display:inline-block;min-width:190px;color:var(--faint)}
-  .sugg b{color:var(--warn);font-weight:600}
-
-  /* headline */
-  .headline{display:flex;gap:22px;align-items:center;flex-wrap:wrap;
-            padding:16px;border-bottom:1px solid var(--line);background:var(--panel-2)}
-  .metric .k{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--faint)}
-  .metric .v{font:22px/1.15 var(--mono);font-weight:650}
-  .metric .v.cold{color:var(--refuse)} .metric .v.warm{color:var(--ok)}
-  .metric .v.nominal{color:var(--warn)}
-  .metric .v.same{color:var(--teal);font-size:17px}
-  .arrow{color:var(--faint);font-size:20px}
-  .verdictbar{padding:11px 16px;font:12.8px var(--mono);border-bottom:1px solid var(--line-soft)}
-  .verdictbar.ok{color:var(--ok);background:rgba(61,220,151,.07)}
-  .verdictbar.warned{color:var(--warn);background:rgba(255,180,84,.07)}
-  .verdictbar.blocked{color:var(--refuse);background:rgba(255,107,94,.07)}
-
-  /* the report: what the engineers asked for instead of a silent refusal --
-     what happened, what it means, and what they can do about it */
-  .report{padding:14px 16px;border-bottom:1px solid var(--line-soft)}
-  .report.ok{background:rgba(61,220,151,.05);border-left:3px solid var(--ok)}
-  .report.warned{background:rgba(255,180,84,.07);border-left:3px solid var(--warn)}
-  .report.blocked{background:rgba(255,107,94,.07);border-left:3px solid var(--refuse)}
-  .report .rhead{font:11px var(--mono);letter-spacing:1.1px;text-transform:uppercase;
-                 margin-bottom:6px;font-weight:600}
-  .report.ok .rhead{color:var(--ok)}
-  .report.warned .rhead{color:var(--warn)}
-  .report.blocked .rhead{color:var(--refuse)}
-  .report .rreason{font:13px/1.5 var(--mono);color:var(--ink)}
-  .report .rcons{color:var(--dim);font-size:12.5px;margin-top:5px;line-height:1.55}
-  .ovr{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .ovrhint{flex:1 0 100%;color:var(--faint);font-size:12px}
-  .ovr input{flex:1 1 160px;min-width:120px;background:var(--bg);color:var(--ink);
-             border:1px solid var(--line);border-radius:7px;padding:7px 10px;
-             font:12.5px var(--mono)}
-  .ovr input:focus{outline:none;border-color:var(--warn)}
-  .ovrbtn{border-color:var(--warn);color:var(--warn)}
-  .ovrbtn:hover{background:rgba(255,180,84,.12);border-color:var(--warn);color:var(--warn)}
-
-  /* simulation is a departmental activity, so an accepted risk is attributed */
-  .audit{padding:12px 16px;border-top:1px solid var(--line-soft);background:var(--panel-2)}
-  .audit .ahead{font:11px var(--mono);letter-spacing:1.1px;text-transform:uppercase;
-                color:var(--faint);margin-bottom:7px;font-weight:600}
-  .audit .arow{font:11.8px/1.7 var(--mono);color:var(--dim)}
-  .audit .at{color:var(--faint)}
-  .audit b{color:var(--ink);font-weight:600}
-
-  table{width:100%;border-collapse:collapse;font:12.5px var(--mono)}
-  th{text-align:left;color:var(--faint);font-weight:600;font-size:11px;
-     text-transform:uppercase;letter-spacing:.6px;padding:9px 16px;
-     border-bottom:1px solid var(--line-soft)}
-  td{padding:7px 16px;border-bottom:1px solid var(--line-soft)}
-  tr:last-child td{border-bottom:none}
-  td.num{text-align:right;color:var(--ink)}
-  td.unit{color:var(--faint)} td.raw{color:var(--teal-dim);font-size:11.5px}
-  td.miss{color:var(--refuse);letter-spacing:.5px}
-  .empty{padding:40px 16px;text-align:center;color:var(--faint);font-size:13.5px}
-  .err{margin:16px;padding:12px;border:1px solid var(--refuse);border-radius:8px;
-       color:var(--refuse);font:12.5px var(--mono)}
-
-/* --- the geometry view ------------------------------------------------- */
-.geo{max-width:1180px;margin:26px auto 0;padding:0 18px}
-.geo h2{font-size:15px;letter-spacing:.08em;text-transform:uppercase;
-        color:var(--dim);margin:0 0 4px;font-weight:600}
-.geosub{color:var(--faint);font-size:12px;margin-bottom:12px;line-height:1.5}
-.geowrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);
-         gap:14px;align-items:start}
-@media(max-width:900px){.geowrap{grid-template-columns:1fr}}
-.geostage{background:var(--panel);border:1px solid var(--line);border-radius:8px;
-          padding:10px 12px 12px;position:relative}
-.geotabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-.geotab{background:var(--panel-2);border:1px solid var(--line);color:var(--dim);
-        font:inherit;font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}
-.geotab.on{border-color:var(--teal);color:var(--ink);background:#0d2b2b}
-.geotab:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
-/* an arm the pipeline never solved. Shown rather than hidden: "warm — not run"
-   is the result, and a tab that quietly disappears looks like a missing
-   feature instead of a refusal. */
-.geotab[disabled]{opacity:.4;cursor:default;border-style:dashed}
-.geotab[disabled]:hover{border-color:var(--line);color:var(--dim)}
-input[type=range]:disabled{opacity:.35;cursor:default}
-.geoview{width:100%;display:block;touch-action:none;cursor:grab;user-select:none}
-.geoview.drag{cursor:grabbing}
-.geocap{color:var(--faint);font-size:11.5px;line-height:1.55;margin-top:8px;
-        min-height:52px}
-.geocap b{color:var(--ink);font-weight:600}
-.geokey{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--dim);
-        margin-top:6px}
-.geokey span{display:inline-flex;align-items:center;gap:5px}
-.geokey i{width:9px;height:9px;border-radius:50%;display:inline-block}
-.georow{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
-.geobtn{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
-        font:inherit;font-size:12px;padding:4px 12px;border-radius:5px;cursor:pointer}
-.geobtn:hover{border-color:var(--teal)}
-.geobtn[disabled]{opacity:.45;cursor:default}
-.geosheet{background:var(--panel);border:1px solid var(--line);border-radius:8px;
-          padding:10px 12px 12px}
-.geosheet h3{margin:0 0 2px;font-size:13px;color:var(--ink);font-weight:600}
-.geosheet .cn{color:var(--faint);font-size:11.5px;margin-bottom:9px}
-.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px}
-.tile{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;
-      padding:0;cursor:pointer;overflow:hidden;display:block;width:100%}
-.tile:hover{border-color:var(--teal-dim)}
-.tile.on{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal-dim)}
-.tile svg{display:block;width:100%}
-.tile .tl{font-size:9.5px;color:var(--faint);padding:1px 4px 3px;
-          display:flex;justify-content:space-between;font-family:var(--mono)}
-.tile.on .tl{color:var(--dim)}
-.geopair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px}
-.geopair figure{margin:0;background:var(--panel-2);border:1px solid var(--line);
-                border-radius:5px;overflow:hidden}
-.geopair figcaption{font-size:10.5px;color:var(--faint);padding:2px 6px 4px;
-                    font-family:var(--mono)}
-.geonums{display:flex;gap:14px;flex-wrap:wrap;margin-top:9px;font-size:11.5px}
-.geonums div{color:var(--faint)}
-.geonums b{display:block;color:var(--ink);font-size:15px;font-family:var(--mono);
-           font-weight:600;line-height:1.35}
-.geomissing{color:var(--faint);font-size:12px;padding:10px 0}
-
-/* --- the machine ------------------------------------------------------- */
-.mach{max-width:1180px;margin:22px auto 0;padding:0 18px}
-.mach h2{font-size:15px;letter-spacing:.08em;text-transform:uppercase;
-         color:var(--dim);margin:0 0 4px;font-weight:600}
-.machsub{color:var(--faint);font-size:12px;margin-bottom:10px;line-height:1.55}
-.machsub b{color:var(--dim)}
-.machviews{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:760px){.machviews{grid-template-columns:1fr}}
-.machview{width:100%;display:block;background:var(--panel);touch-action:none;
-          border:1px solid var(--line);border-radius:8px;cursor:grab;user-select:none}
-.machview:active{cursor:grabbing}
-
-/* --- the failed runs ---------------------------------------------------- */
-.failwrap{background:var(--panel);border:1px solid var(--line);border-radius:8px;
-          padding:10px 12px 12px;margin-top:14px}
-.failwrap h3{margin:0 0 6px;font-size:13px;color:var(--ink);font-weight:600;
-             display:flex;align-items:baseline;gap:8px}
-.failwrap .failn{font-size:11px;color:var(--refuse);font-family:var(--mono);font-weight:400}
-.failnote{color:var(--faint);font-size:11.5px;line-height:1.6;margin-top:4px}
-.failnote b{color:var(--dim)}
-
-</style>
-</head>
-<body>
-<header>
-  <div class="hero">
-    <h1>Déjà <span class="gradtext">Solve</span></h1>
-    <div class="tagline">Every solver run starts from zero. This one doesn't.</div>
-  </div>
-  <div class="badges" id="badges"></div>
-</header>
-
-<main>
-  <section class="panel">
-    <h2>Run artifact</h2>
-    <div class="body">
-      <div class="samples" id="samples"></div>
-      <textarea id="text" spellcheck="false"
-                placeholder="Paste a solver log, an input deck, or an engineer's note — in any format, any language. Or drop a file here."></textarea>
-      <div class="row">
-        <button class="run" id="run">Analyse</button>
-        <button class="geobtn" id="loadfile">Load a file…</button>
-        <input type="file" id="fileinput" hidden
-               accept=".log,.txt,.dat,.bdf,text/plain">
-        <select id="backend" title="ingest backend"></select>
-        <span class="hint" id="hint"></span>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Déjà Solve</title>
+    <link rel="stylesheet" href="/static/app.css" />
+  </head>
+  <body>
+    <header>
+      <div class="hero">
+        <h1>Déjà <span class="gradtext">Solve</span></h1>
+        <div class="tagline">
+          Every solver run starts from zero. This one doesn't.
+        </div>
       </div>
-    </div>
-  </section>
+      <div class="badges" id="badges"></div>
+    </header>
 
-  <section class="panel">
-    <h2>Pipeline</h2>
-    <div id="out"><div class="empty">Pick an artifact and press Analyse.</div></div>
-  </section>
-</main>
+    <main>
+      <section class="panel">
+        <h2>Run artifact</h2>
+        <div class="body">
+          <div class="samples" id="samples"></div>
+          <textarea
+            id="text"
+            spellcheck="false"
+            placeholder="Paste a solver log, an input deck, or an engineer's note — in any format, any language. Or drop a file here."
+          ></textarea>
+          <div class="row">
+            <button class="run" id="run">Analyse</button>
+            <button class="geobtn" id="loadfile">Load a file…</button>
+            <input
+              type="file"
+              id="fileinput"
+              hidden
+              accept=".log,.txt,.dat,.bdf,text/plain"
+            />
+            <select id="backend" title="ingest backend"></select>
+            <span class="hint" id="hint"></span>
+            <!-- separate from #hint on purpose: #hint is the backend explanation,
+             rewritten by explain()/refreshHealth() on a 15s poll and on every
+             window focus. It used to be the only element loadFile() had to
+             put "loaded x.log (3.2 kB)" in, so that confirmation was gone
+             within fifteen seconds of dropping or picking a file -- the only
+             feedback the drop/browse affordance gives, disappearing before
+             most people would notice they were supposed to look for it. -->
+            <span class="hint" id="loadhint" style="color: var(--ok)"></span>
+          </div>
+        </div>
+      </section>
 
-<section class="geo" id="geo">
-  <h2>The geometry</h2>
-  <div class="geosub" id="geosub">loading&hellip;</div>
-  <div class="geowrap">
-    <div class="geostage">
-      <div class="geotabs" id="geotabs">
-        <button class="geotab on" data-mode="archive">1 &middot; The archive</button>
-        <button class="geotab" data-mode="pair">2 &middot; The matched pair</button>
-        <button class="geotab" data-mode="race">3 &middot; Cold vs warm</button>
+      <section class="panel">
+        <h2>Pipeline</h2>
+        <div id="out">
+          <div class="empty">Pick an artifact and press Analyse.</div>
+        </div>
+      </section>
+    </main>
+
+    <section class="geo" id="geo">
+      <h2>The geometry</h2>
+      <div class="geosub" id="geosub">loading&hellip;</div>
+      <div class="geowrap">
+        <div class="geostage">
+          <div class="geotabs" id="geotabs">
+            <button class="geotab on" data-mode="archive" aria-pressed="true">
+              1 &middot; The archive
+            </button>
+            <button class="geotab" data-mode="pair" aria-pressed="false">
+              2 &middot; The matched pair
+            </button>
+            <button class="geotab" data-mode="race" aria-pressed="false">
+              3 &middot; Cold vs warm
+            </button>
+          </div>
+          <svg
+            class="geoview"
+            id="geoview"
+            viewBox="0 0 520 372"
+            role="img"
+            aria-label="solved states of the archive, projected to three dimensions"
+          ></svg>
+          <div class="georow" id="liverow"></div>
+          <div class="georow" id="georow"></div>
+          <div class="geokey" id="geokey"></div>
+          <div class="geocap" id="geocap"></div>
+        </div>
+        <div class="geosheet">
+          <h3>The archive, case by case</h3>
+          <div class="cn" id="sheetcn"></div>
+          <div class="tiles" id="tiles"></div>
+          <div class="geonums" id="geonums"></div>
+        </div>
       </div>
-      <svg class="geoview" id="geoview" viewBox="0 0 520 372" role="img"
-           aria-label="solved states of the archive, projected to three dimensions"></svg>
-      <div class="georow" id="liverow"></div>
-      <div class="georow" id="georow"></div>
-      <div class="geokey" id="geokey"></div>
-      <div class="geocap" id="geocap"></div>
-    </div>
-    <div class="geosheet">
-      <h3>The archive, case by case</h3>
-      <div class="cn" id="sheetcn"></div>
-      <div class="tiles" id="tiles"></div>
-      <div class="geonums" id="geonums"></div>
-    </div>
-  </div>
-  <div class="failwrap" id="failwrap"></div>
-</section>
+      <div class="failwrap" id="failwrap"></div>
+    </section>
 
-<section class="mach" id="mach">
-  <h2>The machine</h2>
-  <div class="machsub" id="machsub">
-    The circuit being solved. Pipe colour is solved pressure, bore is the valve's real
-    flow area, each shaft turns at its solved speed. The layout is illustrative &mdash;
-    the model is lumped and has no geometry.
-  </div>
-  <div class="georow" style="margin-bottom:8px">
-    <button class="geobtn" id="machspin">Stop</button>
-    <button class="geobtn" id="machpair">Show the retrieved pair</button>
-    <span style="color:var(--faint);font-size:11.5px">drag either view to rotate
-      &middot; click a tile above to compare against that case instead</span>
-  </div>
-  <div class="machviews">
-    <svg class="machview" id="machL" viewBox="0 0 400 300" role="img"
-         aria-label="the query case, drawn as a hydraulic circuit"></svg>
-    <svg class="machview" id="machR" viewBox="0 0 400 300" role="img"
-         aria-label="the retrieved archive case, drawn as a hydraulic circuit"></svg>
-  </div>
-  <div class="geonums" id="machdiff"></div>
-  <div class="geocap" id="machnote"></div>
-</section>
+    <section class="mach" id="mach">
+      <h2>The machine</h2>
+      <div class="machsub" id="machsub">
+        The circuit being solved. Pipe colour is solved pressure, bore is the
+        valve's real flow area, each shaft turns at its solved speed. The layout
+        is illustrative &mdash; the model is lumped and has no geometry.
+      </div>
+      <div class="georow" style="margin-bottom: 8px">
+        <button class="geobtn" id="machspin">Stop</button>
+        <button class="geobtn" id="machpair">Show the retrieved pair</button>
+        <span style="color: var(--faint); font-size: 11.5px"
+          >drag either view to rotate &middot; click a tile above to compare
+          against that case instead</span
+        >
+      </div>
+      <div class="machviews">
+        <div class="machview" id="machL" style="aspect-ratio: 4/3;"
+             role="img" aria-label="the query case, drawn as a hydraulic circuit">
+          <div class="machlabel" id="machL-label"></div>
+          <div class="machcap" id="machL-cap"></div>
+        </div>
+        <div class="machview" id="machR" style="aspect-ratio: 4/3;"
+             role="img" aria-label="the retrieved archive case, drawn as a hydraulic circuit">
+          <div class="machlabel" id="machR-label"></div>
+          <div class="machcap" id="machR-cap"></div>
+        </div>
+      </div>
+      <div class="geonums" id="machdiff"></div>
+      <div class="geocap" id="machnote"></div>
+    </section>
 
-<section class="mach" id="flow" style="display:none;margin-top:24px;border-top:1px solid var(--line-soft);padding-top:20px">
-  <h2>Where the flow goes</h2>
-  <div class="machsub">
-    The same solved case, drawn as flow instead of pressure. Every leg carries
-    what the solver says it carries &mdash; the dots are spaced by flow rate, so
-    a tighter stream is more litres per minute. <b>The model is lumped and has no
-    pipe area, so there is no velocity to draw</b>: spacing is the honest
-    variable, not speed.
-  </div>
-  <svg id="flowview" viewBox="0 0 470 250" role="img"
-       aria-label="the analysed case, drawn as flow through the circuit"
-       style="width:100%;max-width:760px;display:block;background:var(--panel);
-              border:1px solid var(--line);border-radius:8px"></svg>
-  <div class="geonums" id="flownums"></div>
-  <div class="geocap" id="flowcap"></div>
-</section>
+    <section
+      class="mach"
+      id="flow"
+      style="
+        display: none;
+        margin-top: 24px;
+        border-top: 1px solid var(--line-soft);
+        padding-top: 20px;
+      "
+    >
+      <h2>Where the flow goes</h2>
+      <div class="machsub">
+        The same solved case, drawn as flow instead of pressure. Every leg
+        carries what the solver says it carries &mdash; the dots are spaced by
+        flow rate, so a tighter stream is more litres per minute.
+        <b
+          >The model is lumped and has no pipe area, so there is no velocity to
+          draw</b
+        >: spacing is the honest variable, not speed.
+      </div>
+      <svg
+        id="flowview"
+        viewBox="0 0 470 250"
+        role="img"
+        aria-label="the analysed case, drawn as flow through the circuit"
+        style="
+          width: 100%;
+          max-width: 760px;
+          display: block;
+          background: var(--panel);
+          border: 1px solid var(--line);
+          border-radius: 8px;
+        "
+      ></svg>
+      <div class="geonums" id="flownums"></div>
+      <div class="geocap" id="flowcap"></div>
+    </section>
 
-<section class="mach" id="stepper" style="margin-top:24px;border-top:1px solid var(--line-soft);padding-top:20px">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-    <h2>Newton Convergence & Fluid Dynamics Studio</h2>
-    <span class="badge" style="--badge-accent:var(--grad-1)">Live Particle Physics & Newton Trajectory Stepper</span>
-  </div>
-  <div class="machsub" style="margin-top:6px">
-    Watch Newton's method converge physically across the 3D machine model. Select a solver starting guess (Cold vs Nominal vs Warm start), scrub through solver iterations, or watch animated fluid particles flow through the circuit in real-time.
-  </div>
+    <section
+      class="mach"
+      id="stepper"
+      style="
+        margin-top: 24px;
+        border-top: 1px solid var(--line-soft);
+        padding-top: 20px;
+      "
+    >
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 10px;
+        "
+      >
+        <h2>Newton Convergence & Fluid Dynamics Studio</h2>
+        <span class="badge" style="--badge-accent: var(--grad-1)"
+          >Live Particle Physics & Newton Trajectory Stepper</span
+        >
+      </div>
+      <div class="machsub" style="margin-top: 6px">
+        Watch Newton's method converge physically across the 3D machine model.
+        Select a solver starting guess (Cold vs Nominal vs Warm start), scrub
+        through solver iterations, or watch animated fluid particles flow
+        through the circuit in real-time.
+      </div>
 
-  <div class="geostage" style="margin-top:12px;padding:14px 18px">
-    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between">
-      <!-- Arm selector. Filled by renderStepperArms() from the iterates that
+      <div class="geostage" style="margin-top: 12px; padding: 14px 18px">
+        <div
+          style="
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: space-between;
+          "
+        >
+          <!-- Arm selector. Filled by renderStepperArms() from the iterates that
            actually exist for the case on screen -- the counts here are not
            typed in, because they change with every artifact analysed. -->
-      <div class="geotabs" id="steparms" style="margin:0"></div>
+          <div class="geotabs" id="steparms" style="margin: 0"></div>
 
-      <!-- Fluid Flow Toggle -->
-      <div style="display:flex;align-items:center;gap:8px">
-        <label style="font-size:12px;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px">
-          <input type="checkbox" id="flowparticles" checked style="accent-color:var(--grad-1);cursor:pointer">
-          Fluid Particle Dynamics
-        </label>
+          <!-- Fluid Flow Toggle -->
+          <div style="display: flex; align-items: center; gap: 8px">
+            <label
+              style="
+                font-size: 12px;
+                color: var(--ink);
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+              "
+            >
+              <input
+                type="checkbox"
+                id="flowparticles"
+                checked
+                style="accent-color: var(--grad-1); cursor: pointer"
+              />
+              Fluid Particle Dynamics
+            </label>
+          </div>
+        </div>
+
+        <!-- Timeline Slider Row -->
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+          "
+        >
+          <button class="geobtn" id="stepplay" style="min-width: 68px">
+            Play
+          </button>
+          <input
+            type="range"
+            id="steprange"
+            min="0"
+            max="0"
+            value="0"
+            aria-label="Newton iteration"
+            style="
+              flex: 1;
+              min-width: 180px;
+              accent-color: var(--grad-2);
+              cursor: pointer;
+            "
+          />
+          <span
+            style="font: 13px var(--mono); color: var(--ink); min-width: 130px"
+            id="steptext"
+          ></span>
+        </div>
+
+        <!-- Stats & Residual readout -->
+        <div class="geonums" id="stepreadout" style="margin-top: 12px"></div>
       </div>
-    </div>
-
-    <!-- Timeline Slider Row -->
-    <div style="display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap">
-      <button class="geobtn" id="stepplay" style="min-width:68px">Play</button>
-      <input type="range" id="steprange" min="0" max="0" value="0"
-             aria-label="Newton iteration"
-             style="flex:1;min-width:180px;accent-color:var(--grad-2);cursor:pointer">
-      <span style="font:13px var(--mono);color:var(--ink);min-width:130px" id="steptext"></span>
-    </div>
-
-    <!-- Stats & Residual readout -->
-    <div class="geonums" id="stepreadout" style="margin-top:12px"></div>
-  </div>
-</section>
-
-<script>
-const $ = s => document.querySelector(s);
-const esc = s => String(s).replace(/[&<>"]/g, c =>
-  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fmt = v => (v === null || v === undefined) ? '' :
-  (Math.abs(v) >= 1e-4 && Math.abs(v) < 1e6) ? (+v.toPrecision(6)).toString()
-                                             : v.toExponential(3);
-
-let SAMPLES = [];
-
-//: label for each backend id. `auto` is always offered and always works —
-//: it degrades to the parser rather than failing.
-const BACKEND_LABEL = {hybrid:'hybrid (parser + local model)',
-                       rules:'rules only (instant)',
-                       ollama:'Ollama only (local)'};
-
-//: last health payload, so `explain()` can describe the current selection
-//: without another round trip
-let HEALTH = {};
-
-function renderHealth(h){
-  HEALTH = h;
-  const B = h.backends || {};
-  const ready = Object.keys(B).filter(k => B[k].available);
-
-  // "cases" was true until the failed runs were kept as well. Both halves, and
-  // the failed one is amber rather than red: a failed run is not an error, it is
-  // the more expensive half of what the archive knows.
-  const failed = h.archive_failed
-    ? ` <span style="color:var(--warn)">&middot; <b>${h.archive_failed}</b> failed</span>` : '';
-  //: each stat gets a category accent (--badge-accent) so archive / ingest /
-  //: local read as three distinct facts at a glance, the way a dashboard's
-  //: KPI row does, rather than as one run of small grey text.
-  $('#badges').innerHTML =
-    `<span class="badge" style="--badge-accent:var(--grad-1)">archive
-       <b>${h.archive_size}</b> solved${failed}</span>` +
-    `<span class="badge" style="--badge-accent:var(--grad-3)">ingest
-       <b>${ready.join(' + ') || 'none'}</b></span>` +
-    (B.ollama && B.ollama.available
-      ? `<span class="badge" style="--badge-accent:var(--ok);color:var(--ok)">local
-           <b>on-prem</b></span>` : '');
-
-  // Whatever /api/health offers is what the page offers — the list is not
-  // written out here, so a backend can never exist on one side only.
-  // Unavailable ones stay visible with the reason in the label; hiding them
-  // is how a demo ends up with an unexplained missing feature.
-  // `auto` is deliberately absent from this list, though it remains the default
-  // for the CLI and `POST /api/analyse`. A dropdown entry whose meaning changes
-  // with what happens to be running is the wrong thing to have on a stage: the
-  // page's whole argument is that it shows which component did what, and an
-  // option that silently resolves to hybrid or to rules hides exactly that.
-  // Choosing the backend by name means the demo can never be asked "so which
-  // one actually ran?" without the screen already answering.
-  const sel = $('#backend');
-  const keep = sel.value;                     // survive a refresh mid-demo
-  const markup =
-    Object.keys(B).map(k =>
-      `<option class="${B[k].available ? 'on' : 'off'}" value="${k}"` +
-      `${B[k].available ? '' : ' data-off="1"'}>ingest: ${BACKEND_LABEL[k]||k}` +
-      `${B[k].available ? '' : ' - unavailable'}</option>`).join('');
-  // Rebuilding on every poll would close an open dropdown under the user's
-  // cursor, so only touch the DOM when the availability picture changed.
-  if(sel.innerHTML !== markup){
-    sel.innerHTML = markup;
-    // keep the operator's choice across a poll; otherwise open on the best
-    // backend that is actually up, which is what `auto` used to decide silently
-    sel.value = [...sel.options].some(x => x.value === keep) ? keep
-              : (B.hybrid && B.hybrid.available ? 'hybrid' : 'rules');
-  }
-  explain();
-}
-
-function explain(){
-  const sel = $('#backend');
-  const B = HEALTH.backends || {};
-  const o = sel.selectedOptions[0];
-  const k = sel.value;
-  $('#hint').textContent = B[k] ? B[k].detail : '';
-  const off = !!(o && o.dataset.off);
-  $('#hint').style.color = off ? 'var(--refuse)' : 'var(--ok)';
-  sel.classList.toggle('off', off);
-  sel.classList.toggle('on', !off);
-}
-
-//: Health is a live property, not a load-time fact: Ollama can come up or go
-//: away while the page sits open. Re-read it rather than leaving the page
-//: asserting something that stopped being true — a demo that says
-//: "unavailable" about a backend you just fixed is the worst kind of wrong.
-async function refreshHealth(){
-  try{ renderHealth(await (await fetch('/api/health')).json()); }
-  catch(e){ /* transient: keep showing the last known state */ }
-}
-
-
-/* --- the geometry view --------------------------------------------------
-//: Three beats on one viewport: where the archive's solved states sit, which
-//: one was retrieved for a query, and what the solver then does from each
-//: starting guess. Hand-drawn SVG for the same reason every other graphic here
-//: is — one file, no CDN, and a conference room with no internet. (This used to
-//: read "for the same reason as lineChart above"; `lineChart` left with the
-//: Evidence panel and the comment kept pointing at it.)
-//:
-//: Everything drawn here comes from viz_results.json, which `viz.py` refuses
-//: to write if its iteration counts disagree with results.json. The picture
-//: cannot quote a number the benchmark does not.
-*/
-let VIZ = null;
-/* --- the analysed case, placed in the same space -------------------------
-//: Everything above draws what `viz.py` measured offline. This connects it to
-//: what the operator just ran: the case they analysed is projected with the
-//: *published transform* -- the same mu/sd/basis the archive was projected
-//: with -- so a case the archive has never seen lands in the archive's own
-//: coordinates rather than in a second, incomparable picture.
-//:
-//: No geometry is computed here that the pipeline did not already compute.
-//: `POST /api/analyse` returns the solved state, the retrieved neighbour's
-//: state and the three Newton paths; this only multiplies them by a matrix.
-*/
-let LIVE = null;
-
-function projectState(sol){
-  const T = VIZ.projection.transform;
-  const z = T.state_order.map((k, i) => ((sol[k] - T.mu[i]) / T.sd[i]) - T.centre[i]);
-  return T.basis.map(row => row.reduce((a, w, i) => a + w * z[i], 0));
-}
-
-//: a live case is only placeable once it has actually been solved. A refusal --
-//: incomplete card, foreign domain, blocked transfer -- has no solved state, and
-//: inventing a position for it would be the one dishonesty this whole view is
-//: built to avoid. Those return null and the views keep showing the fixture.
-function liveFromTrace(t){
-  const sol = t && t.solve && t.solve.solution;
-  const ret = t && t.retrieval;
-  if(!sol || !ret || !ret.solution) return null;
-  return {
-    id: (t.artifact || 'your run'),
-    params: t.card.params,
-    solution: sol,
-    xyz: projectState(sol),
-    relief_open: !!(t.solve.regime && t.solve.regime.relief_open),
-    neighbour: {
-      id: ret.case_id,
-      params: ret.params,
-      solution: ret.solution,
-      xyz: projectState(ret.solution),
-      relief_open: !!(ret.regime && ret.regime.relief_open),
-    },
-    distance: ret.distance,
-    paths: t.solve.paths || {},
-    iterations: {cold: t.solve.cold_iterations, nominal: t.solve.nominal_iterations,
-                 warm: t.solve.warm_iterations},
-    //: which arms actually converged, carried alongside their counts. A count
-    //: on its own cannot be read: the cold arm reports the iteration it stalled
-    //: on exactly as it reports the iteration it finished on.
-    converged: {cold: t.solve.cold_converged, nominal: t.solve.nominal_converged,
-                warm: t.solve.warm_converged},
-    agreement: t.solve.agreement,
-    agreementAgainst: t.solve.agreement_against,
-    //: whether the archive was used at all. A warned transfer the engineer left
-    //: standing still retrieves a neighbour and still reports it -- it just
-    //: never starts from it -- so `neighbour` being present is not the same
-    //: statement as "this run warm-started", and the panels below must not read
-    //: it as one.
-    usedArchive: t.solve.warm_iterations !== undefined,
-    outcome: t.outcome,
-  };
-}
-
-//: every panel in this section, re-rendered from whatever `LIVE` now is. One
-//: function because they must never be refreshed in different combinations --
-//: updating the view and the machine panel but not the contact sheet is exactly
-//: how the sheet came to quote a different case from the banner above it.
-function renderGeoAll(){
-  GEO.bounds = geoBounds();              // the live paths may reach further out
-  renderControls(); renderView(); renderMachPanel(); renderFailures();
-  renderGeoNums();
-  if(typeof updateStepperUI === 'function') updateStepperUI();
-}
-
-//: back to the exemplar `viz.py` shipped, with an optional line saying why.
-//: Used by the "Show the shipped example" button and by `adoptTrace` when a run
-//: is refused -- both need the same teardown, and having only the button do it
-//: is what left a refused run showing the previous case's geometry.
-function showFixture(note){
-  LIVE = null;
-  MACH.right = null;
-  MACH.overrideState = null;
-  MACH.overrideLabel = null;
-  GEO.sel = null;
-  document.querySelectorAll('.tile').forEach(x => x.classList.remove('on'));
-  $('#liverow').innerHTML = note || '';
-  renderGeoAll();
-}
-
-function adoptTrace(t){
-  const live = liveFromTrace(t);
-  if(!live){
-    //: A refusal has no solved state, so there is nothing to place in a space
-    //: built out of solved states, and inventing a position for it is the one
-    //: dishonesty this view exists to avoid.
-    //:
-    //: But "nothing to place" was implemented as an early return, and `LIVE` was
-    //: never cleared -- so the *previous* run stayed on screen underneath a
-    //: banner reading "the artifact you just analysed". Analyse `run-bigpump.log`
-    //: and then the NASTRAN deck and the section correctly refuses the deck three
-    //: panels up while still captioning a hydraulic run from two clicks ago as
-    //: the thing you just submitted. Falling back to the fixture is what the
-    //: comment here always claimed happened; now it does.
-    showFixture(
-      `<span style="color:var(--warn);font-size:11.5px"><b>${esc(t.artifact || 'that artifact')}</b>
-         produced no solved state (${esc((t.outcome || 'refused').replace(/_/g, ' '))}),
-         so there is nothing to place in this space &mdash; showing the shipped
-         example instead. The refusal is above.</span>`);
-    return;
-  }
-  LIVE = live;
-  MACH.right = null;
-  MACH.overrideState = null;
-  MACH.overrideLabel = null;
-  GEO.sel = null;
-  document.querySelectorAll('.tile').forEach(x => x.classList.remove('on'));
-  //: the banner states what actually happened to *this* run. It used to say
-  //: "and the case retrieval chose for it" unconditionally, which on a warned
-  //: transfer described the opposite of what the pipeline did three panels
-  //: above: retrieval found the case, the verifier warned, and the solver never
-  //: touched it. The neighbour is still drawn -- seeing what was rejected is
-  //: the point -- but it is labelled as rejected.
-  $('#liverow').innerHTML =
-    `<button class="geobtn" id="livereset">Show the shipped example</button>` +
-    (live.usedArchive
-      ? `<span style="color:var(--ok);font-size:11.5px">showing <b>${esc(live.id)}</b>
-           &mdash; the artifact you just analysed, and the case retrieval chose for it</span>`
-      : `<span style="color:var(--warn);font-size:11.5px">showing <b>${esc(live.id)}</b>
-           &mdash; the artifact you just analysed, beside the case retrieval found and
-           <b>the verifier refused</b>. It was not used as a starting point.</span>`);
-  $('#livereset').onclick = () => showFixture();
-  renderGeoAll();
-}
-
-//: from here down, the views ask these two for their subject instead of
-//: reaching into VIZ directly, so one branch decides "live or fixture" and the
-//: three panels can never disagree about which case they are showing.
-function subjectPair(){
-  return LIVE ? {query: LIVE, neighbour: LIVE.neighbour,
-                 distance: LIVE.distance, live: true}
-              : {query: VIZ.pair.query, neighbour: VIZ.pair.neighbour,
-                 distance: VIZ.pair.setup_distance, live: false};
-}
-function subjectRace(){
-  if(!LIVE || !LIVE.paths || !LIVE.paths.cold) return VIZ.race;
-  const out = {};
-  for(const k of ['cold','nominal','warm']){
-    const p = LIVE.paths[k];
-    if(!p) continue;
-    //: `converged` travels with the count, because a path's length is the
-    //: number of steps taken and says nothing about whether the last one
-    //: arrived anywhere. Every caller that prints an iteration count has to be
-    //: able to tell a result from a stall. `VIZ.race` already carries the flag,
-    //: so the fixture and the live run answer the same question the same way.
-    out[k] = {iterations: p.length - 1,
-              converged: (LIVE.converged || {})[k] !== false,
-              path_xyz: p.map(row => projectState(
-                Object.fromEntries(VIZ.projection.transform.state_order
-                  .map((n, i) => [n, row[i]]))))};
-  }
-  return out;
-}
-const GEO = {mode:'archive', yaw:0.62, pitch:0.34, step:0, spin:true,
-             sel:null, bounds:null, raf:null, playing:false};
-
-//: pressure ramp, dark-cool to hot. Not decoration: p1 is the manifold and p3
-//: is the return line, so a tile that reads dark on the right is a case where
-//: most of the pump's pressure was spent, which is what the eye should catch.
-const RAMP = [[0,[22,65,63]],[0.33,[10,107,107]],[0.6,[0,179,179]],
-              [0.8,[255,180,84]],[1,[255,107,94]]];
-function ramp(t){
-  t = Math.max(0, Math.min(1, t));
-  for(let i=1;i<RAMP.length;i++){
-    if(t <= RAMP[i][0]){
-      const [a,ca]=RAMP[i-1], [b,cb]=RAMP[i], u=(t-a)/(b-a||1);
-      return `rgb(${ca.map((v,k)=>Math.round(v+(cb[k]-v)*u)).join(',')})`;
-    }
-  }
-  return `rgb(${RAMP[RAMP.length-1][1].join(',')})`;
-}
-
-//: orthographic yaw-then-pitch. Orthographic rather than perspective because
-//: this is a map of a space, not a photograph of an object — a perspective
-//: divide would make equal distances look unequal, which is the one thing a
-//: picture about distance must not do.
-function rot3(p){
-  const cy=Math.cos(GEO.yaw), sy=Math.sin(GEO.yaw);
-  const cp=Math.cos(GEO.pitch), sp=Math.sin(GEO.pitch);
-  const x=p[0], y=p[1], z=p[2];
-  const x1 = x*cy + z*sy, z1 = z*cy - x*sy;
-  return [x1, y*cp - z1*sp, y*sp + z1*cp];
-}
-
-//: the largest distance from the centre, not the largest coordinate. Rotation
-//: preserves length, so a scale set from the radius fits at every viewing angle
-//: — sizing from per-axis extents instead makes the cloud breathe as it spins.
-function geoBounds(){
-  const pts = VIZ.archive.map(a => a.xyz).concat(
-    Object.values(subjectRace()).flatMap(r => r.path_xyz));
-  let m = 0;
-  for(const p of pts) m = Math.max(m, Math.hypot(p[0], p[1], p[2]));
-  return m || 1;
-}
-
-const VW = 520, VH = 372, VCX = 250, VCY = 180;
-function screen(p){
-  const r = rot3(p), s = 166 / GEO.bounds;
-  return [VCX + r[0]*s, VCY - r[1]*s, r[2]];
-}
-
-//: a triad rather than boxed axes: the three directions are principal
-//: components, so their *orientation* is meaningful and their origin is not.
-function triad(){
-  const o = [455, 322], L = 30;
-  return VIZ.projection.axes.map((ax, i) => {
-    const v = [0,0,0]; v[i] = 1;
-    const r = rot3(v);
-    const x = o[0] + r[0]*L, y = o[1] - r[1]*L;
-    return `<line x1="${o[0]}" y1="${o[1]}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"
-                  stroke="#3a4a50" stroke-width="1.2"/>
-            <text x="${x.toFixed(1)}" y="${(y-3).toFixed(1)}" fill="#5d7076"
-                  font-size="9" text-anchor="middle">${ax.variance_pct.toFixed(1)}%</text>`;
-  }).join('');
-}
-
-function dot(p, r, fill, op, extra){
-  const s = screen(p);
-  return {z:s[2], svg:`<circle cx="${s[0].toFixed(1)}" cy="${s[1].toFixed(1)}"
-    r="${r}" fill="${fill}" opacity="${op}" ${extra||''}/>`};
-}
-
-function polyline(path, colour, upto){
-  const pts = path.slice(0, upto == null ? path.length : upto+1).map(screen);
-  if(!pts.length) return '';
-  const d = pts.map((p,i) => `${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
-  const dots = pts.map((p,i) =>
-    `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}"
-       r="${i===pts.length-1?4.2:2.4}" fill="${colour}"
-       stroke="${i===pts.length-1?'#0e1416':'none'}" stroke-width="1"/>`).join('');
-  return `<path d="${d}" fill="none" stroke="${colour}" stroke-width="1.8"
-                opacity="0.95" stroke-linejoin="round"/>${dots}`;
-}
-
-const ARM = {cold:{c:'#8fa3a9', label:'cold — every unknown at zero'},
-             nominal:{c:'#ffb454', label:'nominal — an engineer’s guess'},
-             warm:{c:'#3ddc97', label:'warm — the retrieved state'}};
-
-function renderView(){
-  if(!VIZ) return;
-  const layers = [];
-  const dim = GEO.mode !== 'archive';
-
-  for(const a of VIZ.archive){
-    const on = GEO.sel === a.id;
-    layers.push(dot(a.xyz, on ? 5 : 2.6,
-      on ? '#e6eef0' : (a.relief_open ? '#ffb454' : '#00b3b3'),
-      on ? 1 : (dim ? 0.16 : 0.62),
-      on ? 'stroke="#00b3b3" stroke-width="1.5"' : ''));
-  }
-  //: the analysed case is drawn on top of the cloud in every mode -- it is the
-  //: subject, and a subject that vanishes when you change tab is not one.
-  if(LIVE && GEO.mode !== 'race'){
-    layers.push(dot(LIVE.neighbour.xyz, 5.5, '#00b3b3', 1,
-                    'stroke="#0e1416" stroke-width="1.5"'));
-    layers.push(dot(LIVE.xyz, 6, '#3ddc97', 1, 'stroke="#0e1416" stroke-width="1.5"'));
-  }
-  layers.sort((u,v) => u.z - v.z);
-  let svg = layers.map(l => l.svg).join('');
-
-  if(GEO.mode === 'pair'){
-    const P = subjectPair();
-    const q = screen(P.query.xyz), n = screen(P.neighbour.xyz);
-    svg += `<line x1="${q[0].toFixed(1)}" y1="${q[1].toFixed(1)}"
-                  x2="${n[0].toFixed(1)}" y2="${n[1].toFixed(1)}"
-                  stroke="#3ddc97" stroke-width="1.4" stroke-dasharray="4 3"/>`;
-    svg += `<circle cx="${n[0].toFixed(1)}" cy="${n[1].toFixed(1)}" r="6"
-              fill="#00b3b3" stroke="#0e1416" stroke-width="1.5"/>
-            <circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="6"
-              fill="#3ddc97" stroke="#0e1416" stroke-width="1.5"/>
-            <text x="${(n[0]+9).toFixed(1)}" y="${(n[1]+4).toFixed(1)}" fill="#8fa3a9"
-              font-size="10.5" font-family="ui-monospace,monospace">${esc(P.neighbour.id)}</text>
-            <text x="${(q[0]+9).toFixed(1)}" y="${(q[1]+4).toFixed(1)}" fill="#e6eef0"
-              font-size="10.5" font-family="ui-monospace,monospace">${esc(P.query.id)}</text>`;
-  }
-
-  if(GEO.mode === 'race'){
-    const R = subjectRace();
-    for(const k of ['cold','nominal','warm'])
-      if(R[k]) svg += polyline(R[k].path_xyz, ARM[k].c, GEO.step);
-  }
-
-  $('#geoview').innerHTML = svg + triad();
-}
-
-function renderControls(){
-  const m = GEO.mode;
-  if(m === 'race'){
-    const R = subjectRace();
-    const maxStep = Math.max(...Object.values(R).map(r => r.path_xyz.length - 1));
-    $('#georow').innerHTML =
-      `<button class="geobtn" id="geoplay">${GEO.playing ? 'Pause' : 'Play'}</button>
-       <button class="geobtn" id="georeset">Reset</button>
-       <span style="color:var(--faint);font-size:11.5px">
-         iteration <b style="color:var(--ink);font-family:var(--mono)">${Math.min(GEO.step,maxStep)}</b>
-         of ${maxStep}</span>`;
-    $('#geoplay').onclick = () => { GEO.playing = !GEO.playing;
-      if(GEO.playing && GEO.step >= maxStep) GEO.step = 0; renderControls(); };
-    $('#georeset').onclick = () => { GEO.step = 0; GEO.playing = false;
-      renderControls(); renderView(); };
-    //: the count and its caveat live in one element on purpose -- `.geokey span`
-    //: is an inline-flex row with a 5px gap, so a second child would be pushed
-    //: away from the text it qualifies and render as "7 iterations , did not
-    //: converge"
-    $('#geokey').innerHTML = ['cold','nominal','warm'].filter(k => R[k]).map(k =>
-      `<span><i style="background:${ARM[k].c}"></i>${esc(ARM[k].label)} &mdash;
-        <b style="color:${R[k].converged === false ? 'var(--refuse)' : 'var(--ink)'}"
-        >${R[k].iterations} iterations${
-          R[k].converged === false ? ', did not converge' : ''}</b></span>`).join('');
-  }else{
-    $('#georow').innerHTML =
-      `<button class="geobtn" id="geospin">${GEO.spin ? 'Stop' : 'Spin'}</button>
-       <span style="color:var(--faint);font-size:11.5px">drag to rotate</span>`;
-    $('#geospin').onclick = () => { GEO.spin = !GEO.spin; renderControls(); };
-    $('#geokey').innerHTML =
-      `<span><i style="background:#00b3b3"></i>relief valve closed</span>
-       <span><i style="background:#ffb454"></i>relief valve open</span>` +
-      (m === 'pair' ? `<span><i style="background:#3ddc97"></i>the query</span>` : '');
-  }
-  $('#geocap').innerHTML = CAPTION[m]();
-}
-
-const CAPTION = {
-  archive: () => {
-    const p = VIZ.projection;
-    return `${VIZ.config.archive_size} solved cases, placed by where their answer landed.
-      Three axes carry <b>${p.top3_variance_pct}%</b> of the variance. Distances quoted
-      here are true seven-parameter distances, not screen distances.`;
-  },
-  pair: () => {
-    const P = subjectPair(), g = pairGap(P);
-    return `<b>${esc(P.query.id)}</b> &rarr; <b>${esc(P.neighbour.id)}</b> at distance
-      <b>${(+P.distance).toFixed(3)}</b>. Solved states differ by
-      <b>${g.dp.toFixed(1)} bar</b> and <b>${Math.round(g.dw)} rev/min</b>.`;
-  },
-  race: () => {
-    const R = subjectRace();
-    const n = k => R[k] ? R[k].iterations : '&mdash;';
-    //: "same answer" is a claim about arms that both ran and both converged.
-    //: On a warned transfer there is no warm arm to agree with anything, and
-    //: on a case where the flat start stalls there is a count that is not a
-    //: result. The sentence used to assert agreement in both situations.
-    const stalled = ['cold','nominal','warm']
-      .filter(k => R[k] && R[k].converged === false);
-    const tail = !R.warm
-      ? ` &mdash; the warm arm was not run: the transfer was warned and left
-          standing, so the solver started from the nominal guess instead.`
-      : stalled.length
-      ? ` &mdash; same answer, from the arms that got one: the
-          <b>${stalled.join(' and ')}</b> start did not converge at all.`
-      : ' &mdash; same answer.';
-    return `Only the starting point differs. Cold <b>${n('cold')}</b>,
-      nominal <b>${n('nominal')}</b>, warm <b>${n('warm')}</b> iterations${tail}`;
-  },
-};
-
-/* --- the contact sheet ------------------------------------------------- */
-//: a schematic, not a rendering. The circuit this solves is a lumped hydraulic
-//: network — there is no geometry in the model, so drawing geometry would be
-//: inventing it. An Amesim-shaped sketch is both honest and the vocabulary the
-//: audience already reads: pipe colour is solved pressure, ring fill is solved
-//: shaft speed, and every number in it came out of the solver.
-let PSCALE = 1;
-function schematic(c, w){
-  const s = c.solution, p = c.params;
-  const col = v => ramp(v / PSCALE);
-  const branch = (Y, p2, p3, w_, area) => {
-    const spd = Math.min(1, Math.abs(w_) / 2600);
-    const circ = 2 * Math.PI * 7.5;
-    return `
-      <line x1="30" y1="${Y}" x2="43" y2="${Y}" stroke="${col(s.p1)}" stroke-width="2.6"/>
-      <path d="M43 ${Y-5} L47 ${Y-1.6} M43 ${Y+5} L47 ${Y+1.6}" stroke="#5d7076"
-            stroke-width="1.5" fill="none"/>
-      <line x1="47" y1="${Y}" x2="64" y2="${Y}" stroke="${col(p2)}" stroke-width="2.6"/>
-      <circle cx="72" cy="${Y}" r="7.5" fill="#121b1e" stroke="#3a4a50" stroke-width="1.2"/>
-      <circle cx="72" cy="${Y}" r="7.5" fill="none" stroke="#3ddc97" stroke-width="2"
-              stroke-dasharray="${(circ*spd).toFixed(1)} ${circ.toFixed(1)}"
-              transform="rotate(-90 72 ${Y})" opacity="0.9"/>
-      <line x1="80" y1="${Y}" x2="97" y2="${Y}" stroke="${col(p3)}" stroke-width="2.6"/>
-      <path d="M97 ${Y} L104 ${Y} M100 ${Y+4} L108 ${Y+4}" stroke="#3a4a50"
-            stroke-width="1.4" fill="none"/>`;
-  };
-  const reliefOn = c.relief_open;
-  return `<svg viewBox="0 0 116 84" width="${w||'100%'}" role="img">
-    <circle cx="11" cy="42" r="6.5" fill="#121b1e" stroke="#3a4a50" stroke-width="1.2"/>
-    <path d="M8 42 L14 42 M11 39 L11 45" stroke="#5d7076" stroke-width="1.2"/>
-    <line x1="17.5" y1="42" x2="30" y2="42" stroke="${col(s.p1)}" stroke-width="2.6"/>
-    <line x1="30" y1="18" x2="30" y2="66" stroke="${col(s.p1)}" stroke-width="3.4"/>
-    <line x1="30" y1="66" x2="30" y2="72" stroke="${reliefOn ? '#ffb454' : '#243237'}"
-          stroke-width="2.2"/>
-    <rect x="26" y="72" width="8" height="6" rx="1"
-          fill="${reliefOn ? '#ffb454' : '#1a2529'}" stroke="#3a4a50" stroke-width="1"/>
-    ${branch(18, s.p2a, s.p3a, s.w_a, p.A_valve_a)}
-    ${branch(66, s.p2b, s.p3b, s.w_b, p.A_valve_b)}
-  </svg>`;
-}
-
-/* --- the runs that died --------------------------------------------------
-//: Failures cannot go in the cloud above: that view is drawn in solution
-//: space and a failed run has no solution. They are placed here on the one
-//: axis that needs no projection at all -- true Euclidean distance in the
-//: normalised parameter space retrieval actually searches -- so nothing about
-//: this strip is approximate. The nearest *solved* case is drawn on the same
-//: axis, because a distance means nothing without the scale beside it.
-*/
-function normParams(p){
-  const B = VIZ.param_bounds;
-  return VIZ.param_names.map(k => (p[k] - B[k][0]) / (B[k][1] - B[k][0]));
-}
-function paramDistance(a, b){
-  const x = normParams(a), y = normParams(b);
-  return Math.hypot(...x.map((v, i) => v - y[i]));
-}
-
-function renderFailures(){
-  if(!VIZ.failures || !VIZ.failures.length){ $('#failwrap').innerHTML = ''; return; }
-  const P = subjectPair();
-  const rows = VIZ.failures
-    .map(f => ({...f, d: paramDistance(P.query.params, f.params)}))
-    .sort((a, b) => a.d - b.d);
-  const near = rows[0];
-  const good = P.distance;
-  const max = Math.max(rows[rows.length - 1].d, good) * 1.12;
-  const W = 520, L = 8, R = 96, y = 30;
-  const px = d => L + (d / max) * (W - L - R);
-
-  const marks = rows.map(f =>
-    `<g><line x1="${px(f.d).toFixed(1)}" y1="${y - 7}" x2="${px(f.d).toFixed(1)}" y2="${y + 7}"
-        stroke="#ff6b5e" stroke-width="2"/>
-      <title>${esc(f.id)} — ${esc(f.status)} — distance ${f.d.toFixed(3)}</title></g>`).join('');
-
-  $('#failwrap').innerHTML = `
-    <h3>The runs that died <span class="failn">${VIZ.failures.length} of
-      ${VIZ.config.archive_size + VIZ.failures.length}</span></h3>
-    <svg viewBox="0 0 ${W} 58" width="100%" role="img"
-         aria-label="failed runs by true distance from the current case">
-      <line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="#243237" stroke-width="1"/>
-      <g><line x1="${px(good).toFixed(1)}" y1="${y - 9}" x2="${px(good).toFixed(1)}" y2="${y + 9}"
-           stroke="#3ddc97" stroke-width="2.5"/>
-        <title>${esc(P.neighbour.id)} — the retrieved case — distance ${good.toFixed(3)}</title></g>
-      ${marks}
-      <text x="${L}" y="${y + 24}" fill="#5d7076" font-size="10">0 &mdash; identical setup</text>
-      <text x="${(W - R).toFixed(0)}" y="${y + 24}" fill="#5d7076" font-size="10"
-            text-anchor="end">${max.toFixed(2)}</text>
-      <text x="${(W - R + 8).toFixed(0)}" y="${y - 2}" fill="#3ddc97" font-size="10">retrieved</text>
-      <text x="${(W - R + 8).toFixed(0)}" y="${y + 11}" fill="#ff6b5e" font-size="10">failed</text>
-    </svg>
-    <div class="failnote">
-      Nearest failed run <b>${esc(near.id)}</b> (<b>${esc(near.status)}</b>) at
-      <b>${near.d.toFixed(3)}</b>, against <b>${good.toFixed(3)}</b> to the retrieved
-      case. Failures have no solved state, so they have no 3D model and no place in
-      the cloud &mdash; shown here as setups only. Context, not a decision.
-    </div>`;
-}
-
-//: The four numbers under the contact sheet describe *whichever pair the
-//: section is currently showing* -- and once an artifact has been analysed that
-//: is the analysed one, not the fixture.
-//:
-//: It used to always read `VIZ.pair`/`VIZ.race`, the exemplar shipped in
-//: viz_results.json, because `adoptTrace` re-renders the view and the machine
-//: panel but never the sheet. So the banner said "showing run-tidy.log -- the
-//: artifact you just analysed" while the row beneath it quoted 11 -> 4 from a
-//: different case entirely, against the pipeline's own 8 -> 3. Two panels on
-//: one screen disagreeing about the same run is worse than either number being
-//: wrong, because it makes both untrustworthy.
-//: Every cell here is a number the pipeline reported, or a word saying it did
-//: not report one. Both used to be printed the same way: on a warned transfer
-//: `solve` carries no `warm_iterations` and no `agreement`, and this template
-//: interpolated them straight, so the panel read "iterations 10 -> undefined"
-//: and "agreement NaN bar" one click from the front page.
-function renderGeoNums(){
-  if(LIVE){
-    const gap = stateGap(LIVE.solution, LIVE.neighbour.solution);
-    const it = LIVE.iterations || {}, ok = LIVE.converged || {};
-    const none = w => `<span style="color:var(--warn);font-size:12px">${w}</span>`;
-    //: a stalled arm reports the iteration it gave up on. Printing that as a
-    //: baseline reads as a result, so it is marked rather than shown bare.
-    const count = k => it[k] === undefined ? none('not run')
-                     : ok[k] === false ? `${it[k]}<span style="color:var(--refuse)">*</span>`
-                     : `${it[k]}`;
-    const stalled = ['cold', 'warm'].some(k => ok[k] === false);
-    $('#geonums').innerHTML = `
-      <div>setup distance<b>${(+LIVE.distance).toFixed(3)}</b>true, 7 parameters</div>
-      <div>state gap<b>${gap.dp.toFixed(1)} bar</b>${Math.round(gap.dw)} rev/min</div>
-      <div>iterations<b>${count('cold')} &rarr; ${count('warm')}</b>cold &rarr; warm${
-        stalled ? ' &middot; <span style="color:var(--refuse)">*did not converge</span>' : ''}</div>` +
-      (LIVE.agreement === undefined
-        ? `<div>agreement<b>${none('not checked')}</b>${
-             LIVE.usedArchive ? 'no converged baseline' : 'the archive was not used'}</div>`
-        : `<div>agreement<b>${(+LIVE.agreement).toExponential(1)}</b>bar, vs ${
-             esc(LIVE.agreementAgainst || 'baseline')}</div>`);
-    return;
-  }
-  const p = VIZ.pair, r = VIZ.race;
-  $('#geonums').innerHTML = `
-    <div>setup distance<b>${p.setup_distance.toFixed(3)}</b>true, 7 parameters</div>
-    <div>state gap<b>${p.state_gap_bar.toFixed(1)} bar</b>${Math.round(p.state_gap_rpm)} rev/min</div>
-    <div>iterations<b>${r.cold.iterations} &rarr; ${r.warm.iterations}</b>cold &rarr; warm</div>
-    <div>agreement<b>${(+r.warm.agreement_vs_cold.max_dp_bar).toExponential(1)}</b>bar</div>`;
-}
-
-function renderTiles(){
-  const P0 = subjectPair();
-  PSCALE = Math.max(...VIZ.tiles.concat([P0.neighbour])
-    .map(t => t.solution.p1), P0.query.solution.p1);
-  $('#sheetcn').innerHTML =
-    `${VIZ.config.n_tiles} of ${VIZ.config.archive_size}, chosen to span the cloud &middot;
-     pipe colour is solved pressure, ring fill is solved shaft speed`;
-  $('#tiles').innerHTML = VIZ.tiles.map(t =>
-    `<button class="tile" data-id="${esc(t.id)}" title="${esc(t.id)}">
-       ${schematic(t)}
-       <div class="tl"><span>${esc(t.id.replace('sweep-',''))}</span>
-         <span>${Math.round(t.solution.p1)}&#8202;bar</span></div>
-     </button>`).join('');
-  $('#tiles').onclick = e => {
-    const b = e.target.closest('button'); if(!b) return;
-    const id = b.dataset.id;
-    GEO.sel = (GEO.sel === id) ? null : id;
-    document.querySelectorAll('.tile').forEach(t =>
-      t.classList.toggle('on', t.dataset.id === GEO.sel));
-    if(GEO.sel){ MACH.right = VIZ.tiles.find(t => t.id === GEO.sel) || null; }
-    renderMachPanel();
-    if(GEO.sel && GEO.mode !== 'archive') setMode('archive');
-    else renderView();
-  };
-  renderGeoNums();
-}
-
-function setMode(m){
-  GEO.mode = m; GEO.playing = false;
-  if(m === 'race') GEO.step = 0;
-  document.querySelectorAll('.geotab').forEach(t =>
-    t.classList.toggle('on', t.dataset.mode === m));
-  renderControls(); renderView();
-}
-
-function geoTick(){
-  let dirty = false;
-  if(GEO.spin && GEO.mode !== 'race'){ GEO.yaw += 0.0032; dirty = true; }
-  if(GEO.playing){
-    GEO._t = (GEO._t || 0) + 1;
-    if(GEO._t % 28 === 0){
-      const maxStep = Math.max(...Object.values(subjectRace())
-        .map(r => r.path_xyz.length - 1));
-      if(GEO.step < maxStep){ GEO.step++; dirty = true; renderControls(); }
-      else { GEO.playing = false; renderControls(); }
-    }
-  }
-  if(dirty) renderView();
-  GEO.raf = requestAnimationFrame(geoTick);
-}
-
-function geoDrag(){
-  const el = $('#geoview');
-  let last = null;
-  el.addEventListener('pointerdown', e => {
-    last = [e.clientX, e.clientY]; GEO.spin = false;
-    el.classList.add('drag'); el.setPointerCapture(e.pointerId); renderControls();
-  });
-  el.addEventListener('pointermove', e => {
-    if(!last) return;
-    GEO.yaw += (e.clientX - last[0]) * 0.008;
-    GEO.pitch = Math.max(-1.35, Math.min(1.35, GEO.pitch + (e.clientY - last[1]) * 0.008));
-    last = [e.clientX, e.clientY]; renderView();
-  });
-  const up = () => { last = null; el.classList.remove('drag'); };
-  el.addEventListener('pointerup', up);
-  el.addEventListener('pointercancel', up);
-}
-
-async function geoBoot(){
-  const res = await fetch('/api/viz');
-  if(!res.ok) throw new Error('viz unavailable');
-  VIZ = await res.json();
-  GEO.bounds = geoBounds();
-  const p = VIZ.projection;
-  $('#geosub').innerHTML =
-    `Where the solved states sit, and why a neighbour is a good place to start.`;
-  $('#geotabs').onclick = e => {
-    const b = e.target.closest('button'); if(b) setMode(b.dataset.mode);
-  };
-  renderTiles(); renderFailures(); renderControls(); renderView(); geoDrag();
-  GEO.raf = requestAnimationFrame(geoTick);
-  machBoot();
-}
-
-/* --- the machine ---------------------------------------------------------
-//: A 3D view of the circuit being solved: reservoir, pump, manifold block,
-//: relief valve, two feed lines through their orifices, two motors, two
-//: returns. Hand-built primitives projected with the same orthographic
-//: rotation as the cloud above — still one file and no CDN.
-//:
-//: **Say what this is before anyone asks.** The model is lumped: it has seven
-//: unknowns and no geometry, so the *layout* here is illustrative and nothing
-//: about pipe length or routing was simulated. What is solved is what drives
-//: it — pipe colour is the solved pressure at that node, the orifice bore is
-//: the valve's real flow area, the relief valve stands open only when the
-//: solved regime says it does, and each motor turns at its own solved speed.
-//: Drawing a mesh would have claimed the thing §6h is careful never to claim;
-//: drawing the circuit claims exactly what the solver actually computed.
-*/
-const MACH = {yaw:0.72, pitch:0.42, t0:performance.now(), raf:null, right:null,
-              spin:true};
-
-//: bore in model units. Diameter, not area, scales with sqrt(A) — an orifice
-//: twice the flow area is sqrt(2) wider, and drawing it twice as wide would
-//: misstate the one parameter this picture puts on screen.
-const BORE_MAIN = 0.40, A_REF = 10.0;
-const bore = a => 0.13 + 0.30 * Math.sqrt(Math.max(a, 0) / A_REF);
-
-function machineParts(c){
-  const s = c.solution, p = c.params, parts = [];
-  const P = v => ramp(v / PSCALE);
-  const RES_Y = -6.4;
-
-  // reservoir and the suction line up to the pump
-  parts.push({t:'box', c:[-0.6, RES_Y - 0.7, 0], s:[15.6, 1.5, 4.6], col:'#1b2a2e'});
-  parts.push({t:'pipe', pts:[[-11, RES_Y - 0.4, 0], [-11, -1.0, 0]],
-              r:BORE_MAIN, col:'#2c3f45', flow:true, flowSpeed:0.6});
-  // pump, and the supply line into the manifold
-  parts.push({t:'motor', c:[-11, 0, 0], len:1.5, r:1.15, col:'#2b3b41', w:0, axis:'y'});
-  parts.push({t:'pipe', pts:[[-11, 0.9, 0], [-11, 1.85, 1.25], [-8.9, 1.85, 1.25],
-                             [-8.9, 0, 1.25], [-7.9, 0, 1.25]],
-              r:BORE_MAIN, col:P(s.p1), flow:true, flowSpeed:Math.max(0.2, (s.p1||0)/90)});
-  // the manifold block itself is at p1
-  parts.push({t:'box', c:[-7.0, 0, 0], s:[1.9, 6.4, 3.4], col:P(s.p1), edge:true});
-
-  // relief valve: a stub down to tank, open only when the solved regime says so
-  parts.push({t:'pipe', pts:[[-7.0, -3.2, 0], [-7.0, -4.4, 0]],
-              r:0.26, col:c.relief_open ? '#ffb454' : '#2c3f45', flow:!!c.relief_open, flowSpeed:1.2});
-  parts.push({t:'box', c:[-7.0, -4.9, 0], s:[1.2, 1.0, 1.2],
-              col:c.relief_open ? '#ffb454' : '#22333a', edge:true});
-  parts.push({t:'pipe', pts:[[-7.0, -5.4, 0], [-7.0, RES_Y - 0.2, 0]],
-              r:0.22, col:c.relief_open ? '#ffb454' : '#2c3f45', flow:!!c.relief_open, flowSpeed:1.2});
-
-  const branch = (Y, Z, p2, p3, w, area) => {
-    parts.push({t:'pipe', pts:[[-6.02, Y, Z * 0.46], [-4.6, Y, Z], [-2.2, Y, Z]],
-                r:BORE_MAIN, col:P(s.p1), flow:true, flowSpeed:Math.max(0.15, (s.p1||0)/100)});
-    parts.push({t:'pipe', pts:[[-2.2, Y, Z], [-1.2, Y, Z]], r:bore(area),
-                col:'#7d9198', flow:true, flowSpeed:0.9});
-    parts.push({t:'pipe', pts:[[-1.2, Y, Z], [1.4, Y, Z]], r:BORE_MAIN, col:P(p2),
-                flow:true, flowSpeed:Math.max(0.15, Math.sqrt(Math.max(0, (s.p1||0) - p2))/7)});
-    parts.push({t:'motor', c:[2.9, Y, Z], len:1.6, r:1.5, col:'#26363c',
-                w:w, axis:'x'});
-    parts.push({t:'pipe', pts:[[4.4, Y, Z], [6.6, Y, Z], [7.4, Y, Z * 0.45],
-                               [7.4, RES_Y - 0.2, Z * 0.45]],
-                r:BORE_MAIN, col:P(p3), flow:true, flowSpeed:Math.max(0.15, Math.sqrt(Math.max(0, p3))/6)});
-  };
-  branch( 2.1,  2.5, s.p2a, s.p3a, s.w_a, p.A_valve_a);
-  branch(-2.1, -2.5, s.p2b, s.p3b, s.w_b, p.A_valve_b);
-  return parts;
-}
-
-/* --- where the flow goes --------------------------------------------------
-//: The other two views draw *pressure* -- colour in the schematic, colour in
-//: the 3D model. Neither can show where the oil actually goes, and on this
-//: circuit that is not a detail: the relief valve is a leg that carries real
-//: flow and does no work at all, so a case with it cracked open is spending
-//: part of every pump revolution pushing oil back to tank.
-//:
-//: Every number here is `model.flows` on the converged state, which is the
-//: same arithmetic `residual` does. That matters for honesty: at convergence
-//: `pump = relief + a + b` to 1e-8, so dots cannot appear or vanish at a
-//: junction, because the physics says they do not.
-//:
-//: **Spacing, not speed.** The model is lumped and has no pipe area, so there
-//: is no velocity to draw. Dot spacing is litres per minute; every dot travels
-//: at the same rate.
-*/
-const FLOW = {t0: performance.now(), raf: null, data: null};
-
-//: one polyline, with dots spaced by flow. `q` is L/min.
-function flowLeg(pts, q, colour, tms, width){
-  const seg = [], L = [];
-  let total = 0;
-  for(let i = 1; i < pts.length; i++){
-    const dx = pts[i][0]-pts[i-1][0], dy = pts[i][1]-pts[i-1][1];
-    const l = Math.hypot(dx, dy);
-    seg.push([pts[i-1], pts[i], l]); L.push(l); total += l;
-  }
-  const line = `<polyline points="${pts.map(p=>p.join(',')).join(' ')}"
-    fill="none" stroke="${colour}" stroke-width="${width||5}"
-    stroke-linecap="round" stroke-linejoin="round" opacity="0.34"/>`;
-  if(!(q > 1e-6)) return line;
-
-  // spacing is inversely proportional to flow, clamped so a trickle does not
-  // produce one dot per kilometre and a torrent does not produce a solid bar
-  const spacing = Math.max(9, Math.min(90, 260 / q));
-  const speed = 34;                       // px/s, the same for every leg
-  const off = ((tms/1000) * speed) % spacing;
-  let out = line;
-  for(let d = off; d < total; d += spacing){
-    let acc = 0, k = 0;
-    while(k < seg.length && acc + seg[k][2] < d){ acc += seg[k][2]; k++; }
-    if(k >= seg.length) break;
-    const f = (d - acc) / seg[k][2];
-    const x = seg[k][0][0] + (seg[k][1][0]-seg[k][0][0])*f;
-    const y = seg[k][0][1] + (seg[k][1][1]-seg[k][0][1])*f;
-    out += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5"
-              fill="${colour}"/>`;
-  }
-  return out;
-}
-
-function renderFlow(tms){
-  const d = FLOW.data;
-  if(!d) return;
-  const f = d.flows, s = d.solution, open = d.relief_open;
-  const TANK = 232, teal = '#00b3b3', warn = '#ffb454', dim = '#3a4a50';
-  const YA = 62, YB = 150, XM = 128;
-  const g = [];
-
-  // reservoir
-  g.push(`<rect x="26" y="${TANK}" width="418" height="12" rx="3"
-            fill="#162226" stroke="#243237"/>`);
-  // suction and pump
-  g.push(flowLeg([[52,TANK],[52,150]], f.pump, dim, tms, 5));
-  g.push(`<circle cx="52" cy="140" r="13" fill="#121b1e" stroke="#3a4a50" stroke-width="1.5"/>
-          <path d="M45 140 L59 140 M52 133 L52 147" stroke="#5d7076" stroke-width="1.5"/>
-          <text x="52" y="170" fill="#5d7076" font-size="10"
-                font-family="ui-monospace,monospace" text-anchor="middle">pump</text>`);
-  // pump -> manifold
-  g.push(flowLeg([[52,127],[52,36],[XM,36],[XM,YA]], f.pump, teal, tms, 6));
-  // the manifold rail
-  g.push(flowLeg([[XM,YA],[XM,YB]], f.valve_b + f.relief, teal, tms, 6));
-  // relief leg: the one that does no work
-  g.push(flowLeg([[XM,YB],[XM,196],[92,196],[92,TANK]], f.relief,
-                 open ? warn : dim, tms, 5));
-  g.push(`<rect x="${XM-9}" y="188" width="18" height="14" rx="2"
-            fill="${open ? warn : '#1a2529'}" stroke="#3a4a50" stroke-width="1.2"/>
-          <text x="${XM+16}" y="199" fill="${open ? warn : '#5d7076'}" font-size="10"
-                font-family="ui-monospace,monospace">relief ${open ? 'OPEN' : 'shut'}</text>`);
-
-  [[YA,'a',f.valve_a,s.w_a],[YB,'b',f.valve_b,s.w_b]].forEach(([Y,tag,q,w]) => {
-    g.push(flowLeg([[XM,Y],[186,Y]], q, teal, tms, 5));
-    g.push(`<path d="M186 ${Y-7} L194 ${Y-2} M186 ${Y+7} L194 ${Y+2}"
-              stroke="#7d9198" stroke-width="1.8" fill="none"/>
-            <text x="190" y="${Y-13}" fill="#5d7076" font-size="9.5"
-                  font-family="ui-monospace,monospace" text-anchor="middle">valve ${tag}</text>`);
-    g.push(flowLeg([[194,Y],[248,Y]], q, teal, tms, 5));
-    const spd = Math.min(1, Math.abs(w)/2600), circ = 2*Math.PI*13;
-    g.push(`<circle cx="262" cy="${Y}" r="13" fill="#121b1e" stroke="#3a4a50" stroke-width="1.5"/>
-            <circle cx="262" cy="${Y}" r="13" fill="none" stroke="#3ddc97" stroke-width="3"
-              stroke-dasharray="${(circ*spd).toFixed(1)} ${circ.toFixed(1)}"
-              transform="rotate(-90 262 ${Y})"/>
-            <text x="262" y="${Y-19}" fill="#5d7076" font-size="9.5"
-              font-family="ui-monospace,monospace" text-anchor="middle">${Math.round(w)} rev/min</text>`);
-    g.push(flowLeg([[275,Y],[352,Y],[352,TANK]], q, teal, tms, 5));
-  });
-
-  $('#flowview').innerHTML = g.join('');
-}
-
-function adoptFlow(t){
-  const s = t && t.solve;
-  if(!(s && s.flows && s.solution)){ FLOW.data = null; $('#flow').style.display='none'; return; }
-  $('#flow').style.display = '';
-  FLOW.data = {flows: s.flows, solution: s.solution,
-               relief_open: !!(s.regime && s.regime.relief_open)};
-  const f = s.flows;
-  const wasted = 100 * f.power_wasted_share;
-  $('#flownums').innerHTML = `
-    <div>pump delivers<b>${f.pump.toFixed(1)}</b>L/min</div>
-    <div>through shaft a<b>${f.valve_a.toFixed(1)}</b>L/min &middot; ${f.power_a_kw.toFixed(2)} kW</div>
-    <div>through shaft b<b>${f.valve_b.toFixed(1)}</b>L/min &middot; ${f.power_b_kw.toFixed(2)} kW</div>
-    <div>dumped by the relief<b style="color:${f.relief > 1e-6 ? 'var(--warn)' : 'var(--dim)'}">${f.relief.toFixed(1)}</b>L/min &middot; ${f.power_relief_kw.toFixed(2)} kW</div>`;
-  $('#flowcap').innerHTML = f.relief > 1e-6
-    ? `The relief valve is carrying <b>${f.relief.toFixed(1)} L/min</b> straight back
-       to tank at <b>${Math.round(s.solution.p1)} bar</b> &mdash; <b>${wasted.toFixed(0)}%</b>
-       of this case's hydraulic power, doing no work. That is in the solved answer,
-       not an estimate: at convergence pump = relief + a + b to 1e-8 L/min.`
-    : `The relief valve is shut, so every litre the pump delivers reaches a motor.
-       Flow balances to 1e-8 L/min at every node &mdash; the dots cannot appear or
-       vanish at a junction because the physics says they do not.`;
-}
-
-function flowTick(){
-  renderFlow(performance.now() - FLOW.t0);
-  FLOW.raf = requestAnimationFrame(flowTick);
-}
-
-function rotM(p){
-  const cy=Math.cos(MACH.yaw), sy=Math.sin(MACH.yaw);
-  const cp=Math.cos(MACH.pitch), sp=Math.sin(MACH.pitch);
-  const x=p[0], y=p[1], z=p[2];
-  const x1 = x*cy + z*sy, z1 = z*cy - x*sy;
-  return [x1, y*cp - z1*sp, y*sp + z1*cp];
-}
-const MW = 400, MH = 300, MS = 14.2;
-//: the circuit is not built around the origin -- the reservoir sits well below
-//: it -- so the model is centred before it is rotated. Rotating first would
-//: swing the whole assembly around a point outside itself.
-const MODEL_C = [-1.4, -2.3, 0];
-//: and a mild perspective divide. The cloud above is deliberately orthographic
-//: because it is a map and equal distances there must look equal; this is a
-//: picture of an object, where a near end that reads larger than the far end is
-//: most of what makes it look solid. CAM_D is in model units — large enough to
-//: keep the assembly from fish-eyeing, small enough to be felt.
-const CAM_D = 30;
-function scr(p){
-  const r = rotM([p[0]-MODEL_C[0], p[1]-MODEL_C[1], p[2]-MODEL_C[2]]);
-  const f = CAM_D / Math.max(6, CAM_D - r[2]);
-  return [MW/2 + r[0]*MS*f, MH/2 - r[1]*MS*f, r[2], f];
-}
-
-function shade(hex, f){
-  const m = /^#?([0-9a-f]{6})$/i.exec(hex);
-  let c;
-  if(m) c = [0,2,4].map(i => parseInt(m[1].substr(i,2),16));
-  else { const n = /rgb\((\d+),(\d+),(\d+)\)/.exec(hex); if(!n) return hex;
-         c = [+n[1],+n[2],+n[3]]; }
-  return `rgb(${c.map(v => Math.max(0, Math.min(255, Math.round(v*f)))).join(',')})`;
-}
-
-//: gradients are collected per frame rather than declared once: their direction
-//: is perpendicular to each pipe *on screen*, so it changes as the assembly
-//: turns. DEFS is reset by renderMachine before anything is drawn.
-let DEFS = [], DEFN = 0, DEF_PREFIX = '';
-function tubeGrad(a, b, r){
-  let nx = -(b[1]-a[1]), ny = (b[0]-a[0]);
-  const L = Math.hypot(nx, ny) || 1; nx /= L; ny /= L;
-  // keep the lit side up-and-left whichever way the segment happens to run
-  if(nx - ny < 0){ nx = -nx; ny = -ny; }
-  const cx = (a[0]+b[0])/2, cy = (a[1]+b[1])/2;
-  return [cx - nx*r, cy - ny*r, cx + nx*r, cy + ny*r];
-}
-//: four stops, not two: a tube is dark at the silhouette, bright just inside
-//: the lit edge, mid across the body and dark again at the far silhouette.
-//: Two stops give a wedge, which is what made these read as flat ribbons.
-function pipePaint(col, a, b, r){
-  const [x1,y1,x2,y2] = tubeGrad(a, b, r);
-  const id = `${DEF_PREFIX}_g${DEFN++}`;
-  DEFS.push(`<linearGradient id="${id}" gradientUnits="userSpaceOnUse"
-      x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}">
-      <stop offset="0" stop-color="${shade(col,0.34)}"/>
-      <stop offset="0.30" stop-color="${shade(col,1.30)}"/>
-      <stop offset="0.62" stop-color="${col}"/>
-      <stop offset="1" stop-color="${shade(col,0.30)}"/></linearGradient>`);
-  return `url(#${id})`;
-}
-function ballPaint(col){
-  const id = `${DEF_PREFIX}_b${DEFN++}`;
-  DEFS.push(`<radialGradient id="${id}" cx="0.35" cy="0.3" r="0.75">
-      <stop offset="0" stop-color="${shade(col,1.35)}"/>
-      <stop offset="0.55" stop-color="${col}"/>
-      <stop offset="1" stop-color="${shade(col,0.36)}"/></radialGradient>`);
-  return `url(#${id})`;
-}
-
-//: every segment is sorted on its own depth, and every bend gets a ball joint.
-//: Sorting a whole run by its mean depth was the other reason this looked flat:
-//: a line that travels from the back of the assembly to the front cannot be
-//: entirely in front of, or entirely behind, the block it passes.
-function drawPipe(pr, out){
-  //: subdivide any run that spans real depth. Painter's algorithm gives each
-  //: piece one sort key, so a length travelling from the back of the assembly
-  //: to the front is either wholly in front of or wholly behind whatever it
-  //: passes. Short, flat runs are left alone.
-  const model = [];
-  for(let i=0;i<pr.pts.length-1;i++){
-    const A = pr.pts[i], B = pr.pts[i+1];
-    const dz = Math.abs(rotOnly(A)[2] - rotOnly(B)[2]);
-    const k = dz > 0.9 ? Math.min(4, Math.ceil(dz / 0.9)) : 1;
-    for(let j=0;j<k;j++){
-      const t0 = j/k, t1 = (j+1)/k;
-      model.push([[A[0]+(B[0]-A[0])*t0, A[1]+(B[1]-A[1])*t0, A[2]+(B[2]-A[2])*t0],
-                  [A[0]+(B[0]-A[0])*t1, A[1]+(B[1]-A[1])*t1, A[2]+(B[2]-A[2])*t1]]);
-    }
-  }
-  const pts = pr.pts.map(scr);
-  for(const [mA, mB] of model){
-    const a = scr(mA), b = scr(mB);
-    const f = (a[3]+b[3])/2, w = pr.r*2*MS*f;
-    const d = `M${a[0].toFixed(1)},${a[1].toFixed(1)} L${b[0].toFixed(1)},${b[1].toFixed(1)}`;
-    const paint = pipePaint(pr.col, a, b, w/2);
-    out.push({z:(a[2]+b[2])/2, svg:
-      `<path d="${d}" fill="none" stroke-linecap="butt"
-         stroke="${shade(pr.col,0.22)}" stroke-width="${(w+2.2).toFixed(1)}"/>
-       <path d="${d}" fill="none" stroke-linecap="butt"
-         stroke="${paint}" stroke-width="${w.toFixed(1)}"/>`});
-  }
-  // ball joints at the bends and at both open ends, so runs meet as fittings
-  for(let i=0;i<pts.length;i++){
-    const p = pts[i], rad = pr.r*MS*p[3]*1.04;
-    out.push({z:p[2]+0.01, svg:
-      `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${rad.toFixed(1)}"
-         fill="${ballPaint(pr.col)}" stroke="${shade(pr.col,0.22)}" stroke-width="0.8"/>`});
-  }
-
-  // animated fluid flow particles
-  const flowEl = $('#flowparticles');
-  if(pr.flow && (!flowEl || flowEl.checked)){
-    const speed = pr.flowSpeed || 0.8;
-    const numP = 3;
-    let totalL = 0; const segL = [];
-    for(let i=0; i<pr.pts.length-1; i++){
-      const l = Math.hypot(pr.pts[i+1][0]-pr.pts[i][0], pr.pts[i+1][1]-pr.pts[i][1], pr.pts[i+1][2]-pr.pts[i][2]);
-      segL.push(l); totalL += l;
-    }
-    if(totalL > 0){
-      const tSec = (performance.now() * 0.001) * speed;
-      for(let np=0; np<numP; np++){
-        const frac = ((tSec * 0.8 + np / numP) % 1.0);
-        let dist = frac * totalL;
-        let pt3d = pr.pts[0];
-        for(let i=0; i<segL.length; i++){
-          if(dist <= segL[i]){
-            const u = dist / (segL[i] || 1);
-            pt3d = [pr.pts[i][0] + (pr.pts[i+1][0]-pr.pts[i][0])*u,
-                    pr.pts[i][1] + (pr.pts[i+1][1]-pr.pts[i][1])*u,
-                    pr.pts[i][2] + (pr.pts[i+1][2]-pr.pts[i][2])*u];
-            break;
-          }
-          dist -= segL[i];
-        }
-        const pScr = scr(pt3d);
-        const pRad = Math.max(1.6, pr.r * MS * pScr[3] * 0.48);
-        out.push({z: pScr[2] + 0.06, svg:
-          `<circle cx="${pScr[0].toFixed(1)}" cy="${pScr[1].toFixed(1)}" r="${pRad.toFixed(1)}"
-             fill="#ffffff" opacity="0.9" stroke="${pr.col}" stroke-width="0.8"/>`});
-      }
-    }
-  }
-}
-
-const BOX_FACES = [[0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6],[0,3,7,4],[1,2,6,5]];
-
-//: rotation without the perspective divide. Normals have to be computed from
-//: these: a perspective-divided quad is not similar to the face it came from,
-//: so its cross product points somewhere slightly wrong and the shading wobbles
-//: as the assembly turns.
-function rotOnly(p){
-  return rotM([p[0]-MODEL_C[0], p[1]-MODEL_C[1], p[2]-MODEL_C[2]]);
-}
-
-//: a fixed light, up and to the left and slightly toward the viewer, in the
-//: *rotated* frame -- so it behaves like a lamp in the room rather than one
-//: bolted to the model, and turning the assembly actually changes which faces
-//: catch it.
-const LIGHT = (() => { const v=[-0.42,0.82,0.39], m=Math.hypot(...v);
-                       return v.map(c=>c/m); })();
-
-function drawBox(b, out){
-  const [w,h,d] = b.s, hx=w/2, hy=h/2, hz=d/2;
-  const corners = [[-hx,-hy,hz],[hx,-hy,hz],[hx,hy,hz],[-hx,hy,hz],
-                   [-hx,-hy,-hz],[hx,-hy,-hz],[hx,hy,-hz],[-hx,hy,-hz]]
-                  .map(p => [p[0]+b.c[0], p[1]+b.c[1], p[2]+b.c[2]]);
-  const V = corners.map(scr);        // screen, for the polygon
-  const R = corners.map(rotOnly);    // rotated, for the normal
-
-  BOX_FACES.forEach(f => {
-    const pts = f.map(i => V[i]);
-    let a = 0;
-    for(let i=0;i<pts.length;i++){ const q = pts[(i+1)%pts.length];
-      a += pts[i][0]*q[1] - q[0]*pts[i][1]; }
-    if(a >= -0.5) return;            // back face, or degenerate to a sliver
-
-    // Lambert on the true face normal. Shading by depth (what this used to do)
-    // gives every face of a flat slab almost the same value, which is why the
-    // reservoir could read as a bare outline at a shallow pitch -- a box needs
-    // its top and its sides to differ, and only the normal knows that.
-    const p0=R[f[0]], p1=R[f[1]], p2=R[f[2]];
-    const u=[p1[0]-p0[0],p1[1]-p0[1],p1[2]-p0[2]];
-    const t=[p2[0]-p0[0],p2[1]-p0[1],p2[2]-p0[2]];
-    let n=[u[1]*t[2]-u[2]*t[1], u[2]*t[0]-u[0]*t[2], u[0]*t[1]-u[1]*t[0]];
-    const nm=Math.hypot(...n)||1; n=n.map(c=>c/nm);
-    if(n[2] < 0) n = n.map(c => -c);            // orient toward the viewer
-    const lam = Math.max(0, n[0]*LIGHT[0] + n[1]*LIGHT[1] + n[2]*LIGHT[2]);
-    const lit = 0.34 + 0.92 * lam;              // ambient + diffuse
-
-    out.push({z: pts.reduce((s,q) => s+q[2], 0)/4, svg:
-      `<polygon points="${pts.map(q => `${q[0].toFixed(1)},${q[1].toFixed(1)}`).join(' ')}"
-         fill="${shade(b.col, lit)}"
-         stroke="${shade(b.col, lit*0.55)}" stroke-width="1"
-         stroke-linejoin="round"/>`});
-  });
-
-  //: the silhouette, drawn last and on top. It is what stops a slab seen
-  //: edge-on from disappearing: the faces collapse to nothing at that angle,
-  //: the outline does not.
-  if(b.edge !== false){
-    const hull = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],
-                  [0,4],[1,5],[2,6],[3,7]];
-    const seg = hull.map(([i,j]) =>
-      `M${V[i][0].toFixed(1)},${V[i][1].toFixed(1)} L${V[j][0].toFixed(1)},${V[j][1].toFixed(1)}`).join(' ');
-    out.push({z: Math.max(...V.map(q => q[2])) + 0.02, svg:
-      `<path d="${seg}" fill="none" stroke="${shade(b.col,1.5)}" stroke-width="0.9"
-         opacity="0.30" stroke-linecap="round"/>`});
-  }
-}
-
-//: the shaft mark turns at the solved speed, slowed by a fixed factor so it
-//: reads as rotation rather than blur: the archive's fastest shaft is 1793
-//: rev/min, which lands just under two turns a second here. The factor is the
-//: same for both motors, so the *ratio* between them is untouched — and that
-//: ratio is a solved quantity, not a chosen one.
-const RPM_SLOW = 0.0004;
-//: an end cap is a circle in 3D, so it is drawn as a circle in 3D and projected.
-//: Stamping a screen-space circle on the end of the barrel was the third thing
-//: giving this away — a real cylinder's cap narrows to a slit edge-on.
-function capPoly(c, r, u, v, n){
-  const pts = [];
-  for(let i=0;i<n;i++){
-    const t = i/n*2*Math.PI, cs = Math.cos(t), sn = Math.sin(t);
-    pts.push(scr([c[0]+r*(u[0]*cs+v[0]*sn), c[1]+r*(u[1]*cs+v[1]*sn),
-                  c[2]+r*(u[2]*cs+v[2]*sn)]));
-  }
-  return pts;
-}
-function drawMotor(m, tms, out){
-  const ax = m.axis === 'x' ? [1,0,0] : [0,1,0];
-  const u  = m.axis === 'x' ? [0,1,0] : [1,0,0], v2 = [0,0,1];
-  const a = [m.c[0]-ax[0]*m.len/2, m.c[1]-ax[1]*m.len/2, m.c[2]];
-  const b = [m.c[0]+ax[0]*m.len/2, m.c[1]+ax[1]*m.len/2, m.c[2]];
-  const pa = scr(a), pb = scr(b);
-  const f = (pa[3]+pb[3])/2, w = m.r*2*MS*f;
-  const d = `M${pa[0].toFixed(1)},${pa[1].toFixed(1)} L${pb[0].toFixed(1)},${pb[1].toFixed(1)}`;
-  out.push({z:(pa[2]+pb[2])/2, svg:
-    `<path d="${d}" fill="none" stroke-linecap="butt"
-       stroke="${shade(m.col,0.3)}" stroke-width="${(w+2.4).toFixed(1)}"/>
-     <path d="${d}" fill="none" stroke-linecap="butt"
-       stroke="${pipePaint(m.col, pa, pb, w/2)}" stroke-width="${w.toFixed(1)}"/>`});
-  //: the caps face along the axis, so they get the same Lambert term the boxes
-  //: do -- otherwise a cylinder end reads as a flat sticker on a lit barrel
-  const axisR = (() => {
-    const ra = rotOnly(a), rb = rotOnly(b);
-    let n = [rb[0]-ra[0], rb[1]-ra[1], rb[2]-ra[2]];
-    const nm = Math.hypot(...n) || 1; return n.map(c => c/nm);
-  })();
-  for(const [c, sgn] of [[a, -1], [b, 1]]){
-    let n = axisR.map(x => x * sgn);
-    if(n[2] < 0) n = n.map(x => -x);
-    const lam = Math.max(0, n[0]*LIGHT[0] + n[1]*LIGHT[1] + n[2]*LIGHT[2]);
-    const poly = capPoly(c, m.r, u, v2, 26);
-    out.push({z: poly.reduce((s,p) => s+p[2], 0)/poly.length + 0.02, svg:
-      `<polygon points="${poly.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}"
-         fill="${shade(m.col, 0.42 + 1.05*lam)}" stroke="${shade(m.col,0.4)}"
-         stroke-width="1"/>`});
-  }
-  if(m.w){
-    const th = tms * RPM_SLOW * m.w / 60;
-    const tip = [0,1,2].map(i => b[i] + (u[i]*Math.cos(th) + v2[i]*Math.sin(th)) * m.r*0.7);
-    const pt = scr(tip), pc = scr(b);
-    out.push({z: Math.max(pt[2], pc[2]) + 0.05, svg:
-      `<line x1="${pc[0].toFixed(1)}" y1="${pc[1].toFixed(1)}"
-         x2="${pt[0].toFixed(1)}" y2="${pt[1].toFixed(1)}"
-         stroke="#3ddc97" stroke-width="${(2.6*f).toFixed(1)}" stroke-linecap="round"/>
-       <circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}"
-         r="${(1.9*f).toFixed(1)}" fill="#3ddc97"/>`});
-  }
-}
-
-//: a contact shadow on the reservoir lid. Cheap, and it is what stops the
-//: assembly reading as floating in front of a backdrop.
-function drawShadow(out){
-  const poly = capPoly([-1.0, -5.62, 0], 1, [7.6,0,0], [0,0,3.4], 26);
-  out.push({z:-99, svg:
-    `<polygon points="${poly.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}"
-       fill="#070c0d" opacity="0.55"/>`});
-}
-
-function renderMachine(el, c, tms, label){
-  if(!c) return;
-  DEF_PREFIX = (el && el.id) ? el.id : 'm';
-  DEFS = []; DEFN = 0;
-  const out = [];
-  drawShadow(out);
-  for(const p of machineParts(c)){
-    if(p.t === 'pipe') drawPipe(p, out);
-    else if(p.t === 'box') drawBox(p, out);
-    else drawMotor(p, tms, out);
-  }
-  out.sort((u,v) => u.z - v.z);
-  const s = c.solution;
-  el.innerHTML = `<defs>${DEFS.join('')}</defs>` + out.map(d => d.svg).join('') +
-    `<text x="10" y="18" fill="#8fa3a9" font-size="11.5"
-       font-family="ui-monospace,monospace">${esc(label)}</text>
-     <text x="10" y="${MH-24}" fill="#5d7076" font-size="10.5"
-       font-family="ui-monospace,monospace">manifold ${Math.round(s.p1)} bar &middot; relief ${c.relief_open ? 'open' : 'closed'}</text>
-     <text x="10" y="${MH-10}" fill="#5d7076" font-size="10.5"
-       font-family="ui-monospace,monospace">shafts ${Math.round(s.w_a)} / ${Math.round(s.w_b)} rev/min</text>`;
-}
-
-function stateGap(q, n){
-  return {dp: Math.max(...['p1','p2a','p3a','p2b','p3b'].map(k => Math.abs(q[k]-n[k]))),
-          dw: Math.max(...['w_a','w_b'].map(k => Math.abs(q[k]-n[k])))};
-}
-function pairGap(P){ return stateGap(P.query.solution, P.neighbour.solution); }
-function machDiff(other){ return stateGap(subjectPair().query.solution, other.solution); }
-
-function renderMachPanel(){
-  const P = subjectPair();
-  const right = MACH.right || P.neighbour;
-  const picked = MACH.right && MACH.right.id !== P.neighbour.id;
-  const d = machDiff(right), best = machDiff(P.neighbour);
-  $('#machdiff').innerHTML =
-    `<div>largest pressure difference<b>${d.dp.toFixed(1)} bar</b>across five nodes</div>
-     <div>largest speed difference<b>${Math.round(d.dw)} rev/min</b>across two shafts</div>` +
-    (picked
-      ? `<div>versus the retrieved case<b>${best.dp.toFixed(1)} bar</b>which is
-           ${(d.dp / (best.dp || 1)).toFixed(1)}&times; closer</div>`
-      : (() => { const R = subjectRace();
-          // "solved in — iterations from 10 cold" is not a sentence. When the
-          // archive was not used, say that instead of leaving a dash where the
-          // result would be.
-          return R.warm
-            ? `<div>then solved in<b>${R.warm.iterations} iterations</b>from
-                 ${R.cold.converged === false
-                   ? 'a cold start that never converged'
-                   : R.cold.iterations + ' cold'}</div>`
-            : `<div>then solved in<b style="color:var(--warn)">${R.nominal
-                 ? R.nominal.iterations + ' iterations' : '&mdash;'}</b>from the
-                 nominal guess &mdash; the archive was not used</div>`; })());
-  //: the point of letting a tile be picked is that picking badly is visible.
-  //: A hand-chosen case is a control, and saying how much worse it is turns the
-  //: comparison from an illustration into a measurement the room can check.
-  $('#machnote').innerHTML = picked
-    ? `<b>${esc(MACH.right.id)}</b> picked by hand, not chosen by retrieval &mdash;
-       <b>${d.dp.toFixed(1)} bar</b> away against the retrieved case's
-       <b>${best.dp.toFixed(1)} bar</b>.`
-    : `<b>${esc(P.neighbour.id)}</b> is what retrieval chose out of
-       ${VIZ.config.archive_size}.` +
-      // the right-hand machine is on screen either way; whether the solver was
-      // allowed to start from it is a different fact and belongs beside it
-      (LIVE && !LIVE.usedArchive
-        ? ` <span style="color:var(--warn)">The verifier refused the transfer, so
-            this state was not used as a starting point.</span>`
-        : '') +
-      ` Click a tile to compare against another.`;
-}
-
-function machTick(){
-  const t = performance.now() - MACH.t0;
-  if(MACH.spin) MACH.yaw += 0.0022;
-  const P = subjectPair();
-  const leftSubject = MACH.overrideState || P.query;
-  const leftLabel = MACH.overrideLabel || (P.query.id + '  (the new run)');
-  renderMachine($('#machL'), leftSubject, t, leftLabel);
-  renderMachine($('#machR'), MACH.right || P.neighbour, t,
-                (MACH.right || P.neighbour).id + '  (from the archive)');
-  MACH.raf = requestAnimationFrame(machTick);
-}
-
-/* --- Interactive Newton Convergence Stepper ---------------------------
-//: Every state this panel shows is an iterate the solver actually produced.
-//:
-//: It used to interpolate. With no analysed run it built a start state by hand
-//: and eased from there to the answer with `Math.sin(u * PI/2)`, which is not
-//: Newton's method and does not look like it: the real cold path on the shipped
-//: fixture goes 0 -> 107.9 -> **-20.6** -> 87.9 -> ... -> 134.63 bar, and the
-//: drawn one climbed 0 -> 19 -> 38 -> ... -> 134.63 without ever leaving the
-//: envelope. That excursion through a negative manifold pressure is the whole
-//: reason the admissibility gate exists; smoothing it away made this the one
-//: panel on the page whose contents were invented.
-//:
-//: The iterates were already here. `model.solve(record_path=True)` keeps every
-//: one, `POST /api/analyse` returns them as `solve.paths`, and `viz.py` writes
-//: them into viz_results.json as `race.<arm>.path_state`. Both are rows in
-//: `state_order`, so one reader serves the live run and the fixture.
-*/
-const STEPPER = {
-  arm: 'warm',
-  step: 0,
-  playing: false,
-  timer: null
-};
-
-//: the arms that were actually run, in presentation order. A warned-and-not-
-//: overridden run never solves a warm arm, so `warm` is genuinely absent from
-//: its trace -- and the panel says so rather than manufacturing one.
-const STEP_ARMS = ['cold', 'nominal', 'warm'];
-const STEP_ARM_LABEL = {cold: 'Cold Start', nominal: 'Nominal Guess',
-                        warm: 'Warm Start'};
-
-//: the raw iterates for one arm, as states -- or null if that arm was not run.
-//: Never interpolated, never defaulted: the only two sources are the pipeline's
-//: own `solve.paths` and the fixture's `path_state`.
-function armPath(arm){
-  const order = VIZ.projection.transform.state_order;
-  const rows = LIVE ? (LIVE.paths || {})[arm]
-                    : ((VIZ.race[arm] || {}).path_state);
-  if(!rows || !rows.length) return null;
-  return rows.map(row => Object.fromEntries(order.map((n, i) => [n, row[i]])));
-}
-
-function getStepperTrajectory(){ return armPath(STEPPER.arm); }
-
-//: did that arm actually arrive, or is its last iterate where it gave up? The
-//: tab has to say, for the same reason `#geonums` does: "Cold Start (7 iters)"
-//: beside "Warm Start (4 iters)" reads as a comparison, and on a case where the
-//: flat start stalls it is not one.
-function armConverged(arm){
-  return LIVE ? (LIVE.converged || {})[arm] !== false
-              : ((VIZ.race[arm] || {}).converged !== false);
-}
-
-//: the tab labels are the measured iteration counts, not text typed into the
-//: markup. They used to read "Cold Start (8+ iters)" beside a readout saying
-//: "Iteration 0 of 11", because nothing updated them when the subject changed.
-function renderStepperArms(){
-  const tabs = $('#steparms');
-  if(!tabs) return;
-  tabs.innerHTML = STEP_ARMS.map(arm => {
-    const p = armPath(arm);
-    const on = arm === STEPPER.arm ? ' on' : '';
-    const note = !p ? 'not run'
-               : !armConverged(arm) ? `${p.length - 1} iters, stalled`
-               : `${p.length - 1} iters`;
-    const why = !p ? 'this arm was not run for the case on screen'
-              : !armConverged(arm) ? 'this arm never converged -- its last iterate '
-                                     + 'is where it gave up, not an answer'
-              : '';
-    return `<button class="geotab${on}" data-arm="${arm}"${p ? '' : ' disabled'}
-              title="${esc(why)}"
-            >${STEP_ARM_LABEL[arm]} (${note})</button>`;
-  }).join('');
-}
-
-function updateStepperUI(){
-  renderStepperArms();
-  const path = getStepperTrajectory();
-  const slider = $('#steprange'), txt = $('#steptext'),
-        readout = $('#stepreadout'), playBtn = $('#stepplay');
-
-  //: an arm that was not run has nothing to step through. Every control goes
-  //: inert and the readout says which arm and why -- the alternative, and what
-  //: this did before, is to invent a path so the slider has something to move
-  //: along. The commonest case is a warned transfer the engineer left standing:
-  //: the pipeline deliberately never solved a warm arm, and a stepper that
-  //: animates one is drawing the transfer the verifier just refused.
-  if(!path){
-    STEPPER.playing = false;
-    if(STEPPER.timer){ clearInterval(STEPPER.timer); STEPPER.timer = null; }
-    MACH.overrideState = null;
-    MACH.overrideLabel = null;
-    if(slider){ slider.disabled = true; slider.max = 0; slider.value = 0; }
-    if(playBtn){ playBtn.disabled = true; playBtn.textContent = 'Play'; }
-    if(txt) txt.innerHTML = `<span style="color:var(--faint)">no iterates</span>`;
-    if(readout){
-      //: only the warm arm can be absent -- the pipeline always solves cold and
-      //: nominal -- and it is absent for exactly one reason, so say that reason
-      //: rather than leaving an empty panel to be read as a bug.
-      const why = STEPPER.arm === 'warm'
-        ? `<div>why<b>the archive was not used</b>the transfer was warned and not overridden</div>`
-        : `<div>why<b>this arm is not in the trace</b>nothing to step through</div>`;
-      readout.innerHTML =
-        `<div>starting guess <b>${esc(STEPPER.arm)} arm</b></div>` +
-        `<div>iterates <b style="color:var(--warn)">not run</b>for the case on screen</div>` + why;
-    }
-    return;
-  }
-
-  const maxStep = path.length - 1;
-  if(STEPPER.step > maxStep) STEPPER.step = maxStep;
-  if(slider){
-    slider.disabled = false;
-    slider.max = maxStep;
-    slider.value = STEPPER.step;
-  }
-  if(playBtn) playBtn.disabled = false;
-
-  const currState = path[STEPPER.step];
-  const P = subjectPair();
-  //: the relief valve's state on an *intermediate* iterate, by the same test
-  //: `model.regime` applies to a converged one: `relief_opening()` is zero at
-  //: and below the cracking pressure and positive above it.
-  const p_crack = P.query.params ? P.query.params.p_crack : undefined;
-
-  const isDone = STEPPER.step === maxStep;
-  if(isDone && STEPPER.arm === 'warm'){
-    MACH.overrideState = null;
-    MACH.overrideLabel = null;
-  } else {
-    MACH.overrideState = {
-      solution: currState,
-      params: P.query.params,
-      relief_open: p_crack === undefined ? false : currState.p1 > p_crack
-    };
-    MACH.overrideLabel = `${P.query.id} (${STEPPER.arm} start, iter ${STEPPER.step}/${maxStep})`;
-  }
-
-  const stepCol = isDone ? 'var(--ok)' : (STEPPER.step === 0 ? 'var(--refuse)' : 'var(--warn)');
-  if(txt) txt.innerHTML = `Iteration <b style="color:${stepCol}">${STEPPER.step}</b> of ${maxStep}`;
-
-  //: the gap to the converged answer, largest over the five pressure nodes.
-  //: A Newton path is not monotone -- on the cold arm this rises before it
-  //: falls, and it is allowed to, because that is what the solver did.
-  const targetSol = P.query.solution;
-  const resProxy = Math.max(...['p1','p2a','p3a','p2b','p3b']
-    .map(k => Math.abs(currState[k] - (targetSol[k] || 0))));
-
-  if(readout){
-    readout.innerHTML =
-      `<div>starting guess <b>${esc(STEPPER.arm)} arm</b></div>` +
-      `<div>manifold pressure <b>${Math.round(currState.p1)} bar</b></div>` +
-      `<div>shaft speeds <b>${Math.round(currState.w_a)} / ${Math.round(currState.w_b)} rpm</b></div>` +
-      `<div>distance to solved state <b>${resProxy < 1e-3 ? '0.00 (converged)' : resProxy.toFixed(1) + ' bar'}</b></div>`;
-  }
-}
-
-function stepperBoot(){
-  const tabs = $('#steparms');
-  if(tabs){
-    // the buttons are rebuilt by renderStepperArms on every update, so the
-    // handler lives on the container and reads the arm off the target rather
-    // than closing over an element that will not survive the next render
-    tabs.onclick = e => {
-      const b = e.target.closest('button');
-      if(!b || b.disabled) return;
-      STEPPER.arm = b.dataset.arm;
-      STEPPER.step = 0;
-      STEPPER.playing = false;
-      if(STEPPER.timer){ clearInterval(STEPPER.timer); STEPPER.timer = null; }
-      const pb = $('#stepplay'); if(pb) pb.textContent = 'Play';
-      updateStepperUI();
-    };
-  }
-  
-  const slider = $('#steprange');
-  if(slider){
-    slider.oninput = () => {
-      STEPPER.step = parseInt(slider.value, 10);
-      STEPPER.playing = false;
-      const pb = $('#stepplay'); if(pb) pb.textContent = 'Play';
-      updateStepperUI();
-    };
-  }
-  
-  const playBtn = $('#stepplay');
-  if(playBtn){
-    playBtn.onclick = () => {
-      STEPPER.playing = !STEPPER.playing;
-      playBtn.textContent = STEPPER.playing ? 'Pause' : 'Play';
-      if(STEPPER.playing){
-        const path = getStepperTrajectory();
-        if(!path){ STEPPER.playing = false; updateStepperUI(); return; }
-        if(STEPPER.step >= path.length - 1) STEPPER.step = 0;
-        if(STEPPER.timer) clearInterval(STEPPER.timer);
-        STEPPER.timer = setInterval(() => {
-          if(!STEPPER.playing){ clearInterval(STEPPER.timer); return; }
-          const p = getStepperTrajectory();
-          if(p && STEPPER.step < p.length - 1){
-            STEPPER.step++;
-            updateStepperUI();
-          } else {
-            STEPPER.playing = false;
-            playBtn.textContent = 'Play';
-            clearInterval(STEPPER.timer);
-          }
-        }, 450);
-      }
-    };
-  }
-  
-  updateStepperUI();
-}
-
-function machDrag(){
-  for(const id of ['#machL','#machR']){
-    const el = $(id); let last = null;
-    if(!el) continue;
-    el.addEventListener('pointerdown', e => {
-      last = [e.clientX, e.clientY]; MACH.spin = false;
-      el.setPointerCapture(e.pointerId); $('#machspin').textContent = 'Spin';
-    });
-    el.addEventListener('pointermove', e => {
-      if(!last) return;
-      MACH.yaw += (e.clientX - last[0]) * 0.008;
-      MACH.pitch = Math.max(-1.2, Math.min(1.2, MACH.pitch + (e.clientY - last[1]) * 0.008));
-      last = [e.clientX, e.clientY];
-    });
-    const up = () => { last = null; };
-    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
-  }
-}
-
-function machBoot(){
-  $('#machspin').onclick = () => { MACH.spin = !MACH.spin;
-    $('#machspin').textContent = MACH.spin ? 'Stop' : 'Spin'; };
-  $('#machpair').onclick = () => { MACH.right = null; renderMachPanel(); };
-  renderMachPanel(); machDrag(); stepperBoot();
-  MACH.raf = requestAnimationFrame(machTick);
-}
-
-async function boot(){
-  try{
-    renderHealth(await (await fetch('/api/health')).json());
-
-    $('#backend').onchange = explain;
-    // focus fires before the popup opens, so the next open is already correct
-    $('#backend').addEventListener('focus', refreshHealth);
-    // coming back to the tab after fixing something outside the browser
-    window.addEventListener('focus', refreshHealth);
-    // and a slow backstop for the case where neither of those happens
-    setInterval(refreshHealth, 15000);
-
-    // A view is not allowed to take the pipeline down with it. A fresh
-    // clone that has not run the reproducer says so here rather than throwing.
-    flowTick();
-
-    geoBoot().catch(() => {
-      $('#geo').innerHTML =
-        '<div class="geomissing">geometry unavailable &mdash; run '
-        + '<code>python run_all.py</code> to generate viz_results.json</div>';
-      $('#mach').remove();   // it reads the same file; do not leave two empty frames
-    });
-
-    SAMPLES = await (await fetch('/api/samples')).json();
-    $('#samples').innerHTML = SAMPLES.map((s,i) =>
-      `<button class="chip" data-i="${i}">${esc(s.name)}</button>`).join('');
-    $('#samples').onclick = e => {
-      const b = e.target.closest('button'); if(!b) return;
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
-      b.classList.add('on');
-      $('#text').value = SAMPLES[+b.dataset.i].text;
-      $('#text').dataset.name = SAMPLES[+b.dataset.i].name;
-    };
-    if(SAMPLES.length) document.querySelector('.chip').click();
-  }catch(e){
-    $('#out').innerHTML = `<div class="err">cannot reach the API: ${esc(e.message)}</div>`;
-  }
-}
-
-// drag a file straight onto the textarea
-const ta = $('#text');
-ta.addEventListener('dragover', e => { e.preventDefault(); ta.style.borderColor = 'var(--teal)'; });
-ta.addEventListener('dragleave', () => ta.style.borderColor = '');
-//: one loader for both ways in. Dropping a file always worked; nothing on
-//: screen said so, and an affordance nobody can see is not one — hence the
-//: button beside Analyse, which opens the same picker and lands in the same
-//: place. Reading happens in the browser: the file's text is posted like any
-//: pasted artifact, so there is no upload endpoint and nothing touches disk.
-function loadFile(f){
-  if(!f) return;
-  const r = new FileReader();
-  r.onload = () => {
-    ta.value = r.result;
-    ta.dataset.name = f.name;
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
-    $('#hint').textContent = `loaded ${f.name} (${(f.size/1024).toFixed(1)} kB)`;
-  };
-  r.onerror = () => { $('#out').innerHTML =
-    `<div class="err">could not read ${esc(f.name)}</div>`; };
-  r.readAsText(f);
-}
-
-ta.addEventListener('drop', e => {
-  e.preventDefault(); ta.style.borderColor = '';
-  loadFile(e.dataTransfer.files[0]);
-});
-
-$('#loadfile').onclick = () => $('#fileinput').click();
-$('#fileinput').onchange = e => { loadFile(e.target.files[0]); e.target.value = ''; };
-
-//: the request that produced what is on screen. An override has to re-analyse
-//: *the same artifact*, not whatever the textarea happens to hold by then.
-let LAST_REQ = null;
-
-async function analyse(req){
-  const btn = $('#run'); btn.disabled = true; btn.textContent = 'Analysing…';
-  try{
-    const res = await fetch('/api/analyse', {
-      method:'POST', headers:{'content-type':'application/json'},
-      body: JSON.stringify(req)
-    });
-    if(!res.ok){
-      // FastAPI's 422 detail is an array of objects, not a string — rendering it
-      // straight gives the user "[object Object]", which says nothing about
-      // what went wrong. Flatten anything that is not already text.
-      const d = (await res.json().catch(() => ({}))).detail;
-      const detail = !d ? res.statusText
-        : typeof d === 'string' ? d
-        : (Array.isArray(d) ? d : [d])
-            .map(x => x && x.msg ? `${(x.loc||[]).slice(1).join('.')}: ${x.msg}`
-                                 : JSON.stringify(x)).join('; ');
-      $('#out').innerHTML = `<div class="err">HTTP ${res.status} &mdash; ${esc(detail)}</div>`;
-    } else {
-      LAST_REQ = req;
-      const trace = await res.json();
-      draw(trace);
-      // the geometry below is about this run now, not about the shipped fixture
-      try{ adoptFlow(trace); }catch(e){ /* a view must never break the pipeline */ }
-      try{ if(VIZ) adoptTrace(trace); }catch(e){ /* a view must never break the pipeline */ }
-    }
-  }catch(e){
-    $('#out').innerHTML = `<div class="err">${esc(e.message)}</div>`;
-  }
-  btn.disabled = false; btn.textContent = 'Analyse';
-}
-
-$('#run').onclick = () => analyse({
-  text: ta.value,
-  name: ta.dataset.name || 'pasted-artifact.log',
-  backend: $('#backend').value });
-
-//: The report the engineers asked for: what happened, what it means, and --
-//: when the verdict is a warning rather than a fact -- the control that lets
-//: them take the risk themselves. A block never renders one.
-function reportBlock(r){
-  if(!r) return '';
-  const cls = r.severity === 'ok' ? 'ok' : r.severity === 'warn' ? 'warned' : 'blocked';
-  const head = r.severity === 'ok' ? 'report'
-             : r.severity === 'warn' ? 'warning &mdash; the decision is yours'
-             : 'blocked &mdash; nothing here for you to decide';
-  let html = `<div class="report ${cls}">
-    <div class="rhead">${head}${r.override_applied ? ' &middot; override applied' : ''}</div>
-    <div class="rreason">${esc(r.reason)}</div>
-    <div class="rcons">${esc(r.consequence)}.</div>`;
-  if(r.override_available){
-    const who = localStorage.getItem('ds.operator') || '';
-    html += `<div class="ovr">
-      <div class="ovrhint">Accepting this warning is recorded against your name.</div>
-      <input id="op" placeholder="your name" value="${esc(who)}">
-      <input id="basis" placeholder="why you are accepting it">
-      <button id="override-go" class="ovrbtn">Warm-start anyway</button>
-    </div>`;
-  }
-  return html + '</div>';
-}
-
-function auditBlock(t){
-  if(!t.audit || !t.audit.length) return '';
-  return `<div class="audit"><div class="ahead">audit trail</div>` +
-    t.audit.map(a => `<div class="arow"><span class="at">${esc(a.at)}</span> ` +
-      `${esc(a.action)} by <b>${esc(a.operator || 'unattributed')}</b> ` +
-      `[${esc(a.rule || '-')}] &mdash; ${esc(a.basis || 'no basis stated')}</div>`).join('') +
-    `</div>`;
-}
-
-function draw(t){
-  let html = '';
-
-  // headline: the number, when there is one.
-  //
-  // Gated on the warm arm having *run*, not on the cold-vs-warm agreement being
-  // computable. Requiring `agreement` meant the metric block disappeared
-  // entirely whenever the flat start failed -- which is to say, on precisely the
-  // cases where the warm start does the most good. Those runs fell through to
-  // the verdict bar and read "warm_started - cold start, 7 iterations".
-  const s = t.solve;
-  if(s && s.warm_iterations !== undefined){
-    //: a baseline that did not converge shows why instead of its iteration
-    //: count. The count is real, but it is where that arm gave up, and setting
-    //: it in the same large numeral beside a converged one invites the room to
-    //: read it as a finish line.
-    const arm = (key, cls, label) => {
-      const n = s[`${key}_iterations`], ok = s[`${key}_converged`];
-      if(n === undefined) return '';
-      return `<div class="metric"><div class="k">${label}</div>` +
-        (ok === false
-          ? `<div class="v" style="color:var(--refuse);font-size:14px"
-               title="${esc(s[`${key}_status`] || '')}">did not converge</div>`
-          : `<div class="v ${cls}">${n}</div>`) + `</div>`;
-    };
-    //: the nominal guess sits between the two on purpose: it is the baseline
-    //: the warm start actually has to beat, not the flat start
-    const agree = s.agreement !== undefined
-      ? `<div class="v same">same answer as ${esc(s.agreement_against || 'baseline')}
-           to ${s.agreement.toExponential(1)}</div>`
-      // no converged baseline means no second opinion, and the panel says so
-      // rather than leaving a gap that reads as agreement
-      : `<div class="v same" style="color:var(--warn)">no converged baseline</div>`;
-    html += `<div class="headline">
-      ${arm('cold', 'cold', 'cold start')}
-      ${arm('nominal', 'nominal', 'nominal guess')}
-      <div class="arrow">&rarr;</div>
-      ${arm('warm', 'warm', 'warm start')}
-      <div class="metric"><div class="k">Newton iterations</div>
-        ${agree}</div>
-    </div>`;
-  } else {
-    const sev = (t.report || {}).severity;
-    const cls = t.outcome.startsWith('warm_started') ? 'ok'
-              : sev === 'warn' ? 'warned' : 'blocked';
-    html += `<div class="verdictbar ${cls}">${esc(t.outcome)} &mdash; ${esc(t.summary||'')}</div>`;
-  }
-
-  html += reportBlock(t.report);
-
-  // the pipeline stages
-  html += '<div id="stages">';
-  t.stages.forEach((st, i) => {
-    const glyph = {ok:'&check;', warned:'!', blocked:'&times;'}[st.state] || '&middot;';
-    let extra = '';
-    const sug = st.detail && st.detail.suggestion;
-    if(sug){
-      const vals = Object.entries(sug.values)
-        .map(([k,v]) => `${k} = <b>${fmt(v)}</b>`).join(', ');
-      extra += `<div class="sugg">nearest on the ${sug.on_fields} parameters it did read:
-                ${esc(sug.case_id)} (${sug.distance.toFixed(2)} away) &mdash; ${vals}</div>`;
-    }
-    if(st.detail && st.detail.note) extra += `<div class="note">${esc(st.detail.note)}</div>`;
-    if(st.detail && st.detail.overridden && st.detail.basis)
-      extra += `<div class="sugg">basis: ${esc(st.detail.basis)}</div>`;
-    // Context, deliberately not a verdict. Proximity to a failed run predicts
-    // whether a *case* is hard (AUC 0.77) and barely predicts whether a
-    // *transfer* is legitimate (0.63), so it is stated as two distances and
-    // nothing is concluded from it on screen.
-    // What Layer 1 read out of an artifact from another domain. Shown because
-    // the refusal is only convincing if you can see that the file *was* read:
-    // "I could not parse your file" and "this is a 3D structural deck, 6 nodes,
-    // linear static, and none of its fields exist in this schema" are different
-    // sentences, and only one of them tells an engineer what to do next.
-    const fg = st.detail && st.detail.foreign;
-    if(fg){
-      extra += '<div class="foreign">' + Object.entries(fg).map(([k, val]) =>
-        `<div><span class="fk">${esc(k)}</span>${esc(val)}</div>`).join('') + '</div>';
-    }
-    const nf = st.detail && st.detail.nearest_failure;
-    if(nf){
-      extra += `<div class="sugg">indexed on <b>${st.detail.indexed_on}</b> parameters &middot; ` +
-        `nearest of ${nf.archive_failures} failed runs: ${esc(nf.case_id)} ` +
-        `(${nf.distance.toFixed(2)} away, ${esc(nf.status)})</div>`;
-    }
-    html += `<div class="stage ${st.state}" style="animation-delay:${i*90}ms">
-       <div class="dot">${glyph}</div>
-       <div><div class="name">${esc(st.title)}</div><div class="sub">${esc(st.subtitle)}</div></div>
-       <div><div class="msg">${esc(st.headline)}</div>${extra}</div>
-     </div>`;
-  });
-  html += '</div>';
-
-  // the Case Card
-  html += `<table><thead><tr><th>parameter</th><th style="text-align:right">value</th>
-           <th>unit</th><th>read from</th></tr></thead><tbody>`;
-  t.fields.forEach(f => {
-    html += f.value === null || f.value === undefined
-      ? `<tr><td>${esc(f.name)}</td><td class="miss" colspan="3">NOT READ FROM ARTIFACT</td></tr>`
-      : `<tr><td>${esc(f.name)}</td><td class="num">${fmt(f.value)}</td>
-           <td class="unit">${esc(f.unit)}</td><td class="raw">${esc(f.raw||'')}</td></tr>`;
-  });
-  html += '</tbody></table>';
-
-  // converged state
-  if(t.solution){
-    html += `<table><thead><tr><th>converged state</th>
-             <th style="text-align:right">value</th><th>unit</th></tr></thead><tbody>`;
-    t.solution.forEach(x => {
-      html += `<tr><td>${esc(x.name)}</td><td class="num">${x.value.toFixed(2)}</td>
-               <td class="unit">${esc(x.unit)}</td></tr>`;
-    });
-    html += '</tbody></table>';
-  }
-
-  html += auditBlock(t);
-
-  $('#out').innerHTML = html;
-
-  // wired after the markup lands, so the handler always points at the report
-  // currently on screen rather than a stale one
-  const go = $('#override-go');
-  if(go) go.onclick = () => {
-    const operator = ($('#op').value || '').trim() || 'unattributed';
-    const basis = ($('#basis').value || '').trim();
-    localStorage.setItem('ds.operator', operator);
-    analyse(Object.assign({}, LAST_REQ, {override:true, operator, basis}));
-  };
-}
-
-boot();
-</script>
-</body>
+    </section>
+
+    <!-- three.js is vendored, not fetched: this page has to come up whole on a
+         dead network, which the "no CDN" note in app.js has always claimed.
+         The ES module build rather than build/three.min.js, which r160 prints a
+         deprecation warning for on every load and which r161 removes outright.
+         The shim hands it to app.js as a global so that file stays a plain
+         script; an inline module and a deferred classic script run in document
+         order, so THREE is in place before app.js is evaluated. -->
+    <script type="module">
+      import * as THREE from "/static/vendor/three.module.min.js";
+      window.THREE = THREE;
+    </script>
+    <script defer src="/static/app.js"></script>
+  </body>
 </html>

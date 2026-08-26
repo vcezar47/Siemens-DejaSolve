@@ -14,6 +14,7 @@ Populate the table first with sync_archive_to_aurora.py.
 
 from __future__ import annotations
 
+import functools
 import json
 import os
 
@@ -25,11 +26,28 @@ import model
 import verifier
 
 
+@functools.lru_cache(maxsize=1)
+def _password(secret_arn: str) -> str:
+    """The Aurora login, fetched from Secrets Manager once per process.
+
+    `_connect()`'s "no pool, this demo doesn't need it" decision is about the
+    database *connection* -- Aurora's own request volume for a ten-minute
+    demo. It says nothing about a Secrets Manager API call, and every
+    `nearest()` was repeating this one regardless: a fresh `get_secret_value`
+    round trip before every single analyse, for a secret that does not rotate
+    mid-demo. `lru_cache` rather than a bare module global so the cache is
+    invalidated the normal way (`_password.cache_clear()`) if this process
+    ever needs to pick up a rotated secret without restarting.
+    """
+    import boto3
+    secret = boto3.client("secretsmanager").get_secret_value(SecretId=secret_arn)
+    return json.loads(secret["SecretString"])["password"]
+
+
 def _connect():
     """A fresh connection per call, not a pooled one -- this backend serves a
     ten-minute demo's request volume, not production traffic, and a pool would
     be complexity this doesn't need yet."""
-    import boto3
     import psycopg2
 
     endpoint = os.environ["AURORA_ENDPOINT"]
@@ -37,11 +55,9 @@ def _connect():
     user = os.environ.get("AURORA_DB_USER", "dejasolve_admin")
     dbname = os.environ.get("AURORA_DB_NAME", "dejasolve")
 
-    secret = boto3.client("secretsmanager").get_secret_value(SecretId=secret_arn)
-    password = json.loads(secret["SecretString"])["password"]
-
     return psycopg2.connect(host=endpoint, port=5432, dbname=dbname,
-                             user=user, password=password, sslmode="require")
+                             user=user, password=_password(secret_arn),
+                             sslmode="require")
 
 
 def _vector_literal(params: dict) -> str:
@@ -94,6 +110,11 @@ class AuroraArchive(dejasolve.Archive):
             else np.asarray(r["sensitivity"], dtype=float) for r in self.records]
         self.verifier = verifier.Verifier(self.records)
         self.domain = casecard.DOMAIN
+        #: case_id -> position in `self.records`, built once rather than
+        #: linear-scanned per `nearest()` call -- see `nearest()` for why a
+        #: bare `next()` over `self.records` was also the wrong tool here,
+        #: not just the slow one.
+        self._index_by_id = {r["case_id"]: i for i, r in enumerate(self.records)}
 
     def nearest(self, params: dict) -> tuple[int, float]:
         """The one query that actually goes through pgvector rather than numpy.
@@ -117,5 +138,18 @@ class AuroraArchive(dejasolve.Archive):
                 case_id, distance = cur.fetchone()
         finally:
             conn.close()
-        j = next(i for i, r in enumerate(self.records) if r["case_id"] == case_id)
+        # `self.records` is a snapshot taken at __init__; pgvector queries the
+        # live table. A row inserted into `cases` after this process started
+        # is a case_id this snapshot does not contain, and a bare
+        # `next(i for ... )` over `self.records` raised an unhandled
+        # StopIteration for it -- a bare, unhelpful exception rather than the
+        # RuntimeError every other refusal in this pipeline is. `_index_by_id`
+        # (built once in __init__) turns the lookup into a dict `.get()`, so
+        # a miss is a clear, actionable message instead of a crash.
+        j = self._index_by_id.get(case_id)
+        if j is None:
+            raise RuntimeError(
+                f"pgvector returned {case_id!r} as the nearest case, but this "
+                f"process's snapshot does not have it -- the archive changed "
+                f"since this service started; restart it to pick up new rows")
         return j, float(distance)

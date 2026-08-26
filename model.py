@@ -87,6 +87,39 @@ HARDWARE = {
     "b_visc_a": B_VISC, "b_visc_b": B_VISC,
 }
 
+#: How far each promoted constant plausibly varies across real hardware of the
+#: same family, as (lo, hi) multipliers on its default. This used to be a
+#: private copy inside `wide_sweep.py`, which needed it to generate synthetic
+#: machine variants ("kept modest on purpose... a range wide enough to stop
+#: cases converging would measure the sampler rather than the gate" -- that
+#: reasoning is unchanged and still lives there). It moved here, next to the
+#: defaults it is a spread *around*, because `HARDWARE_BOUNDS` below needs the
+#: same judgement for a second purpose -- catching a misread unit on ingest --
+#: and a second, silently-driftable copy of the same seventeen numbers was the
+#: wrong way to share it. `wide_sweep.py` now imports this one.
+HARDWARE_SPREAD = {
+    "cd": (0.85, 1.15),
+    "R_leak": (0.7, 1.4),
+    "A_relief_max": (0.8, 1.25),
+    "relief_band": (0.7, 1.5),
+    "D_mot_a": (0.75, 1.3), "D_mot_b": (0.75, 1.3),
+    "A_ret_a": (0.7, 1.4), "A_ret_b": (0.7, 1.4),
+    "leak_mot_a": (0.5, 1.8), "leak_mot_b": (0.5, 1.8),
+    "t_coul_a": (0.6, 1.5), "t_coul_b": (0.6, 1.5),
+    "t_stat_a": (0.8, 1.4), "t_stat_b": (0.8, 1.4),
+    "w_strib_a": (0.7, 1.4), "w_strib_b": (0.7, 1.4),
+    "b_visc_a": (0.5, 1.8), "b_visc_b": (0.5, 1.8),
+}
+
+#: (lo, hi) for each promoted constant, in absolute units -- `HARDWARE_SPREAD`
+#: applied to `HARDWARE`'s defaults. This is `PARAM_BOUNDS`'s counterpart for
+#: the 18 hardware constants: `CaseCard.validate()` checks a stated value
+#: against it with the same "orders of magnitude outside this range" slack it
+#: already applies to the seven swept parameters, so a misread unit on one of
+#: these eighteen gets caught the same way a misread `Q_nom` does.
+HARDWARE_BOUNDS = {k: (HARDWARE[k] * lo, HARDWARE[k] * hi)
+                   for k, (lo, hi) in HARDWARE_SPREAD.items()}
+
 
 def hardware(p: dict) -> dict:
     """Resolve every circuit constant for this case: stated, or the default.
@@ -109,15 +142,22 @@ def shaft_hw(h: dict, s: str) -> dict:
             "b_visc": h[f"b_visc_{s}"]}
 
 
-def motor_constants(p: dict) -> tuple[float, float]:
-    """Torque and displacement constants for this case's motor.
+def motor_constants(p: dict, shaft: str | None = None) -> tuple[float, float]:
+    """Torque and displacement constants for a case's motor.
 
-    Displacement is hardware, so it normally comes from the module constant.
-    A case may override it with ``D_mot`` to describe a circuit built around a
-    different motor — which is how the fold variant in ``fold.py`` is built
-    without disturbing the base circuit or anything measured on it.
+    ``shaft=None`` (the default) reads the ``D_mot`` shorthand -- both branches
+    built as one motor -- which is exactly what it did before this took a
+    `shaft` argument, so `fold.py`'s use of it (a variant circuit built
+    entirely around the shorthand) is untouched.
+
+    ``shaft='a'`` or ``'b'`` instead resolves that branch's own displacement
+    through :func:`hardware`, which honours an explicit ``D_mot_a`` /
+    ``D_mot_b`` ahead of the ``D_mot`` shorthand ahead of the module default --
+    for a caller that needs the two branches to be able to disagree, which the
+    shorthand alone cannot express since the promotion.
     """
-    d = p.get("D_mot", D_MOT)
+    d = (p.get("D_mot", D_MOT) if shaft is None
+        else hardware(p)[f"D_mot_{shaft}"])
     return d / (20.0 * np.pi), d / 1000.0
 
 #: the swept case setup, in a fixed order — this is the retrieval feature vector
@@ -792,11 +832,17 @@ def stability(x, p: dict) -> dict:
     }
 
 
-def shaft_regime(w: float) -> str:
-    """Which part of the friction curve a shaft has settled on."""
+def shaft_regime(w: float, w_strib: float = W_STRIB) -> str:
+    """Which part of the friction curve a shaft has settled on.
+
+    `w_strib` defaults to the module constant so every existing caller keeps
+    working untouched, but it is a per-branch hardware constant since the
+    promotion (`w_strib_a` / `w_strib_b`) -- a case that states its own and a
+    caller that does not pass it here gets the wrong curve classified.
+    """
     if abs(w) < 2.0 * W_REG:
         return "stuck"
-    if abs(w) < W_STRIB:
+    if abs(w) < w_strib:
         return "stribeck"      # the negative-slope branch
     return "viscous"
 
@@ -860,15 +906,27 @@ def regime(x, p: dict) -> dict:
     successful simulation' the archive exists to keep. Phase 2's verifier gates
     transfer on it: two cases with nearby parameters but different regimes are
     not safe to warm-start from each other.
+
+    Resolves this case's own hardware (`hardware(p)` / `shaft_hw`) rather than
+    the module defaults, the same way `flows()` already does. It didn't used
+    to: this function called `relief_opening(p1, p["p_crack"])` with the
+    default band and `orifice_gain(A_RELIEF_MAX, p["rho"])` with the default
+    discharge coefficient, and `shaft_regime` against the global `W_STRIB` --
+    so a case stating its own `relief_band`, `A_relief_max`, `cd` or
+    `w_strib_a`/`w_strib_b` got a regime computed for different hardware than
+    it actually has. That regime is what the archive records and what gate 1
+    compares against, so the mismatch was silent everywhere it mattered.
     """
     p1 = float(x[0])
-    op = relief_opening(p1, p["p_crack"])
-    q_rel = orifice_gain(A_RELIEF_MAX, p["rho"]) * op * f_dp(p1 - P_TANK)
+    h = hardware(p)
+    ha, hb = shaft_hw(h, "a"), shaft_hw(h, "b")
+    op = relief_opening(p1, p["p_crack"], h["relief_band"])
+    q_rel = orifice_gain(h["A_relief_max"], p["rho"], h["cd"]) * op * f_dp(p1 - P_TANK)
     return {
         "relief_open": bool(op > 1e-9),
         "relief_fraction": float(op),
         "relief_flow_share": float(q_rel / p["Q_nom"]) if p["Q_nom"] else 0.0,
         "p_manifold": p1,
-        "shaft_a": shaft_regime(float(x[3])),
-        "shaft_b": shaft_regime(float(x[6])),
+        "shaft_a": shaft_regime(float(x[3]), ha["w_strib"]),
+        "shaft_b": shaft_regime(float(x[6]), hb["w_strib"]),
     }

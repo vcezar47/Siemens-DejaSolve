@@ -4,6 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Déjà Solve</title>
+    <!-- SVG first, so a browser that supports it scales the real geometry; the
+    PNG is the fallback for those that do not (older Safari, older Edge) rather
+    than a second source of truth -- both come from the same path data. -->
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/static/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.png" />
     <link rel="stylesheet" href="/static/app.css" />
   </head>
   <body>
@@ -15,6 +21,60 @@
         </div>
       </div>
       <div class="badges" id="badges"></div>
+      <!-- The mark. Pupil then three receding circles: the matched case and its
+      nearest neighbours, ranked by distance. Lashes and eye are separate groups
+      because only the eye blinks -- the lashes hold still, which is how a blink
+      reads in flat illustration. Inline rather than an <img> so it inherits
+      `currentColor` and so the eye group is reachable from CSS. -->
+      <svg class="mark" id="mark" viewBox="0 0 120 120" aria-hidden="true">
+        <defs>
+          <!-- The brand gradient, flowing. `spreadMethod="repeat"` tiles it and
+          the transform slides it one full width per cycle; the ramp starts and
+          ends on the same stop, so the loop has no seam. Stop colours come from
+          the CSS variables (set in app.css) rather than being written here, so
+          the mark cannot drift from the palette. -->
+          <linearGradient
+            id="dsgrad"
+            gradientUnits="userSpaceOnUse"
+            x1="0"
+            y1="0"
+            x2="120"
+            y2="0"
+            spreadMethod="repeat"
+          >
+            <stop class="s1" offset="0" />
+            <stop class="s2" offset="0.25" />
+            <stop class="s3" offset="0.5" />
+            <stop class="s2" offset="0.75" />
+            <stop class="s1" offset="1" />
+            <animateTransform
+              attributeName="gradientTransform"
+              type="translate"
+              from="0 0"
+              to="120 0"
+              dur="7s"
+              repeatCount="indefinite"
+            />
+          </linearGradient>
+        </defs>
+        <g
+          stroke="url(#dsgrad) var(--teal)"
+          stroke-width="6"
+          stroke-linecap="round"
+        >
+          <line x1="32.08" y1="49.04" x2="12.66" y2="30.28" />
+          <line x1="46.58" y1="44.39" x2="37.40" y2="22.76" />
+          <line x1="60.00" y1="43.00" x2="60.00" y2="23.50" />
+          <line x1="73.42" y1="44.39" x2="79.47" y2="30.12" />
+          <line x1="87.92" y1="49.04" x2="96.19" y2="41.05" />
+        </g>
+        <g class="mark-eye" fill="url(#dsgrad) var(--teal)">
+          <path
+            fill-rule="evenodd"
+            d="M6.0,76.0 A69.077,69.077 0 0,1 114.0,76.0 A69.077,69.077 0 0,1 6.0,76.0 Z M45.50,76.00 A14.5,14.5 0 1,0 74.50,76.00 A14.5,14.5 0 1,0 45.50,76.00 Z M79.50,76.00 A6.0,6.0 0 1,0 91.50,76.00 A6.0,6.0 0 1,0 79.50,76.00 Z M95.00,76.00 A4.0,4.0 0 1,0 103.00,76.00 A4.0,4.0 0 1,0 95.00,76.00 Z M105.40,76.00 A2.6,2.6 0 1,0 110.60,76.00 A2.6,2.6 0 1,0 105.40,76.00 Z M61.00,70.50 A4.5,4.5 0 1,0 70.00,70.50 A4.5,4.5 0 1,0 61.00,70.50 Z"
+          />
+        </g>
+      </svg>
     </header>
 
     <main>

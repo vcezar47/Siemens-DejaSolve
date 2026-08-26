@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import re
 from datetime import datetime, timezone
@@ -179,6 +180,49 @@ def ingest_rules(text: str, artifact: str, case_id: str) -> CaseCard:
 #: unreachable from any artifact regardless of which backend read it.
 EXTRACTABLE_FIELDS = model.PARAM_NAMES + tuple(model.HARDWARE.keys())
 
+#: the first number anywhere in a value the model wrote as prose -- an appended
+#: unit ("1.6e-05 Nm/(rev/min)^2") or a hedge it copied over from the artifact
+#: ("roughly 2 mm2", "call it 890", which the prompt explicitly treats as stated
+#: values). Not anchored at the start, because those hedges lead. Being liberal
+#: here is safe: a qualitative answer with no digits at all ("the standard fan
+#: curves") still yields None, and the guard against a number mined out of prose
+#: is `verify_provenance` -- which checks the value against physical bounds and
+#: against the artifact text -- not this regex.
+_ANY_NUMBER = re.compile(r"[-+]?[.,]?\d[\d.,]*(?:[eE][-+]?\d+)?")
+
+
+def _coerce_number(value) -> float | None:
+    """Read a model's answer for one field as a number, or None if it isn't one.
+
+    Both model backends need this and neither can assume the schema's type was
+    honoured: the hosted model may answer null or a string where the schema says
+    number, and the local backend now *asks* for strings (see
+    `OLLAMA_EXTRACTION_SCHEMA`). Routing through `casecard.parse_number` rather
+    than bare `float()` also means the model gets the same decimal-comma
+    tolerance the deterministic parser has always had -- "2,4e-05" is a real way
+    a Romanian-language artifact writes a number, and the prompt asks the model
+    to quote its source, so a comma can reach here verbatim.
+    """
+    if value is None or isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return _finite(float(value))
+    text = str(value)
+    number = parse_number(text)
+    if number is not None:
+        return _finite(number)
+    m = _ANY_NUMBER.search(text)
+    return _finite(parse_number(m.group().rstrip(".,"))) if m else None
+
+
+def _finite(number: float | None) -> float | None:
+    """None for nan/inf. A hole the string-valued schema opened: JSON numbers
+    cannot be NaN, so `float(value)` never produced one while the schema said
+    number -- but `float("NaN")` does, and the prompt's own rule is that a
+    placeholder ("####", "NaN", "---") is a *missing* value, not a number."""
+    return number if number is not None and math.isfinite(number) else None
+
+
 EXTRACTION_SCHEMA = {
     "type": "object",
     "properties": {
@@ -260,6 +304,74 @@ hardware constant only when it is unambiguously that constant, never as a \
 guess at what a typical machine of this kind would have.
 - `provenance` must quote the artifact verbatim, not paraphrase it.
 - A corrupted or placeholder value (####, NaN, ---) is missing, not zero."""
+
+
+def _repair_from_citation(field: str, quote: str) -> float | None:
+    """Re-read one field's value from the model's own verbatim citation.
+
+    **For a value the decoder corrupted, not one the model got wrong.** Ollama
+    compiles the JSON schema to a grammar, and that grammar applies JSON's
+    no-leading-zero rule to a number's *exponent*: having emitted `1.6e-0` there
+    is no reachable second digit, so `1.6e-05` cannot be produced at all. The
+    decoder truncates it to `1.6e-0` -- 1.6, five orders of magnitude out --
+    and `verify_provenance` then correctly rejects it as physically impossible.
+    The model had read the value fine and cited it verbatim; the field still came
+    back as "not stated in the artifact". Measured on qwen2.5:7b against
+    `logs/run-bigpump.log` and `logs/run-legacy.log`, whose `c_load_a`/`c_load_b`
+    are the only fields written with a zero-padded exponent -- and the only ones
+    ever lost this way.
+
+    The citation is the repair, because the prompt already requires it to be
+    verbatim and `verify_provenance` already checks that it is. So the fix is to
+    parse it with the *deterministic* parser -- the same `_LINE`, `parse_number`
+    and `normalise_unit` the rules backend uses, including its unit conversion,
+    since a citation quotes the artifact's units rather than canonical ones.
+    Nothing here trusts the model beyond the quote it is held to anyway.
+
+    Two rejected alternatives, both measured, recorded so neither is retried:
+
+    * Typing the value `string` in the schema sidesteps the number grammar and
+      does fix the truncation -- but it roughly triples output length, because
+      the model re-emits the unit inside every value ("8e-6 Nm/(rev/min)^2") and
+      then over-runs on `provenance`. On `logs/note-ro.txt` that turned a clean
+      62-second call (415 tokens, `done_reason=stop`) into a 153-second one that
+      hit a 1024-token ceiling still generating and returned unparseable JSON.
+      A wrong value became a hung request; that is not a trade worth making.
+    * A `["number", "string"]` union does nothing at all: the grammar admits
+      both branches, and the model still picks `number` and still truncates.
+    """
+    m = _CITED_VALUE.search(quote)
+    if not m:
+        return None
+    value = parse_number(m.group("value"))
+    if value is None:
+        return None
+    return normalise_unit(value, m.group("unit") or None)[0]
+
+
+#: the trailing `value unit` of a citation. Deliberately *not* `_LINE`: the model
+#: does not reliably quote a whole line. Against `logs/run-tidy.log` qwen2.5:7b
+#: cited "= 62.4 L/min" -- the fragment after the separator, with no key -- so a
+#: `_LINE`-based repair silently never fired and the truncated `c_load` values
+#: were dropped exactly as if there had been no repair at all. Anchored at the
+#: end so it reads the value, not some earlier number in a prose citation.
+_CITED_VALUE = re.compile(
+    r"(?P<value>[-+]?[\d.,]+(?:[eE][-+]?\d+)?)\s*"
+    r"(?P<unit>[A-Za-zµ°^/³²\d]*(?:/[A-Za-z0-9^()/]+)?)\s*$")
+
+
+def _same_significand(a: float, b: float) -> bool:
+    """Whether two values differ only in their exponent (1.42 vs 1.42e-05).
+
+    The signature of the decoder truncation this repair exists to undo, and the
+    guard that keeps the repair from doing anything else. Without it, a citation
+    that quotes a whole prose sentence ("ventilul A deschis la 4,5 mm2 iar
+    ventilul B la 9 mm2") could hand back the wrong number entirely -- the last
+    one in the sentence rather than the field's own. Requiring the digits to
+    match means a repair can only ever restore a lost exponent.
+    """
+    digits = lambda x: re.sub(r"[^0-9]", "", f"{abs(x):.10e}".split("e")[0]).rstrip("0")
+    return digits(a) == digits(b)
 
 
 def foreign_card(text: str, artifact: str, case_id: str,
@@ -346,12 +458,11 @@ def ingest_llm(text: str, artifact: str, case_id: str,
         # widened from `model.PARAM_NAMES` -- the schema now offers all 25
         # extractable fields, and a model that used one of the 18 optional
         # hardware constants should not have it silently discarded here.
-        if key not in EXTRACTABLE_FIELDS or value is None:
+        if key not in EXTRACTABLE_FIELDS:
             continue
-        try:
-            params[key] = float(value)
-        except (TypeError, ValueError):
-            continue
+        number = _coerce_number(value)
+        if number is not None:
+            params[key] = number
     return CaseCard(
         case_id=case_id,
         source={"artifact": artifact, "ingested_by": f"llm:{MODEL_ID}",
@@ -421,6 +532,8 @@ def ingest_ollama(text: str, artifact: str, case_id: str,
         "stream": False,
         # Ollama >= 0.5 constrains generation to a JSON schema, the same schema
         # the Claude backend uses -- so both backends are held to one contract.
+        # Its number grammar cannot emit a zero-padded exponent; that is repaired
+        # from the citation afterwards, see `_repair_from_citation`.
         "format": EXTRACTION_SCHEMA,
         "options": {"temperature": 0},
         "messages": [
@@ -453,19 +566,19 @@ def ingest_ollama(text: str, artifact: str, case_id: str,
             f"{name} did not return valid JSON ({exc}); "
             f"first 200 chars: {content[:200]!r}") from exc
 
-    # A local model may emit nulls or strings where the schema says number.
-    # Coerce what is coercible and drop the rest -- a field we cannot read as a
-    # number is missing, which is the honest outcome, not zero.
+    # Every value arrives as a string here by design (`OLLAMA_EXTRACTION_SCHEMA`),
+    # and a local model may still answer null or leave a unit attached. Coerce
+    # what is coercible and drop the rest -- a field we cannot read as a number
+    # is missing, which is the honest outcome, not zero.
     params: dict[str, float] = {}
     for key, value in (data.get("params") or {}).items():
         # widened from `model.PARAM_NAMES` -- see the matching comment in
         # `ingest_llm`.
-        if key not in EXTRACTABLE_FIELDS or value is None:
+        if key not in EXTRACTABLE_FIELDS:
             continue
-        try:
-            params[key] = float(value)
-        except (TypeError, ValueError):
-            continue
+        number = _coerce_number(value)
+        if number is not None:
+            params[key] = number
 
     return CaseCard(
         case_id=case_id,
@@ -517,6 +630,15 @@ def verify_provenance(card: CaseCard, text: str) -> list[str]:
     hay = norm(text)
     hay_digits = digits(text)
     dropped = []
+    repaired = []
+    # One message per reject path, not one message for all three. The bounds
+    # check below and the citation checks fail for unrelated reasons, and until
+    # this split they both reported "the cited source text is not in the
+    # artifact" -- which sent a real investigation (a decoder mangling
+    # `1.6e-05` into `1.6`, see `_string_valued`) looking at the citation, which
+    # was verbatim and correct. A validator that names the wrong cause is worse
+    # than one that names none.
+    why: dict[str, str] = {}
     for field, value in list(card.params.items()):
         quote = card.provenance.get(field, "")
 
@@ -526,15 +648,37 @@ def verify_provenance(card: CaseCard, text: str) -> list[str]:
         #    `PARAM_BOUNDS` has never covered -- falls back to
         #    `HARDWARE_BOUNDS`, the counterpart N3 added for exactly this.
         lo, hi = model.PARAM_BOUNDS.get(field) or model.HARDWARE_BOUNDS[field]
-        if not (lo / 1000 <= abs(value) <= hi * 1000):
-            dropped.append(field)
-            card.params.pop(field, None)
-            card.provenance.pop(field, None)
-            continue
+        plausible = lambda v: lo / 1000 <= abs(v) <= hi * 1000
+        if not plausible(value):
+            # Before rejecting: an implausible value whose citation is verbatim
+            # and *does* parse to a plausible one is a decoder artifact, not an
+            # invention -- the model read the artifact correctly and the grammar
+            # mangled the number on the way out. Re-read the citation with the
+            # deterministic parser. Narrow on purpose: this only ever runs on a
+            # value already headed for rejection, so a healthy extraction can
+            # never be rewritten by it.
+            fixed = _repair_from_citation(field, quote) if quote else None
+            if (fixed is not None and plausible(fixed) and norm(quote) in hay
+                    and _same_significand(value, fixed)):
+                card.params[field] = value = fixed
+                repaired.append(field)
+            else:
+                dropped.append(field)
+                why[field] = (f"{value:g} is far outside any physical range for "
+                              f"this parameter ({lo:g} to {hi:g})")
+                card.params.pop(field, None)
+                card.provenance.pop(field, None)
+                continue
 
         # 2. A citation supports a *number* only if it contains one. Quoting a
         #    qualitative phrase is the model showing it inferred rather than read.
-        if quote and norm(quote) in hay and any(c.isdigit() for c in quote):
+        if not quote:
+            reason = "no source was cited"
+        elif norm(quote) not in hay:
+            reason = "the cited source text is not in the artifact"
+        elif not any(c.isdigit() for c in quote):
+            reason = "the citation states no number"
+        else:
             continue
 
         # 3. No citation is not proof of invention -- the model sometimes reads
@@ -548,13 +692,17 @@ def verify_provenance(card: CaseCard, text: str) -> list[str]:
             continue
 
         dropped.append(field)
+        why[field] = f"{reason}, and the value's digits are not in the artifact"
         card.params.pop(field, None)
         card.provenance.pop(field, None)
 
+    if repaired:
+        card.notes = (f"{card.notes} [recovered {', '.join(repaired)} from the "
+                      f"cited source: the decoder truncated the exponent]").strip()
     if dropped:
         card.missing = [p for p in model.PARAM_NAMES if p not in card.params]
-        card.notes = (f"{card.notes} [dropped {', '.join(dropped)}: the cited "
-                      f"source text is not in the artifact]").strip()
+        detail = "; ".join(f"{f} -- {why[f]}" for f in dropped)
+        card.notes = f"{card.notes} [dropped {detail}]".strip()
     return dropped
 
 
@@ -667,10 +815,10 @@ def ingest_hybrid(text: str, name: str, case_id: str,
         else f"rules (+{which}, nothing added)")
     card.source["filled_by_model"] = filled
     # Only when the model actually contributed something -- previously
-    # unconditional, so a model note about fields it dropped (verify_provenance's
-    # "[dropped ...]: the cited source text is not in the artifact]") could land
-    # on the card even when none of those fields, or anything else the model
-    # found, ended up in `card.params` at all. A note describing a contribution
+    # unconditional, so a model note about fields it dropped
+    # (verify_provenance's "[dropped ...]") could land on the card even when
+    # none of those fields, or anything else the model found, ended up in
+    # `card.params` at all. A note describing a contribution
     # that was not made is not context, it's noise attributed to the wrong card.
     if model_side.notes and filled:
         card.notes = model_side.notes

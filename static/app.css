@@ -166,6 +166,66 @@ header::after {
 .hero {
   position: relative;
 }
+/* The mark sits in the header's own right-hand glow, absolutely placed so it
+cannot disturb the hero/badges column that was already here.
+
+This is the brand gradient's fourth use, past the three the palette note above
+budgets for -- a deliberate exception, not an oversight. It is the mark, it sits
+alone on its side of the header, and flat `--teal` left it reading as a dark
+sticker against a lit header. `brightness()` lifts it rather than a second set
+of hex values: one palette, no drift. */
+.mark {
+  position: absolute;
+  right: clamp(18px, 4.5vw, 60px);
+  top: 50%;
+  translate: 0 -50%;
+  width: clamp(104px, 14vw, 176px);
+  height: auto;
+  color: var(--teal); /* fallback for the url() paints */
+  filter: brightness(1.18) saturate(1.04);
+  pointer-events: none;
+}
+.mark .s1 {
+  stop-color: var(--grad-1);
+}
+.mark .s2 {
+  stop-color: var(--grad-2);
+}
+.mark .s3 {
+  stop-color: var(--grad-3);
+}
+/* `view-box` so the origin is in viewBox units -- 60,76 is the eye's own
+centre, so the lid closes onto its centre line rather than onto the middle of
+the sprite (the lashes sit above it, which would otherwise drag the pivot up). */
+.mark-eye {
+  transform-box: view-box;
+  transform-origin: 60px 76px;
+}
+.mark.blink .mark-eye {
+  animation: blink 300ms cubic-bezier(0.4, 0, 0.3, 1);
+}
+/* asymmetric on purpose: a real blink shuts faster than it opens */
+@keyframes blink {
+  0% {
+    transform: scaleY(1);
+  }
+  38% {
+    transform: scaleY(0.05);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+@media (max-width: 720px) {
+  .mark {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mark.blink .mark-eye {
+    animation: none !important;
+  }
+}
 h1 {
   margin: 0;
   font-size: clamp(32px, 4.6vw, 52px);

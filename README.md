@@ -165,8 +165,8 @@ an easy machine log would move this number for a reason unrelated to ingest:
 | | parser | local model | **hybrid** |
 |---|---|---|---|
 | machine logs (3) | **21/21** | 15/21 | **21/21** |
-| prose (English email, Romanian note) | 2/14 | **12/14** | **12/14** |
-| total | 23/35 | 27/35 | **33/35 (94%)** |
+| prose (English email, Romanian note) | 2/14 | **14/14** | **14/14** |
+| total | 23/35 | 29/35 | **35/35 (100%)** |
 | invented | 0 | 0 | **0** |
 
 The two fail on *disjoint* inputs — the parser is perfect on machine logs and
@@ -180,6 +180,19 @@ supports a number only if it contains a digit, values outside the physical
 envelope are dropped, and a missing citation is accepted only when the value's
 digits are in the artifact. That took inventions to zero *and* raised the score.
 
+It then caught something that was not the model's fault at all. Ollama compiles
+the JSON schema to a grammar that applies JSON's no-leading-zero rule to a
+number's *exponent*, so `1.6e-05` cannot be emitted — it truncates to `1.6e-0`,
+five orders of magnitude out. The model had read the value correctly and quoted
+it verbatim; the bounds check rejected it, and the field surfaced as *"not stated
+in the artifact"*. Because the citation is verbatim and already verified, it is
+also the repair: an out-of-bounds value whose quote re-parses — through the same
+unit conversion the parser uses — to a plausible number *with the same
+significand* is restored rather than dropped. That last condition is what keeps
+the repair honest; it can only ever put back a lost exponent, never substitute a
+different number. `c_load_a` and `c_load_b` are the only fields in the fixtures
+written with a zero-padded exponent, and were the only ones ever lost this way.
+
 ```bash
 python ingest.py --compare        # scores every available backend
 ```
@@ -192,7 +205,7 @@ python ingest.py --compare        # scores every available backend
 
 The prose artifacts (`note-ro.txt`, `note-email.txt`) are the half of the demo
 that needs the model — the deterministic parser scores 0/7 on the Romanian note.
-Without it the pipeline still runs and refuses honestly, but the 94% hybrid
+Without it the pipeline still runs and refuses honestly, but the 100% hybrid
 result cannot be shown.
 
 ```bash

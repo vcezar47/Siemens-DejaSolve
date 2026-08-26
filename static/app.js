@@ -2609,7 +2609,53 @@ function machBoot() {
   MACH.raf = requestAnimationFrame(machTick);
 }
 
+// The header mark blinks on its own clock. CSS cannot express "random", and a
+// fixed interval reads as a metronome within about three blinks -- the eye
+// stops looking alive and starts looking like a loading spinner. So the delay
+// is drawn fresh each time, and the class is removed on `animationend` rather
+// than on a second timer that could drift out of step with the CSS duration.
+// Paused while the tab is hidden: a timer firing into a backgrounded tab buys
+// nothing, and browsers throttle it unevenly anyway.
+function blinkLoop() {
+  const mark = $("#mark");
+  if (!mark) return;
+  // The gradient flows via SMIL, which no media query can reach -- CSS can only
+  // switch off the blink. So reduced motion is honoured here, by stopping the
+  // SVG's own animation clock, and then leaving before the blink is scheduled.
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    mark.pauseAnimations?.();
+    return;
+  }
+
+  const delay = () => 2000 + Math.random() * 3000; // 2-5 s
+  let timer = null;
+
+  mark.addEventListener("animationend", () => mark.classList.remove("blink"));
+
+  const tick = () => {
+    if (!document.hidden) {
+      // Clear-reflow-set rather than a bare `add`. Re-adding a class that is
+      // already present does not restart a CSS animation, so if `animationend`
+      // is ever missed -- it does not fire at all while the document is not
+      // compositing -- the class would stick and the eye would blink once and
+      // then never again. Forcing the reflow makes each tick re-trigger on its
+      // own terms instead of depending on the previous one having cleaned up.
+      mark.classList.remove("blink");
+      void mark.offsetWidth;
+      mark.classList.add("blink");
+    }
+    timer = setTimeout(tick, delay());
+  };
+  timer = setTimeout(tick, delay());
+
+  document.addEventListener("visibilitychange", () => {
+    clearTimeout(timer);
+    if (!document.hidden) timer = setTimeout(tick, delay());
+  });
+}
+
 async function boot() {
+  blinkLoop();
   try {
     renderHealth(await (await fetch("/api/health")).json());
 

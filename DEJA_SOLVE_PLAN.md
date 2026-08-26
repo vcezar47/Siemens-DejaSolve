@@ -219,7 +219,7 @@ know what produced the state they reason about. So:
 
 **"There are whole departments behind the simulations, not just one engineer."** The sleeper. It independently
 validates Layer 1: different people, different tools, different naming, different *languages* is precisely why
-the fixtures include an English email and a Romanian note, and why the hybrid backend scores 33/35 with zero
+the fixtures include an English email and a Romanian note, and why the hybrid backend scores 35/35 with zero
 inventions. It also made the override **attributed** rather than anonymous — an accepted risk in a departmental
 workflow needs a name, a reason and a timestamp, which is what `trace["audit"]` now carries.
 
@@ -705,8 +705,8 @@ miss, not partial credit:
 | artifact style | parser | local model (qwen2.5:7b) | **hybrid** |
 |---|---|---|---|
 | machine logs (3 files, unit conversion + a corrupted value) | **21/21** | 15/21 | **21/21** |
-| prose — an English email and a Romanian note | 2/14 | **12/14** | **12/14** |
-| **total** | 23/35 (66%) | 27/35 (77%) | **33/35 (94%)** |
+| prose — an English email and a Romanian note | 2/14 | **14/14** | **14/14** |
+| **total** | 23/35 (66%) | 29/35 (83%) | **35/35 (100%)** |
 | **invented** | 0 | 0 | **0** |
 
 **The headline finding is not "the model wins" — it is that the two fail on disjoint inputs.** The parser is

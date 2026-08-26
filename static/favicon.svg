@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 3 116 116">
+  <!--
+  Déjà Solve, tab icon. The reduced mark: one larger pupil and a catchlight, no
+  trail of matches. Below about 32px the trail turns into a smudge along the
+  lid, which reads as damage rather than as ranked neighbours. The viewBox is
+  cropped tight to the artwork so the eye fills the tile instead of floating in
+  the padding the 120 square leaves around it.
+
+  Colours are written out rather than inherited: a favicon renders on its own,
+  with no page to take a variable from. They are the brand gradient lifted by
+  the same 1.18 the header mark uses, so tab and header agree. The light scheme
+  block is not decoration; the lifted teal is nearly invisible on a white tab
+  strip, so it swaps to a deeper ramp there.
+
+  Note for future edits: this file is XML, not HTML. A comment here may not
+  contain a double hyphen, which is why this one reads the way it does.
+  -->
+  <style>
+    .s1 { stop-color: #00ffc0 }
+    .s2 { stop-color: #00d8ff }
+    .s3 { stop-color: #1faaff }
+    @media (prefers-color-scheme: light) {
+      .s1 { stop-color: #00916f }
+      .s2 { stop-color: #0081a0 }
+      .s3 { stop-color: #1668b8 }
+    }
+  </style>
+  <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="6" y1="0" x2="114" y2="0">
+    <stop class="s1" offset="0" />
+    <stop class="s2" offset="0.5" />
+    <stop class="s3" offset="1" />
+  </linearGradient>
+  <g stroke="url(#g)" stroke-width="6" stroke-linecap="round">
+    <line x1="32.08" y1="49.04" x2="12.66" y2="30.28" />
+    <line x1="46.58" y1="44.39" x2="37.40" y2="22.76" />
+    <line x1="60.00" y1="43.00" x2="60.00" y2="23.50" />
+    <line x1="73.42" y1="44.39" x2="79.47" y2="30.12" />
+    <line x1="87.92" y1="49.04" x2="96.19" y2="41.05" />
+  </g>
+  <path
+    fill="url(#g)"
+    fill-rule="evenodd"
+    d="M6.0,76.0 A69.077,69.077 0 0,1 114.0,76.0 A69.077,69.077 0 0,1 6.0,76.0 Z M42.00,76.00 A18.0,18.0 0 1,0 78.00,76.00 A18.0,18.0 0 1,0 42.00,76.00 Z M61.50,69.00 A5.5,5.5 0 1,0 72.50,69.00 A5.5,5.5 0 1,0 61.50,69.00 Z"
+  />
+</svg>

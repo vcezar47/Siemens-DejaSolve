@@ -196,6 +196,13 @@ function liveFromTrace(t) {
       relief_open: !!(ret.regime && ret.regime.relief_open),
     },
     distance: ret.distance,
+    //: how retrieval picked this case, and which transfer order the solver then
+    //: used. Both are carried because the panel below draws this case as "what
+    //: retrieval chose" -- and if it was chosen over a nearer one, or started
+    //: from with curvature rather than verbatim, a view that cannot say so is
+    //: describing a simpler pipeline than the one that ran.
+    ranking: ret.ranking || null,
+    transfer: t.solve.transfer || null,
     paths: t.solve.paths || {},
     iterations: {
       cold: t.solve.cold_iterations,
@@ -2163,6 +2170,18 @@ function renderMachPanel() {
  <b>${best.dp.toFixed(1)} bar</b>.`
     : `<b>${esc(P.neighbour.id)}</b> is what retrieval chose out of
  ${VIZ.config.archive_size}.` +
+      //: "chose out of 395" is true of `argmin` and of ranked retrieval alike,
+      //: and on its own it lets the reader assume the first. When the pick was
+      //: not the nearest, saying only that would hide the entire selection step
+      //: -- the case on screen would look like the closest one when a closer
+      //: one was passed over on purpose.
+      (LIVE && LIVE.ranking && !LIVE.ranking.picked_was_nearest
+        ? ` Not the nearest: the ${LIVE.ranking.considered} nearest were
+      gated, and this one was ranked first among the ${LIVE.ranking.admitted}
+      the verifier admitted &mdash; ahead of
+      <b>${esc(LIVE.ranking.nearest.case_id)}</b> at
+      ${LIVE.ranking.nearest.distance.toFixed(3)}.`
+        : "") +
       // the right-hand machine is on screen either way; whether the solver was
       // allowed to start from it is a different fact and belongs beside it
       (LIVE && !LIVE.usedArchive
@@ -2384,11 +2403,35 @@ function updateStepperUI() {
   );
 
   if (readout) {
+    //: Iteration 0 of the warm arm is the single most misread number on this
+    //: page. The archived case is drawn right beside it, so the obvious reading
+    //: is that step 0 *is* that case -- and it is not: the state was walked
+    //: toward this run's parameters before Newton ever saw it, which is the
+    //: entire reason the arm is short. Left unsaid, the panel looks like it is
+    //: contradicting the one next to it. Said, it is the point.
+    const order = LIVE ? LIVE.transfer : "second_order";
+    const ORDER_NOTE = {
+      second_order:
+        "the archived state walked toward this run along the solution " +
+        "manifold's tangent <i>and</i> its curvature &mdash; not the archived " +
+        "state itself",
+      first_order:
+        "the archived state walked toward this run along the solution " +
+        "manifold's tangent &mdash; not the archived state itself",
+      verbatim:
+        "the archived state exactly as it was stored &mdash; this card " +
+        "carried no tangent to walk along",
+    };
+    const note =
+      STEPPER.step === 0 && STEPPER.arm === "warm" && ORDER_NOTE[order]
+        ? `<div>iteration 0 is<b style="font-weight:500;line-height:1.45">${ORDER_NOTE[order]}</b></div>`
+        : "";
     readout.innerHTML =
       `<div>starting guess <b>${esc(STEPPER.arm)} arm</b></div>` +
       `<div>manifold pressure <b>${Math.round(currState.p1)} bar</b></div>` +
       `<div>shaft speeds <b>${Math.round(currState.w_a)} / ${Math.round(currState.w_b)} rpm</b></div>` +
-      `<div>distance to solved state <b>${resProxy < 1e-3 ? "0.00 (converged)" : resProxy.toFixed(1) + " bar"}</b></div>`;
+      `<div>distance to solved state <b>${resProxy < 1e-3 ? "0.00 (converged)" : resProxy.toFixed(1) + " bar"}</b></div>` +
+      note;
   }
 }
 

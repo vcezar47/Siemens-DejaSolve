@@ -69,11 +69,21 @@ RULE = "-" * 78
 #: pipeline one in order to show it being refused.
 ARTIFACT_SUFFIXES = (".log", ".txt", ".dat", ".bdf")
 
+#: how many nearest cases retrieval considers before it picks one. Plain
+#: `argmin` was the whole of retrieval until this constant existed, and it is a
+#: thin reading of "decide *which* past run to start from": distance asks how
+#: different a case is, not how far its answer will have to move. `bench.py`
+#: measures the two policies side by side over the same 5 candidates -- the
+#: nearest is the best pick only 27% of the time -- so the app retrieves the
+#: same 5 and ranks them the same way rather than quoting a number it does not
+#: reproduce. Keep this equal to `bench.K_RANKED`: they are the same policy.
+K_RANKED = 5
+
 #: the five pipeline stages, in order, as the UI and the CLI both present them
 STAGES = [
     ("ingest", "Ingest", "artifact -> Case Card"),
     ("plausible", "Units", "physically plausible?"),
-    ("retrieve", "Retrieve", "nearest solved case"),
+    ("retrieve", "Retrieve", "best of the k nearest solved cases"),
     ("verify", "Verify", "is this transfer legitimate?"),
     ("solve", "Solve", "warm-started initialisation"),
     ("admissible", "Admissible", "is the answer an operating point?"),
@@ -119,6 +129,15 @@ class Archive:
         self.sensitivity = [
             None if r.get("sensitivity") is None
             else np.asarray(r["sensitivity"], dtype=float) for r in self.records]
+        #: d2x*/dp2 per card, on the same terms as `sensitivity` above: absent
+        #: for a singular Jacobian, absent for every card in an archive written
+        #: before `sweep.py` recorded curvature. `transfer_start_second_order`
+        #: degrades to first-order for those and to verbatim when the tangent is
+        #: missing too, so an old archive keeps working at the accuracy it can
+        #: support instead of raising.
+        self.hessian = [
+            None if r.get("hessian") is None
+            else np.asarray(r["hessian"], dtype=float) for r in self.records]
         self.verifier = verifier.Verifier(self.records)
         #: what kind of model this archive holds. Every record in it came
         #: through the same Case Card schema, so the archive inherits its
@@ -131,18 +150,109 @@ class Archive:
         j = int(np.argmin(d))
         return j, float(d[j])
 
-    def warm_start(self, j: int, params: dict) -> tuple[np.ndarray, bool]:
+    def nearest_k(self, params: dict, k: int) -> list[tuple[int, float]]:
+        """The k nearest cases as (index, distance), nearest first.
+
+        Overridden by the Aurora backend so ranked retrieval goes through
+        pgvector on that path too -- the shortlist is retrieval's job, and
+        having only `nearest()` reach the database would mean the demo's
+        headline arm quietly bypassed the index it claims to use.
+        """
+        q = model.normalise(model.param_vector(params))
+        d = np.linalg.norm(self.norm - q, axis=1)
+        order = np.argsort(d)[:k]
+        return [(int(i), float(d[i])) for i in order]
+
+    def select(self, params: dict, k: int = K_RANKED):
+        """Which archived case to start from: shortlist, gate, then rank.
+
+        Three steps, and the order of them is the whole design.
+
+        **Distance shortlists.** It is a cheap proxy and nothing more -- it asks
+        how different a case is, not how far its answer will have to move.
+
+        **The verifier filters.** Admissibility is a hard constraint, not a
+        tiebreak, so it is applied to every candidate before any of them is
+        preferred. Ranking first and gating the winner afterwards is the obvious
+        implementation and it is measurably worse: the ranked pick is often
+        further away than the nearest, so the coverage rule refuses it, and the
+        archive is abandoned for a case sitting two rows down that the gate would
+        have admitted. Measured over the 200 benchmark queries: rank-then-gate
+        falls back to the nominal guess on 21, gate-then-rank on 2.
+
+        **Predicted start error ranks the survivors.** How far each candidate's
+        own recorded tangent says its answer has to move to reach this query. The
+        same parameter step matters far more on a case sitting near the relief
+        valve's cracking point than on one far from it, and only that question
+        knows it.
+
+        When the gate admits nobody the ranking is abandoned and the plain
+        nearest case is returned with its refusal, so the report names a real
+        case and the engineer has something concrete to override. That fallback
+        is not a tidy-up for an empty list -- **the ranking signal is only
+        trustworthy inside the region the gate vouches for.** Predicted start
+        error is read off a tangent recorded at the candidate's own operating
+        point; a shortlist the gate has entirely refused is one where every
+        candidate is being extrapolated past the archive's edge, which is
+        exactly where a tangent stops describing anything. Measured on
+        `run-bigpump.log`, whose Q_nom sits outside the archive: ranking the
+        refused shortlist puts the *worst* of the five first (7 iterations)
+        ahead of the nearest (3). Outside the gate, the conservative signal --
+        raw distance -- is the honest one.
+
+        Returns ``(index, distance, ranking, verdict)`` -- the verdict comes back
+        out of selection rather than being recomputed by the caller, because a
+        second call to the gate is a second chance for the two to disagree.
+        """
+        cand = self.nearest_k(params, k)
+        j_near, d_near = cand[0]
+        scored = []
+        for rank, (i, d) in enumerate(cand):
+            v = self.verifier.check_transfer(params, self.records[i], d)
+            err = model.predicted_start_error(
+                self.sensitivity[i], self.records[i]["params"], params)
+            # `rank` is the second sort key: a shortlist of cards with no tangent
+            # at all (every score `inf`) then picks the nearest admissible one,
+            # which is exactly the old behaviour.
+            scored.append((err, rank, i, d, v))
+        admitted = [s for s in scored if s[4].admit]
+        err, rank, j, dist, verdict = (min(admitted) if admitted
+                                       else scored[0])
+        detail = {
+            "considered": len(cand),
+            "admitted": len(admitted),
+            "ranked_by": "predicted start error (dx*/dp of each candidate)",
+            "policy": "shortlist by distance, filter by the verifier, "
+                      "rank the survivors by predicted start error",
+            "picked_rank": rank,
+            "picked_was_nearest": bool(j == j_near),
+            "predicted_start_error": None if err == float("inf") else float(err),
+            "nearest": {"case_id": self.records[j_near]["case_id"],
+                        "distance": float(d_near),
+                        "admitted": bool(scored[0][4].admit)},
+        }
+        return j, float(dist), detail, verdict
+
+    def warm_start(self, j: int, params: dict) -> tuple[np.ndarray, str]:
         """The start to hand Newton for query `params`, from archive case `j`.
 
-        First-order when the card carries a tangent, verbatim when it does not.
-        Returns the flag too, because the report says which one it used -- a
-        demo that quietly switches transfer order is the failure mode this
-        project is about.
+        Second-order when the card carries both a tangent and a curvature
+        tensor: the archived answer is walked toward this query along the
+        solution manifold, bending with it rather than shooting straight off
+        the tangent where the manifold curves -- which is everywhere the relief
+        valve cracks or a shaft crosses the Stribeck peak.
+
+        Degrades to first-order without curvature and to the verbatim state
+        without a tangent. Returns which of the three it actually did, because
+        a demo that quietly switches transfer order is the failure mode this
+        project is about -- the report names the arm, it does not infer it.
         """
-        s = self.sensitivity[j]
-        x0 = model.transfer_start(self.states[j], s, self.records[j]["params"],
-                                  params)
-        return x0, s is not None
+        s, h = self.sensitivity[j], self.hessian[j]
+        x0 = model.transfer_start_second_order(
+            self.states[j], s, h, self.records[j]["params"], params)
+        order = ("verbatim" if s is None
+                 else "first_order" if h is None else "second_order")
+        return x0, order
 
     def nearest_failure(self, params: dict) -> dict | None:
         """The closest run that *died*, as context -- never as a decision.
@@ -372,23 +482,52 @@ def analyse(text: str, name: str, archive: Archive,
         return trace
 
     # -- Layer 2: retrieval ------------------------------------------------
-    j, distance = archive.nearest(card.params)
+    # Not `argmin`. Distance shortlists the k nearest, the verifier filters
+    # them, and which of the survivors to start from is decided by how far each
+    # one's answer has to move to reach this query. See `Archive.select` -- the
+    # gate runs inside it, so the verdict below is the one that chose this case
+    # rather than a second opinion about it.
+    j, distance, ranking, verdict = archive.select(card.params)
     source = archive.records[j]
     trace["retrieval"] = {
         "case_id": source["case_id"], "distance": distance,
         "coverage_radius": archive.verifier.coverage_radius,
         "regime": source["regime"], "params": source["params"],
+        #: how the pick was made, not just what it was. The geometry view draws
+        #: this case beside the query and calls it "what retrieval chose"; if
+        #: retrieval considered five and this was not the closest of them, the
+        #: view has to be able to say so rather than let the reader assume
+        #: nearest.
+        "ranking": ranking,
     }
+    # Three different things can have happened, and one sentence that covered
+    # all of them would be wrong twice: the pick was the nearest anyway; it beat
+    # the nearest on predicted start error; or the gate admitted nobody and this
+    # is the best of a refused shortlist. "best of 0 admissible" was the first
+    # draft of the third case and it is not a sentence.
+    if ranking["admitted"] == 0:
+        how = (f" -- none of the {ranking['considered']} nearest passed the "
+               f"gate; this is the closest of them")
+    elif ranking["picked_was_nearest"]:
+        how = ""
+    else:
+        how = (f" -- best of {ranking['admitted']} admissible in the "
+               f"{ranking['considered']} nearest, ahead of "
+               f"{ranking['nearest']['case_id']} at "
+               f"{ranking['nearest']['distance']:.3f}")
     stages.append(_stage(
         "retrieve", "ok",
-        f"{source['case_id']} at distance {distance:.3f}",
+        f"{source['case_id']} at distance {distance:.3f}{how}",
         {"coverage_radius": archive.verifier.coverage_radius,
          "regime": source["regime"],
          "indexed_on": len(model.PARAM_NAMES),
+         "ranking": ranking,
          "nearest_failure": archive.nearest_failure(card.params)}))
 
     # -- Layer 3a: is the transfer legitimate? -----------------------------
-    verdict = archive.verifier.check_transfer(card.params, source, distance)
+    # `verdict` came back from `archive.select` above: the gate ran on all k
+    # candidates and this is the verdict for the one it chose. Refused here
+    # means the gate refused *every* candidate, not merely the nearest.
     # An override accepts a *risk*, so it can only move a WARN verdict. A block
     # is a statement of fact and there is no flag that argues with one.
     overridden = bool(override and verdict.overridable and not verdict.admit)
@@ -423,9 +562,10 @@ def analyse(text: str, name: str, archive: Archive,
         rep["override_applied"] = True
     elif verdict.overridable:
         _report(trace, "warn", verdict.rule, verdict.reason,
-                "the archive is not used: the solver starts from the nominal "
-                "guess built from this case's own parameters, so refusing costs "
-                "nothing. Override to warm-start anyway",
+                f"none of the {ranking['considered']} nearest cases passed the "
+                f"gate, so the archive is not used: the solver starts from the "
+                f"nominal guess built from this case's own parameters, and "
+                f"refusing costs nothing. Override to warm-start anyway",
                 override_available=True)
     else:
         _report(trace, "block", verdict.rule, verdict.reason,
@@ -441,10 +581,11 @@ def analyse(text: str, name: str, archive: Archive,
                       record_path=True)
     if accepted:
         # The retrieved card is not just a state -- it also recorded how its
-        # answer moves with the case parameters, so the start is walked from
-        # the neighbour's operating point toward this one before Newton sees
-        # it. Same candidate, same gate, same answer; fewer iterations.
-        x0, first_order = archive.warm_start(j, card.params)
+        # answer moves with the case parameters, and how that movement itself
+        # curves, so the start is walked from the neighbour's operating point
+        # toward this one before Newton sees it. Same candidate, same gate,
+        # same answer; fewer iterations.
+        x0, transfer_order = archive.warm_start(j, card.params)
         warm = model.solve(card.params, x0=x0, record_path=True)
         chosen, label = warm, "warm"
     else:
@@ -453,7 +594,7 @@ def analyse(text: str, name: str, archive: Archive,
         # does not involve it. Cold remains the last resort if nominal fails --
         # and this is what makes the warning cheap enough to be worth reading.
         warm = None
-        first_order = False
+        transfer_order = None
         chosen, label = ((nom, "nominal") if nom["converged"]
                          else (cold, "cold"))
 
@@ -476,8 +617,8 @@ def analyse(text: str, name: str, archive: Archive,
                      #: which transfer order was used. Stated rather than
                      #: implied: an archive without tangents still warm-starts,
                      #: just not as well, and the report should not let those
-                     #: two look like the same run.
-                     transfer="first_order" if first_order else "verbatim")
+                     #: three look like the same run.
+                     transfer=transfer_order)
         if cold["converged"] and warm["converged"]:
             dx = np.abs(np.array(cold["x"]) - np.array(warm["x"]))
             solve["agreement_vs_cold"] = float(dx.max())

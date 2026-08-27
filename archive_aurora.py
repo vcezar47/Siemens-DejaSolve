@@ -108,6 +108,12 @@ class AuroraArchive(dejasolve.Archive):
         self.sensitivity = [
             None if r.get("sensitivity") is None
             else np.asarray(r["sensitivity"], dtype=float) for r in self.records]
+        #: same rule again for the curvature tensor -- a card synced before
+        #: `sweep.py` recorded one simply has none, and `warm_start` degrades to
+        #: the first-order transfer for it.
+        self.hessian = [
+            None if r.get("hessian") is None
+            else np.asarray(r["hessian"], dtype=float) for r in self.records]
         self.verifier = verifier.Verifier(self.records)
         self.domain = casecard.DOMAIN
         #: case_id -> position in `self.records`, built once rather than
@@ -153,3 +159,41 @@ class AuroraArchive(dejasolve.Archive):
                 f"process's snapshot does not have it -- the archive changed "
                 f"since this service started; restart it to pick up new rows")
         return j, float(distance)
+
+    def nearest_k(self, params: dict, k: int) -> list[tuple[int, float]]:
+        """The ranked-retrieval shortlist, from pgvector rather than numpy.
+
+        The same query as `nearest()` with `LIMIT 1` widened to `LIMIT k`.
+        Overridden rather than inherited for one reason: `select()` picks the
+        case the solver actually starts from, and if the shortlist it ranks
+        came from the in-memory snapshot while `nearest()` came from the live
+        table, the demo would be reporting a pgvector retrieval it did not
+        perform. One backend, one source of candidates.
+        """
+        literal = _vector_literal(params)
+        conn = _connect()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT case_id, setup_vector <-> %s::vector AS d FROM cases "
+                    "WHERE status = 'solved' ORDER BY d ASC LIMIT %s",
+                    (literal, int(k)))
+                rows = cur.fetchall()
+        finally:
+            conn.close()
+        out: list[tuple[int, float]] = []
+        for case_id, distance in rows:
+            # A row inserted after this process started is a case_id the
+            # snapshot does not have. `nearest()` raises for it because it has
+            # no candidate left to offer; here there are k-1 others, so the
+            # unknown one is skipped and retrieval proceeds on a shortlist that
+            # is one shorter -- degraded, not broken, and never silently
+            # substituting the wrong record for it.
+            i = self._index_by_id.get(case_id)
+            if i is not None:
+                out.append((i, float(distance)))
+        if not out:
+            raise RuntimeError(
+                "pgvector returned no candidate this process's snapshot has -- "
+                "the archive changed since this service started; restart it")
+        return out

@@ -1,0 +1,26 @@
+{
+  "generated_utc": "2026-08-27T07:40:09+00:00",
+  "what": "dejasolve.Archive.select + warm_start over bench.py's 200 queries -- the shipped app path, gate and fallback included",
+  "archive": "archive\\cases.jsonl",
+  "archive_size": 395,
+  "n_queries": 200,
+  "seed": 99,
+  "nominal": {
+    "mean_iterations": 7.1,
+    "total_iterations": 1420
+  },
+  "app_warm_arm": {
+    "mean_iterations": 3.035,
+    "failures": 0,
+    "iteration_reduction_vs_nominal_pct": 57.25352112676055,
+    "fell_back_to_nominal": 2,
+    "picked_not_nearest": 131,
+    "transfer_orders": {
+      "second_order": 198
+    },
+    "gate_refusals_by_rule": {
+      "coverage": 1,
+      "envelope": 1
+    }
+  }
+}

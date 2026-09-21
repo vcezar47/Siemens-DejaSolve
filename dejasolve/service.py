@@ -1,0 +1,446 @@
+"""HTTP service + demo UI for Déjà Solve.
+
+A service rather than a notebook-style app on purpose: the pitch is a platform,
+and the thing a platform exposes is an API. The page in ``dejasolve/static/index.html`` is
+a client of that API, not a wrapper around a script — so the same endpoint the
+demo calls is the one a Study Manager sweep would call, and it maps directly
+onto the Phase 4 architecture slide.
+
+    python app.py                 # http://127.0.0.1:8000
+    uvicorn dejasolve.service:api --reload      # during development
+
+No secrets required, and no traffic leaves the machine: ingest runs the
+deterministic parser and a local model, and falls back to the parser alone if
+no model is reachable.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import logging
+import os
+from pathlib import Path
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
+
+from . import pipeline
+from . import ingest
+from . import model
+
+#: resolved against this file, not the working directory -- a service should
+#: start correctly whatever directory it was launched from
+PKG = Path(__file__).resolve().parent
+ROOT = PKG.parent
+ARCHIVE_PATH = ROOT / "data" / "archive" / "cases.jsonl"
+STATIC = PKG / "static"
+LOGS = ROOT / "data" / "logs"
+
+logger = logging.getLogger("dejasolve")
+
+api = FastAPI(title="Déjà Solve", version="0.3.0",
+              description="Find the physically-nearest solved case, verify that "
+                          "reusing it is legitimate, warm-start the solver.")
+
+#: the page used to be one self-contained file; it is now index.html + app.css +
+#: app.js + a vendored three.js, which needs a real static mount. The "no CDN"
+#: promise is unchanged and now enforced rather than asserted: every byte the
+#: page loads comes off this container, so the demo runs on a dead network.
+api.mount("/static", StaticFiles(directory=STATIC), name="static")
+
+#: "file" (default) reads data/archive/cases.jsonl exactly as every benchmark does.
+#: "aurora" points the *live demo's* retrieval at the Aurora + pgvector backend
+#: from docs/architecture.md instead -- additive, and never the default, so
+#: `docker compose up` with no AWS credentials is unaffected either way.
+RETRIEVAL_BACKEND = os.environ.get("RETRIEVAL_BACKEND", "file")
+
+_archive: pipeline.Archive | None = None
+
+
+def archive() -> pipeline.Archive:
+    """Loaded once, on first use — the sweep is 400 cases, not a database."""
+    global _archive
+    if _archive is None:
+        if RETRIEVAL_BACKEND == "aurora":
+            from dejasolve.cloud import archive_aurora
+            try:
+                _archive = archive_aurora.AuroraArchive()
+            except Exception as exc:
+                raise HTTPException(503, f"Aurora archive unavailable: {exc}") from exc
+        else:
+            try:
+                _archive = pipeline.Archive(ARCHIVE_PATH)
+            except FileNotFoundError as exc:
+                raise HTTPException(503, str(exc)) from exc
+    return _archive
+
+
+def _mirror_audit_to_dynamo(trace: dict) -> None:
+    """Best-effort copy of trace["audit"] into DynamoDB, for a durable,
+    cross-request audit trail -- see docs/architecture.md's "at scale" row.
+    A no-op wherever AUDIT_TABLE isn't set, and never allowed to fail the
+    request it's attached to: an audit trail nobody can retrieve is a gap,
+    but a demo that 500s because a mirror write failed would be worse.
+    """
+    table_name = os.environ.get("AUDIT_TABLE")
+    if not table_name or not trace.get("audit"):
+        return
+    try:
+        import boto3
+        table = boto3.resource("dynamodb").Table(table_name)
+        case_id = trace.get("card", {}).get("case_id") or trace["artifact"]
+        for entry in trace["audit"]:
+            table.put_item(Item={"case_id": case_id, "recorded_at": entry["at"], **entry})
+    except Exception as exc:  # noqa: BLE001 -- see docstring
+        # print() landed on stdout with no level or timestamp under uvicorn,
+        # indistinguishable from any other line in the log -- a logger call
+        # is filterable and timestamped the way an operator actually needs
+        # to find "did the audit trail actually get mirrored" later.
+        logger.warning("audit mirror skipped: %s", exc)
+
+
+class AnalyseRequest(BaseModel):
+    #: generous relative to any real solver log or note in `logs/` (all under
+    #: a few kB), but bounded: unbounded meant a large-enough paste could run
+    #: the full parser -- and, on the ollama path, an inference that already
+    #: runs close to the 280s timeout on a normal-sized artifact -- against
+    #: however much text a client sent, with nothing here to say no first.
+    text: str = Field(..., description="the raw run artifact", max_length=1_000_000)
+    name: str = Field("pasted-artifact.log", description="filename, for the record")
+    #: built from ingest.BACKENDS rather than written out -- a hardcoded list
+    #: here silently 422s any backend added later, which is how `hybrid` came
+    #: to be unreachable from the page while working everywhere else
+    backend: str = Field("auto", pattern=f"^({'|'.join(ingest.BACKENDS)})$")
+    #: an override accepts a WARN verdict and warm-starts anyway. It cannot
+    #: force a BLOCK, so it is safe to expose: the worst it can do is use a
+    #: starting guess the verifier advised against, and the admissibility gate
+    #: still runs on the answer.
+    override: bool = Field(False, description="accept a WARN verdict and proceed")
+    operator: str | None = Field(None, max_length=120,
+                                 description="who is accepting the risk")
+    basis: str | None = Field(None, max_length=500,
+                              description="why -- recorded in the audit trail")
+
+
+@api.get("/", response_class=HTMLResponse)
+def index() -> str:
+    page = STATIC / "index.html"
+    if not page.exists():
+        raise HTTPException(500, f"missing {page}")
+    return page.read_text(encoding="utf-8")
+
+
+@api.get("/api/health")
+def health() -> dict:
+    """Enough for a container healthcheck, and it states what ingest can do.
+
+    `llm` (hosted Claude) stays a valid backend for /api/analyse and the CLI but
+    is deliberately absent here: the demo's claim is that run data never leaves
+    the network, and an option contradicting that -- greyed out or not -- is the
+    one thing on screen an engineer will ask about.
+    """
+    # archive() can now reach out to Aurora (RETRIEVAL_BACKEND=aurora), and a
+    # health probe that fails whenever a backend hiccups gets the ECS task
+    # killed and cycled over something that should just be a reported field --
+    # the same reasoning ollama_available() already applies below.
+    try:
+        arc = archive()
+        archive_ok = True
+    except Exception as exc:  # noqa: BLE001 -- see comment above
+        arc, archive_ok = None, False
+        archive_error = str(exc)
+    ollama_ok, ollama_detail = ingest.ollama_available()
+    return {
+        "ok": archive_ok,
+        "archive": str(ARCHIVE_PATH) if RETRIEVAL_BACKEND == "file" else RETRIEVAL_BACKEND,
+        "retrieval_backend": RETRIEVAL_BACKEND,
+        "archive_size": len(arc.records) if archive_ok else 0,
+        # The archive is two things now. Reporting only the solved half is how
+        # the page ended up describing an archive that had changed underneath
+        # it: an engineer asked for the failed runs to be kept, they are, and a
+        # health endpoint that says "395 cases" is quietly incomplete.
+        "archive_failed": len(arc.failures) if archive_ok else 0,
+        "failure_modes": arc.failure_modes if archive_ok else {},
+        **({} if archive_ok else {"archive_error": archive_error}),
+        "parameters": list(model.PARAM_NAMES),
+        "backends": {
+            "hybrid": {"available": ollama_ok or ingest.credentials_available(),
+                       "detail": "parser first, model only for what it misses",
+                       "local": ollama_ok},
+            "rules": {"available": True, "detail": "deterministic parser, instant",
+                      "local": True},
+            "ollama": {"available": ollama_ok, "detail": ollama_detail,
+                       "local": True},
+        },
+    }
+
+
+@api.get("/api/samples")
+def samples() -> list[dict]:
+    """The fixture artifacts, so the demo is one click rather than one paste."""
+    if not LOGS.exists():
+        return []
+    out = []
+    for p in sorted(LOGS.iterdir()):
+        if p.suffix not in pipeline.ARTIFACT_SUFFIXES:
+            continue
+        out.append({"name": p.name, "text": p.read_text(encoding="utf-8")})
+    return out
+
+
+#: the measured artifacts, and the headline each one contributes. Read from
+#: disk on every request rather than cached: they are regenerated by
+#: `run_all.py` while the service may be running, and a page showing yesterday's
+#: numbers next to today's pipeline is exactly the kind of quiet inconsistency
+#: this project spends its time refusing.
+EVIDENCE_FILES = {
+    "phase1": ROOT / "results" / "results.json",
+    "surrogate": ROOT / "results" / "surrogate_results.json",
+    "surrogate_fold": ROOT / "results" / "surrogate_fold_results.json",
+    "fold": ROOT / "results" / "fold_results.json",
+    "failure_zone": ROOT / "results" / "failure_zone_results.json",
+    "dimensionality": ROOT / "results" / "dimensionality_results.json",
+    "wide": ROOT / "results" / "wide_sweep_results.json",
+    "selftest": ROOT / "results" / "selftest_results.json",
+    "ranking": ROOT / "results" / "agent_select_results.json",
+    "ranking_model": ROOT / "results" / "agent_model_results.json",
+    "viz": ROOT / "results" / "viz_results.json",
+}
+
+
+def _load(name: str) -> dict | None:
+    path = EVIDENCE_FILES[name]
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
+@api.get("/api/evidence")
+def evidence() -> dict:
+    """The measured results, for the page to render beside the live pipeline.
+
+    **Everything here was measured offline by `python run_all.py`** — none of it
+    is something the service does per request, and the page labels it that way.
+    Serving it anyway is the difference between a demo that claims a number and
+    one that shows it: the same page that runs the pipeline can show the
+    evidence the pipeline's design rests on, without a terminal and a PNG viewer
+    open beside it.
+
+    Missing files are reported as missing rather than faked, so a fresh clone
+    that has not run the reproducer says so on screen.
+    """
+    out: dict = {"reproduce": "python run_all.py", "sections": {}}
+
+    p1 = _load("phase1")
+    if p1:
+        s = p1["summary"]
+        # benchmarks/bench.py averages like-for-like: only the cases where *every* arm
+        # converged, because the flat start fails on four of them and a mean
+        # that quietly drops those flatters it. benchmarks/surrogate.py averages over all
+        # 200. Both are defensible and they differ in the second decimal, so
+        # the basis is computed here and shown on the card -- two numbers for
+        # the same arm with no explanation is how a deck loses an audience.
+        basis = sum(1 for c in p1["cases"]
+                    if all(c[a]["converged"] for a in ("cold", "nominal", "warm")))
+        out["sections"]["phase1"] = {
+            "title": "Retrieval warm start", "n": s["n_queries"],
+            "basis": f"mean over the {basis} cases where every arm converged",
+            "generated_utc": p1.get("generated_utc"),
+            "arms": [{"label": k, "mean": s[k]["mean_iterations"],
+                      "total": s[k]["total_iterations"],
+                      "failures": s[k]["failures"]}
+                     for k in ("cold", "nominal", "warm")],
+        }
+
+    sur = _load("surrogate")
+    if sur:
+        out["sections"]["surrogate"] = {
+            "title": "Predicted warm start", "n": sur["n_queries"],
+            "basis": "mean over the cases each arm converged on",
+            "residual_median": sur["prediction_quality"]["median_residual_inf"],
+            "solver_tolerance": sur["prediction_quality"]["solver_tolerance"],
+            "were_solutions": sur["prediction_quality"]["n_below_solver_tolerance"],
+            "arms": [{"label": k, "mean": v["mean_iterations"],
+                      "total": v["total_iterations"], "failures": v["failed"]}
+                     for k, v in sur["arms"].items()],
+        }
+
+    sf, fo = _load("surrogate_fold"), _load("fold")
+    if sf and fo:
+        out["sections"]["fold"] = {
+            "title": "The same circuit, unverified",
+            "n": sf["n_queries"],
+            "rows": [
+                {"label": "valid operating point",
+                 "retrieval": fo["outcomes"]["naive_ok"],
+                 "prediction": sf["naive"].get("ok", 0)},
+                {"label": "unstable root, silently wrong", "alarm": True,
+                 "retrieval": fo["outcomes"]["naive_wrong"],
+                 "prediction": sf["naive"].get("wrong", 0)},
+                {"label": "no answer at all",
+                 "retrieval": fo["outcomes"]["naive_failed"],
+                 "prediction": sf["naive"].get("failed", 0)},
+                {"label": "verified: silently wrong", "good": True,
+                 "retrieval": 0, "prediction": sf["guarded"]["unresolved"]},
+            ],
+        }
+
+    fz = _load("failure_zone")
+    if fz:
+        fold_row = next((r for r in fz["results"] if r["circuit"] == "foldq"), None)
+        if fold_row:
+            t = fold_row["targets"]["hard_case"]
+            bt = fold_row["targets"]["bad_transfer"]
+            out["sections"]["failures"] = {
+                "title": "Are the failed runs worth keeping?",
+                "archive": fold_row["archive"],
+                "auc_hard_case": t["auc"], "auc_bad_transfer": bt["auc"],
+                "auc_control": t["controls"]["d_success_only"],
+                "base_rate": t["base_rate"], "precision": t["precision"],
+                "verdict": "advisory, not a gate rule",
+            }
+
+    dim = _load("dimensionality")
+    if dim:
+        out["sections"]["dimensionality"] = {
+            "title": "When the Case Card has hundreds of parameters",
+            "n": dim["n_queries"],
+            "nominal": dim["reference"]["nominal"]["mean_iterations"],
+            "warm_physics": dim["reference"]["warm_physics"]["mean_iterations"],
+            "points": [{"width": r["recorded_parameters"],
+                        "mean": r["warm_all"]["mean_iterations"],
+                        "same_pick": r["same_neighbour_as_physics"],
+                        "admitted": r["gate_verdicts"].get("ok", 0),
+                        "contrast": r["relative_contrast"]}
+                       for r in dim["by_dimension"]],
+        }
+
+    w = _load("wide")
+    if w:
+        out["sections"]["wide"] = {
+            "title": "25 real parameters, six machine variants",
+            "n": w["n_queries"],
+            "parameters": w["parameters"],
+            "variants": w["variants"],
+            "band": w["hardware_rel_tol"],
+            "cross_machine": w["cross_machine"]["nearest_neighbour_was_another_machine"],
+            "arms": [{"label": k, "mean": v["mean_iterations"],
+                      "total": v["total_iterations"], "failures": v["failed"]}
+                     for k, v in w["arms"].items()],
+            "scan": w.get("tolerance_scan", []),
+        }
+
+    rk = _load("ranking")
+    if rk:
+        rm = _load("ranking_model")
+        by_circuit = {a["circuit"]: a for a in (rm or {}).get("arms", [])}
+        sections = []
+        for r in rk["results"]:
+            a, row = r["arms"], {"circuit": r["circuit"], "k": r["k"],
+                                 "n": r["n_queries"]}
+            # Ordered worst-first so the chart reads top to bottom the way the
+            # finding does: everything achievable is bunched, and the oracle is
+            # somewhere else entirely.
+            row["arms"] = [
+                {"label": "oracle", "total": a["oracle"]["total_iterations"],
+                 "note": "solves every candidate"},
+                {"label": "distance", "total": a["distance"]["total_iterations"],
+                 "note": "today"},
+                {"label": "physics", "total": r["physics"]["total_iterations"],
+                 "note": "by estimated regime"},
+                {"label": "random", "total": r["random"]["total_iterations"],
+                 "note": "no opinion"},
+            ]
+            m = by_circuit.get(r["circuit"])
+            if m:
+                row["arms"].append({"label": (rm or {}).get("model", "model"),
+                                    "total": m["total_iterations"],
+                                    "note": f"{m['n_scored']} queries, "
+                                            f"{m['parse_failures']} parse failures"})
+            row["headroom_pct"] = (100.0 * r["headroom_iterations"]
+                                   / max(a["distance"]["total_iterations"], 1))
+            row["distance_optimal"] = r["distance_already_optimal"]
+            row["of_admitted"] = r["queries_with_an_admitted_candidate"]
+            sections.append(row)
+        out["sections"]["ranking"] = {
+            "title": "Can anything rank the candidates?",
+            "model_ran": bool(rm), "circuits": sections,
+        }
+
+    st = _load("selftest")
+    if st:
+        # Not a finding -- a statement that the numbers above are worth reading.
+        # A page that shows results without showing whether the invariants under
+        # them hold is asking to be trusted rather than checked.
+        out["selftest"] = {
+            "passed": st["passed"], "total": st["total"],
+            "jacobian_worst": max(st["jacobian_worst_rel_error"],
+                                  st["jacobian_worst_rel_error_asymmetric"]),
+            "defaults_exact": st["defaults_exact"],
+        }
+
+    out["missing"] = [k for k, v in EVIDENCE_FILES.items() if not v.exists()]
+    return out
+
+
+@api.get("/api/viz")
+def viz() -> JSONResponse:
+    """The projected archive, the contact sheet, the matched pair and the race.
+
+    Served as its own endpoint rather than folded into `/api/evidence` because
+    it is an order of magnitude larger — 395 projected cases plus every Newton
+    iterate of three solver runs — and the evidence panel should not pay for a
+    view the room may never open.
+
+    Like everything under `/api/evidence`, this was measured offline by
+    `python run_all.py`; the service reads a file and does no geometry per
+    request. `benchmarks/viz.py` refuses to write the file at all if its iteration counts
+    or its retrieved neighbour disagree with `results.json`, so the picture
+    cannot drift away from the table it illustrates.
+    """
+    payload = _load("viz")
+    if payload is None:
+        raise HTTPException(503, "viz_results.json missing -- run `python run_all.py`")
+    return JSONResponse(payload)
+
+
+@api.post("/api/analyse")
+def analyse(req: AnalyseRequest) -> JSONResponse:
+    """The whole pipeline. Refusals are 200s with an outcome, not HTTP errors —
+    a refusal is a result the caller must read, not a transport failure.
+
+    Every response carries a `report` (severity, reason, consequence) and, where
+    a human took responsibility for a warning, an `audit` trail. That is the
+    shape the interviewed engineers asked for: warn and report, then let the
+    engineer decide — rather than refuse silently on their behalf.
+    """
+    if not req.text.strip():
+        raise HTTPException(422, "empty artifact")
+    trace = pipeline.analyse(req.text, req.name, archive(), backend=req.backend,
+                              override=req.override, operator=req.operator,
+                              basis=req.basis)
+    _mirror_audit_to_dynamo(trace)
+    return JSONResponse(trace)
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--host", default="127.0.0.1")
+    ap.add_argument("--port", type=int, default=8000)
+    args = ap.parse_args()
+
+    import uvicorn
+    if not ARCHIVE_PATH.exists():
+        print(f"warning: no archive at {ARCHIVE_PATH} — run `python run_all.py` first")
+    print(f"Déjà Solve UI  ->  http://{args.host}:{args.port}")
+    uvicorn.run(api, host=args.host, port=args.port, log_level="warning")
+
+
+if __name__ == "__main__":
+    main()

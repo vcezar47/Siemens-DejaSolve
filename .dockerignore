@@ -17,9 +17,12 @@ __pycache__/
 venv/
 .ipynb_checkpoints/
 
-# docs and the assignment brief — not needed at runtime
+# docs, the assignment brief, cloud templates and the unshipped experiments —
+# not needed at runtime
 *.md
-phases/
+docs/
+infra/
+experiments/
 *.pdf
 
 # container files themselves

@@ -27,7 +27,7 @@ Parameters:
     Type: Number
     Default: 0
     Description: >-
-      Leave at 0 until ingest_worker.py exists in the image (see README.md
+      Leave at 0 until dejasolve/cloud/ingest_worker.py exists in the image (see README.md
       §"wiring the app to this infrastructure") — the task definition below
       names that entrypoint and will crash-loop without it.
   RetrievalBackend:
@@ -36,9 +36,9 @@ Parameters:
     AllowedValues: [file, aurora]
     Description: >-
       "file" (default) matches every benchmarked number exactly -- the ui
-      container reads the bundled archive/cases.jsonl, same as docker compose.
+      container reads the bundled data/archive/cases.jsonl, same as docker compose.
       "aurora" points the live demo's retrieval at Aurora + pgvector instead;
-      requires sync_archive_to_aurora.py to have been run first.
+      requires dejasolve/cloud/sync_archive_to_aurora.py to have been run first.
 
 Resources:
   Cluster:
@@ -249,7 +249,7 @@ Resources:
       ContainerDefinitions:
         - Name: ingest-worker
           Image: !Ref ImageUri
-          Command: ["python", "ingest_worker.py"]
+          Command: ["python", "-m", "dejasolve.cloud.ingest_worker"]
           Environment:
             - {
                 Name: DATA_BUCKET,
@@ -310,10 +310,10 @@ Resources:
         - Fn::ImportValue: !Sub "${EnvironmentName}-AlbSecurityGroupId"
       LoadBalancerAttributes:
         # ALB defaults to 60s, well under ingest_ollama()'s own 180s client
-        # timeout in ingest.py -- CPU-only inference on the Ollama EC2 instance
+        # timeout in dejasolve/ingest.py -- CPU-only inference on the Ollama EC2 instance
         # is slow enough that the default was cutting the connection before
         # the backend (correctly) finished. 300s gives a small margin above
-        # that 180s so a genuine backend timeout surfaces as ingest.py's own
+        # that 180s so a genuine backend timeout surfaces as dejasolve/ingest.py's own
         # RuntimeError -- a real pipeline stage the UI can render -- rather
         # than a bare ALB 504 with no context.
         - { Key: idle_timeout.timeout_seconds, Value: "300" }

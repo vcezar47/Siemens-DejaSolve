@@ -19,7 +19,7 @@ flowchart LR
 
   art["run artifacts<br/>logs · decks · e-mails · notes"] --> ui
   ui --> card["Case Card<br/>canonical units · provenance · domain"]
-  card --> idx["archive<br/>archive/cases.jsonl + failures.jsonl"]
+  card --> idx["archive<br/>data/archive/cases.jsonl + failures.jsonl"]
   idx --> ver["verifier<br/>gate 1 before · gate 2 after"]
   ver --> solve["solver<br/>warm-started Newton"]
   solve --> rep["report + audit trail"]
@@ -57,7 +57,7 @@ The layer boundaries do not move. What changes is what sits behind each one.
 | Layer | Today | At scale | What forces the change |
 |---|---|---|---|
 | **1 · Ingest** | in-process parser, optional local model | queue + worker pool (SQS + ECS tasks), artifacts in S3 | Ingest is per-artifact, embarrassingly parallel, and the only slow step. It is also the only component that can call a model, so it is the only one with an egress policy. |
-| **2 · Archive + retrieval** | `cases.jsonl` read into memory, O(n) numpy nearest-neighbour over 395 rows | Postgres + pgvector, or OpenSearch; artifacts in S3 | A linear scan is correct and instant at 10³. At 10⁵–10⁶ runs it is neither. **Note the measured caveat**: [phase 1c](../phases/phase-1c-dimensionality.md) shows the *metric* degrades long before the *scan* does, so an ANN index makes a failing search faster rather than better. |
+| **2 · Archive + retrieval** | `cases.jsonl` read into memory, O(n) numpy nearest-neighbour over 395 rows | Postgres + pgvector, or OpenSearch; artifacts in S3 | A linear scan is correct and instant at 10³. At 10⁵–10⁶ runs it is neither. **Note the measured caveat**: [phase 1c](phases/phase-1c-dimensionality.md) shows the *metric* degrades long before the *scan* does, so an ANN index makes a failing search faster rather than better. |
 | **3 · Verifier** | pure functions over a Case Card and a source record | unchanged — a stateless library, called wherever layer 2 runs | It holds no state and does no I/O. That is the point: it can live in the sweep driver, the API, or a CI check without changing. |
 | **4 · Solve** | in-process Newton | Batch/ECS jobs, one per case, results to S3 | This is where the real solver goes, and it is the layer this project deliberately does not replace. Déjà Solve hands it a starting state; it stays whatever the customer already runs. |
 
@@ -74,12 +74,12 @@ Honest ordering, if this were picked up:
 1. **The archive is a file.** `Archive` loads every record into memory at start-up. That is right for 395 cases
    and wrong for the first real customer. Retrieval is already behind a method, so this is a backing-store
    swap rather than a redesign — but it is the first one.
-2. **Retrieval indexes the whole setup vector.** [phase 1c](../phases/phase-1c-dimensionality.md) measures what
-   that costs on a wide Case Card, and [phase 1d](../phases/phase-1d-wide-parameters.md) shows the hardware
+2. **Retrieval indexes the whole setup vector.** [phase 1c](phases/phase-1c-dimensionality.md) measures what
+   that costs on a wide Case Card, and [phase 1d](phases/phase-1d-wide-parameters.md) shows the hardware
    parameters doing useful work inside it. Knowing which parameters matter is a physics question, and it is
    the highest-value unbuilt thing.
 3. **The transfer operator is state-vector only.** A field mapped between meshes is the adapter that makes this
-   work for 3D — see the domain gate refusing exactly that in `logs/part-bracket.log`. It is real engineering,
+   work for 3D — see the domain gate refusing exactly that in `data/logs/part-bracket.log`. It is real engineering,
    not configuration.
 4. **There is no multi-tenancy.** One archive, one domain, no notion of who may reuse whose results. The
    engineer interview raised it (§8b/Q6) and it was never answered.

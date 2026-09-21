@@ -12,33 +12,33 @@ import json
 import sys
 from pathlib import Path
 
-import bench
-import agent_select
-import dimensionality
-import failure_zone
-import fold
-import ingest
-import make_logs
-import plot_convergence
-import selftest
-import surrogate
-import viz
-import wide_sweep
-import sweep
+from benchmarks import bench
+from benchmarks import agent_select
+from benchmarks import dimensionality
+from benchmarks import failure_zone
+from benchmarks import fold
+from dejasolve import ingest
+from benchmarks import make_logs
+from benchmarks import plot_convergence
+from benchmarks import selftest
+from benchmarks import surrogate
+from benchmarks import viz
+from benchmarks import wide_sweep
+from dejasolve import sweep
 
-ARCHIVE = Path("archive")
-RESULTS = Path("results.json")
-FIGURE = Path("figs/convergence.png")
-FOLD_RESULTS = Path("fold_results.json")
-FOLD_FIGURE = Path("figs/verifier.png")
-SURROGATE_RESULTS = Path("surrogate_results.json")
-SURROGATE_FOLD_RESULTS = Path("surrogate_fold_results.json")
-FAILURE_ZONE_RESULTS = Path("failure_zone_results.json")
-DIMENSIONALITY_RESULTS = Path("dimensionality_results.json")
-DIMENSIONALITY_FIGURE = Path("figs/dimensionality.png")
-WIDE_SWEEP_RESULTS = Path("wide_sweep_results.json")
-AGENT_SELECT_RESULTS = Path("agent_select_results.json")
-VIZ_RESULTS = Path("viz_results.json")
+ARCHIVE = Path("data/archive")
+RESULTS = Path("results/results.json")
+FIGURE = Path("results/figs/convergence.png")
+FOLD_RESULTS = Path("results/fold_results.json")
+FOLD_FIGURE = Path("results/figs/verifier.png")
+SURROGATE_RESULTS = Path("results/surrogate_results.json")
+SURROGATE_FOLD_RESULTS = Path("results/surrogate_fold_results.json")
+FAILURE_ZONE_RESULTS = Path("results/failure_zone_results.json")
+DIMENSIONALITY_RESULTS = Path("results/dimensionality_results.json")
+DIMENSIONALITY_FIGURE = Path("results/figs/dimensionality.png")
+WIDE_SWEEP_RESULTS = Path("results/wide_sweep_results.json")
+AGENT_SELECT_RESULTS = Path("results/agent_select_results.json")
+VIZ_RESULTS = Path("results/viz_results.json")
 
 
 def main(score_models: bool = False) -> int:
@@ -111,7 +111,7 @@ def main(score_models: bool = False) -> int:
     print("=" * 62)
     # The prediction arm on the same circuit, first: it is the experiment that
     # decides whether gating a *predicted* start is safety or merely cost, and
-    # it shares fold.py's archive and query seeds so the two sit side by side.
+    # it shares benchmarks/fold.py's archive and query seeds so the two sit side by side.
     surrogate.report_fold(
         surrogate.run_fold(n_archive=300, n_query=200, out=SURROGATE_FOLD_RESULTS))
     print()
@@ -131,7 +131,7 @@ def main(score_models: bool = False) -> int:
     print("=" * 62)
     # Ceiling, floor and the physics ranker only: all deterministic and fast.
     # The model arm needs a GPU and minutes, so it stays opt-in behind
-    # `python agent_select.py --model ...`, like --score-models.
+    # `python -m benchmarks.agent_select --model ...`, like --score-models.
     agent_select.report_ceiling(
         agent_select.run_deterministic(ARCHIVE / "cases.jsonl", 200, 99, 300,
                                        agent_select.K, AGENT_SELECT_RESULTS))
@@ -156,15 +156,15 @@ def main(score_models: bool = False) -> int:
     else:
         print("\nscoring the parser only (seconds). Add --score-models to "
               "score ollama/hybrid too -- minutes per prose artifact.")
-    ingest.report(ingest.compare(Path("logs"), backends),
-                  Path("logs/ground_truth.json"))
+    ingest.report(ingest.compare(Path("data/logs"), backends),
+                  Path("data/logs/ground_truth.json"))
 
     import json as _json
     print()
     print(f"phase-1 summary hash: "
           f"{bench.summary_hash(_json.loads(RESULTS.read_text(encoding='utf-8')))}")
     print("\nall artifacts regenerated.")
-    print("End-to-end demo:  python dejasolve.py --all")
+    print("End-to-end demo:  python -m dejasolve --all")
     return 0
 
 

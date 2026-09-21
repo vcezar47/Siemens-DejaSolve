@@ -117,7 +117,7 @@ going to pretend otherwise. The ECR console does remove the guesswork of the exa
    - **EnvironmentName**: the same value again — `dejasolve` — so this stack's imports resolve against
      stacks 1 and 2
    - **ImageUri**: paste the URI copied in 2.3
-   - **IngestWorkerDesiredCount**: leave at `0` — see the note on `ingest_worker.py` in §3, it doesn't exist
+   - **IngestWorkerDesiredCount**: leave at `0` — see the note on `dejasolve/cloud/ingest_worker.py` in §3, it doesn't exist
      yet, and this parameter defaulting to `0` is what keeps that service from crash-looping
    → **Next**.
 3. **Next** through stack options.
@@ -204,17 +204,17 @@ rather than this bootstrap step.
 ## 3. Wired in — the three follow-ups, now built
 
 All three pieces of code named in the original draft of this section exist now, each additive rather than a
-replacement, so `run_all.py` / `bench.py` / every benchmarked number on the deck still goes through the
+replacement, so `run_all.py` / `benchmarks/bench.py` / every benchmarked number on the deck still goes through the
 original file-backed `dejasolve.Archive` untouched:
 
-1. **`ingest_worker.py`** — long-polls `IngestQueue`, pulls an artifact from S3, calls the existing
+1. **`dejasolve/cloud/ingest_worker.py`** — long-polls `IngestQueue`, pulls an artifact from S3, calls the existing
    `ingest.ingest_text()` unchanged, writes the resulting Case Card to `s3://<bucket>/cards/<name>.json`.
-2. **`archive_aurora.py`** — `AuroraArchive`, a subclass of `dejasolve.Archive` that overrides `__init__`
+2. **`dejasolve/cloud/archive_aurora.py`** — `AuroraArchive`, a subclass of `dejasolve.Archive` that overrides `__init__`
    (loads from the `cases` table instead of a file) and `nearest()` (a real pgvector `<->` query instead of
    `numpy.linalg.norm`) — both normalise against the same fixed `PARAM_BOUNDS`, so it returns the *same*
    nearest case for the same query, not an approximation. `nearest_failure()`/`nearest_on()` are inherited
    unchanged. `app.py`'s `archive()` factory picks this over the file-backed one when `RETRIEVAL_BACKEND=aurora`
-   — otherwise nothing changes. `sync_archive_to_aurora.py` populates the table (creates it on first run,
+   — otherwise nothing changes. `dejasolve/cloud/sync_archive_to_aurora.py` populates the table (creates it on first run,
    upserts on every run after).
 3. **DynamoDB audit mirror** — `app.py`'s `/api/analyse` now calls `_mirror_audit_to_dynamo(trace)` after
    every request, a best-effort write of `trace["audit"]` into the `AUDIT_TABLE` (no-op if that env var isn't
@@ -234,11 +234,11 @@ treats an unreachable Ollama as a reported state rather than a crash.
    **Run new task**. Launch type **FARGATE**, task definition `dejasolve-ui` (any revision), same subnets and
    security group the `ui` service already uses (private subnets, `EcsSecurityGroup` — it needs to reach
    Aurora on 5432, which that security group already permits). Under **Container overrides**, change the
-   `ui` container's command to `python sync_archive_to_aurora.py` → **Run task**. Check its logs (Task →
+   `ui` container's command to `python -m dejasolve.cloud.sync_archive_to_aurora` → **Run task**. Check its logs (Task →
    **Logs** tab) for `synced N solved, M failed cases to Aurora`.
 3. **Update the compute stack**: CloudFormation → `dejasolve-compute` → **Update** → **Replace current
    template** → upload the updated `compute.yaml` → **Next**. Set **ImageUri** to the freshly pushed tag,
-   **RetrievalBackend** to `aurora`, and **IngestWorkerDesiredCount** to `1` (now that `ingest_worker.py`
+   **RetrievalBackend** to `aurora`, and **IngestWorkerDesiredCount** to `1` (now that `dejasolve/cloud/ingest_worker.py`
    exists) → proceed through to **Update stack**.
 4. Confirm: open `/api/health` on the `AlbDnsName` URL — `retrieval_backend` should read `"aurora"` and
    `archive_size` should match the synced count. Run an artifact through the UI as before; the retrieval stage

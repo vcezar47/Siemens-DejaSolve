@@ -1,8 +1,8 @@
 # Known bugs
 
 A bug sweep of the app as it stands (working tree at `3bf1694` + uncommitted
-changes), covering `static/index.html`, `app.py`, `dejasolve.py`, `ingest.py`,
-`casecard.py`, `model.py`, `verifier.py` and `archive_aurora.py`.
+changes), covering `dejasolve/static/index.html`, `app.py`, `dejasolve/pipeline.py`, `dejasolve/ingest.py`,
+`dejasolve/casecard.py`, `dejasolve/model.py`, `dejasolve/verifier.py` and `dejasolve/cloud/archive_aurora.py`.
 
 Each entry says what is wrong, where, how to reproduce it, and what the user
 sees. Findings marked **verified** were reproduced by running the app; the rest
@@ -28,7 +28,7 @@ against the breakaway gate before this fix and may no longer match it.
 > **FIXED.** The stepper now reads the solver's own iterates for every arm and
 > interpolates nothing. Resolution note at the end of this entry.
 
-**Verified.** `static/index.html:1573` `getStepperTrajectory()`
+**Verified.** `dejasolve/static/index.html:1573` `getStepperTrajectory()`
 
 When no artifact has been analysed yet (the state the page boots in, and the
 state it returns to via "Show the shipped example"), `LIVE` is `null`, so the
@@ -138,7 +138,7 @@ Still open from M2: `renderGeoNums` continues to print `undefined` / `NaN` for
 > **FIXED.** The domain check moved out of `ingest_rules` and now runs ahead of
 > every backend. Resolution note at the end of this entry.
 
-**Verified.** `ingest.py:330` (`ingest_ollama`), `ingest.py:222` (`ingest_llm`)
+**Verified.** `dejasolve/ingest.py:330` (`ingest_ollama`), `dejasolve/ingest.py:222` (`ingest_llm`)
 
 `ingest_rules()` calls `casecard.detect_domain(text)` and sets `domain` /
 `foreign` on the card. `ingest_ollama()` and `ingest_llm()` construct their
@@ -165,7 +165,7 @@ dejasolve.analyse(..., backend='ollama')
 ```
 
 `rho = 2700 kg/m³` is the aluminium density from the `MAT1` card, recorded as
-the hydraulic fluid density. `casecard.py:31-39` names this exact scenario as
+the hydraulic fluid density. `dejasolve/casecard.py:31-39` names this exact scenario as
 the reason the domain check exists. The Units gate passes it — 2700 is inside
 `lo/100 … hi*100` = 8 … 90000 — and reports "all 2 values are within a physical
 range".
@@ -177,7 +177,7 @@ numbers alongside the deck and the aluminium density goes straight into
 retrieval.
 
 **Related, same functions:** `ingest_llm` does `float(v)` over the raw payload
-with no key filter and no `None` guard (`ingest.py:221`), where `ingest_ollama`
+with no key filter and no `None` guard (`dejasolve/ingest.py:221`), where `ingest_ollama`
 carefully coerces and drops. A `null` or an unexpected key from the model
 raises `TypeError` / `KeyError`, neither of which is the `RuntimeError` that
 `dejasolve.analyse` catches at line 235 — so it escapes as an HTTP 500 rather
@@ -222,8 +222,8 @@ known parameter names.
 
 One deliberate behaviour change: `--backend llm` on a foreign artifact now
 returns the refusal without requiring the anthropic SDK or credentials, because
-the domain check no longer needs a model to run. `python dejasolve.py --all
---backend rules` and `python selftest.py` (5/5) are unchanged.
+the domain check no longer needs a model to run. `python -m dejasolve --all
+--backend rules` and `python -m benchmarks.selftest` (5/5) are unchanged.
 
 ---
 
@@ -236,10 +236,10 @@ the domain check no longer needs a model to run. `python dejasolve.py --all
 > everywhere its iteration count used to appear bare. Resolution note at the end
 > of this entry.
 
-**Verified.** `dejasolve.py:492-501`
+**Verified.** `dejasolve/pipeline.py:492-501`
 
 `solve["agreement"]` and `solve["saved"]` are only set when **both** cold and
-warm converged (`dejasolve.py:448`). The headline chain immediately below then
+warm converged (`dejasolve/pipeline.py:448`). The headline chain immediately below then
 reads:
 
 ```python
@@ -265,7 +265,7 @@ Solve stage headline: "cold start, 7 iterations"
 
 In the browser this compounds three ways:
 
-* `draw()` (`static/index.html:1883`) gates the headline block on
+* `draw()` (`dejasolve/static/index.html:1883`) gates the headline block on
   `s.agreement !== undefined`, so **the cold → warm metric block does not render
   at all**. The page's flagship number disappears on exactly the cases where the
   warm start helps most.
@@ -282,7 +282,7 @@ converged.
 
 Two halves — the trace, and every panel that reads an iteration count out of it.
 
-**`dejasolve.py`.** The headline chain now selects on `warm is not None` rather
+**`dejasolve/pipeline.py`.** The headline chain now selects on `warm is not None` rather
 than on `"saved" in solve`, so the arm that produced the answer is the arm the
 headline names. A baseline that failed is rendered as `cold line_search_stall`
 instead of `7 cold`, because its count is the step it gave up on, not a finish
@@ -309,9 +309,9 @@ after :  cold line_search_stall / 7 nominal -> 4 warm iterations,
 ```
 
 The four clean fixtures are unchanged apart from `same answer to 2.3e-13`
-becoming `same answer as cold to 2.3e-13`. `python selftest.py` 5/5.
+becoming `same answer as cold to 2.3e-13`. `python -m benchmarks.selftest` 5/5.
 
-**`static/index.html`.** The headline block is gated on `s.warm_iterations`
+**`dejasolve/static/index.html`.** The headline block is gated on `s.warm_iterations`
 alone, so it renders for these runs instead of collapsing to the verdict bar. A
 non-converged arm shows `did not converge` in red in place of its numeral, and
 the agreement tile names the arm it compared against — or reads
@@ -339,12 +339,12 @@ same way.
 > panel that described a refused transfer as an accepted one are now done too.
 > Resolution note at the end of this entry.
 
-**Verified.** `static/index.html:920` (`renderGeoNums`), `:550` (`liveFromTrace`)
+**Verified.** `dejasolve/static/index.html:920` (`renderGeoNums`), `:550` (`liveFromTrace`)
 
 When the verifier warns and the engineer does **not** override,
 `dejasolve.analyse` sets `warm = None`, so `solve` has no `warm_iterations` and
 no `agreement`. But `trace["retrieval"]["solution"]` is still populated
-(`dejasolve.py:478`), so `liveFromTrace()` returns a `LIVE` object and
+(`dejasolve/pipeline.py:478`), so `liveFromTrace()` returns a `LIVE` object and
 `adoptTrace()` adopts it. `renderGeoNums` then interpolates the missing keys
 directly.
 
@@ -374,7 +374,7 @@ because a refused warm start is treated as an accepted one:
   refused.
 
 The race-tab caption also asserts `"Cold 10, nominal 7, warm — iterations —
-same answer"` (`static/index.html:801`), claiming agreement between arms when one
+same answer"` (`dejasolve/static/index.html:801`), claiming agreement between arms when one
 of them never ran.
 
 #### Resolution
@@ -416,7 +416,7 @@ override.
 > a line saying which artifact was refused and why there is nothing to draw.
 > Resolution note at the end of this entry.
 
-**Verified.** `static/index.html:575` (`adoptTrace`)
+**Verified.** `dejasolve/static/index.html:575` (`adoptTrace`)
 
 `liveFromTrace()` returns `null` for any trace without a solved state — foreign
 domain, incomplete card, implausible units, blocked transfer — and `adoptTrace`
@@ -476,7 +476,7 @@ than most of it.
 > **FIXED** as part of C1 — the tabs and the slider range are rendered from the
 > iterates that exist for the case on screen. See C1's resolution note.
 
-**Verified.** `static/index.html:396-398`
+**Verified.** `dejasolve/static/index.html:396-398`
 
 ```html
 <button class="geotab" data-arm="cold">Cold Start (8+ iters)</button>
@@ -510,9 +510,9 @@ state. Two panels, one screen, two different states of the same case.
 sections and nothing consumes them, so either the panel should come back or
 ~190 lines of endpoint should go.
 
-**Why that was wrong.** The first half is true only of `static/index.html`. The
+**Why that was wrong.** The first half is true only of `dejasolve/static/index.html`. The
 endpoint has a live consumer:
-[`presentation/evidence-section.html`](../presentation/evidence-section.html)
+[`docs/presentation/evidence-section.html`](presentation/evidence-section.html)
 fetches `/api/evidence` and renders the same seven cards for the deck. I checked
 the page and not the project, and reported an unused endpoint on that basis.
 
@@ -524,7 +524,7 @@ kept serving it. That is a defensible call, and the arrangement is working as
 designed.
 
 **What was actually wrong, and is now fixed.** Only the two leftovers in
-`static/index.html`, both of which pointed at things that had moved to the deck
+`dejasolve/static/index.html`, both of which pointed at things that had moved to the deck
 file: the orphaned `.ev h2` selector (no `.ev` element exists on the page) and a
 comment reading *"the same reason as lineChart above"*, referring to a function
 that left with the panel. Both are corrected in place with a note saying where
@@ -550,7 +550,7 @@ main reason it is kept here rather than deleted outright.
 
 The Case Card table renders 442 px wide inside a 375 px viewport. Measured:
 `documentElement.clientWidth = 375`, `scrollWidth = 425` — the whole page scrolls
-sideways. Because `.panel` sets `overflow:hidden` (`static/index.html:92`), the
+sideways. Because `.panel` sets `overflow:hidden` (`dejasolve/static/index.html:92`), the
 rightmost column (`td.raw`, the "read from" provenance) is **clipped with no way
 to scroll to it**, so the provenance — the thing that makes the extraction
 auditable — is unreachable on a phone.
@@ -567,7 +567,7 @@ collapse below a breakpoint.
 > **FIXED.** Both now resolve this case's own hardware. Resolution note at the
 > end of this entry.
 
-**By inspection.** `model.py:856` (`regime`), `verifier.py:110` (`estimate_regime`)
+**By inspection.** `dejasolve/model.py:856` (`regime`), `dejasolve/verifier.py:110` (`estimate_regime`)
 
 `flows()` correctly resolves per-case hardware via `hardware(p)` / `shaft_hw(h, s)`.
 `regime()` does not — it calls `orifice_gain(A_RELIEF_MAX, p["rho"])` and
@@ -592,24 +592,24 @@ then estimates the regime as if none of them existed.
 already did, and `shaft_regime()` takes the per-shaft `w_strib` as a parameter
 (defaulting to the module constant, so every other caller is untouched).
 `model.motor_constants(p, shaft=None)` gained an optional `shaft` argument: with
-none it behaves exactly as before (the `D_mot` shorthand `fold.py`'s variant
+none it behaves exactly as before (the `D_mot` shorthand `benchmarks/fold.py`'s variant
 circuit depends on), and with `'a'`/`'b'` it resolves that branch's own
 displacement through `hardware()`.
 
 `verifier.estimate_regime()` keeps its existing top-level keys
 (`can_break_away`, `stall_torque_Nm`, `breakaway_margin`) computed exactly as
-before — `agent_select.py`'s physics ranker reads them, and changing what they
+before — `benchmarks/agent_select.py`'s physics ranker reads them, and changing what they
 mean would have silently moved an already-measured result out from under it
 without anyone rerunning it. A new `breakaway` dict adds the per-shaft version,
 resolving each branch's own `t_stat`, `t_coul` and motor displacement.
 
-This is a **guaranteed no-op for every case in `archive/cases.jsonl` and every
-fixture in `logs/`**: `sweep.py` (which built that archive) never sets any of
+This is a **guaranteed no-op for every case in `data/archive/cases.jsonl` and every
+fixture in `logs/`**: `dejasolve/sweep.py` (which built that archive) never sets any of
 the 18 constants, so `hardware(p)` resolves to the module defaults for every
-record either way. Confirmed with `python selftest.py` (5/5, including the
-"explicit defaults == module defaults" check) and `python dejasolve.py --all`
+record either way. Confirmed with `python -m benchmarks.selftest` (5/5, including the
+"explicit defaults == module defaults" check) and `python -m dejasolve --all`
 (byte-identical output). The fix only changes behaviour for a case that states
-its own hardware — which today means only `wide_sweep.py`'s synthetic machine
+its own hardware — which today means only `benchmarks/wide_sweep.py`'s synthetic machine
 variants (see N2's resolution note for what that implies for its results file).
 
 ### N2 — The breakaway gate refuses any source case with mixed shaft states
@@ -618,7 +618,7 @@ variants (see N2's resolution note for what that implies for its results file).
 > this gate now reads. Resolution and a real before/after test at the end of
 > this entry.
 
-**By inspection.** `verifier.py:215-229`
+**By inspection.** `dejasolve/verifier.py:215-229`
 
 `est["can_break_away"]` is one circuit-wide boolean, but the loop compares it
 against each shaft of the source separately:
@@ -672,12 +672,12 @@ loosen the gate.
 resolves to default hardware (see N1 — N3 is why: ingest cannot write these
 fields onto a Case Card), so `check_transfer`'s behaviour on `/api/analyse` is
 unchanged. The one place that already exercises non-default hardware through
-this exact gate is `wide_sweep.py --tolerance`, which varies all 18 constants
+this exact gate is `benchmarks/wide_sweep.py --tolerance`, which varies all 18 constants
 across six synthetic "machine variants" and calls `Verifier.check_transfer`
 directly. Its committed `wide_sweep_results.json` — the "25 real parameters,
 six machine variants" section of `/api/evidence` and the README — was measured
 against the old, buggy gate, and this fix can change which transfers it admits.
-I did not regenerate it: that is a `python wide_sweep.py` rerun (smoke-tested
+I did not regenerate it: that is a `python -m benchmarks.wide_sweep` rerun (smoke-tested
 below, no crash, all queries converged) changing a committed, cited result, and
 that call belongs to whoever owns the deck, not to a bug fix. **Flagging for a
 decision:** regenerate `wide_sweep_results.json` before the numbers on
@@ -692,14 +692,14 @@ are shown as-is in the meantime.
 > pipeline reports on a run, not just used silently. Resolution note at the
 > end of this entry.
 
-**By inspection.** `ingest.py:48` (`SYNONYMS`), `ingest.py:125` (`EXTRACTION_SCHEMA`)
+**By inspection.** `dejasolve/ingest.py:48` (`SYNONYMS`), `dejasolve/ingest.py:125` (`EXTRACTION_SCHEMA`)
 
 `SYNONYMS` covers only the seven swept parameters, and `EXTRACTION_SCHEMA`
 enumerates `model.PARAM_NAMES` with `additionalProperties: False`. So no
 backend — rules, ollama, llm or hybrid — can put `cd`, `t_stat_a`, `leak_mot_b`
 or any of the other 18 onto a Case Card. `/api/health` reports
 `"parameters": list(model.PARAM_NAMES)` (7), while the docs describe a 25-parameter
-Case Card. Every path that can reach the constants (`fold.py`, `wide_sweep.py`)
+Case Card. Every path that can reach the constants (`benchmarks/fold.py`, `benchmarks/wide_sweep.py`)
 is offline; the app itself cannot.
 
 Related: `CaseCard.validate()` only bounds-checks names present in
@@ -709,21 +709,21 @@ Related: `CaseCard.validate()` only bounds-checks names present in
 
 #### Resolution
 
-**Bounds.** `wide_sweep.py` already had physically-judged (lo, hi) multipliers
+**Bounds.** `benchmarks/wide_sweep.py` already had physically-judged (lo, hi) multipliers
 per constant (`HARDWARE_SPREAD` — "kept modest on purpose... a range wide
 enough to stop cases converging would measure the sampler rather than the
 gate"), used to generate its synthetic machine variants. It moved to
-`model.py`, next to the `HARDWARE` defaults it is a spread *around*, and a new
+`dejasolve/model.py`, next to the `HARDWARE` defaults it is a spread *around*, and a new
 `model.HARDWARE_BOUNDS` applies it in absolute units — `PARAM_BOUNDS`'s
-counterpart for the 18. `wide_sweep.py` now imports the constant instead of
+counterpart for the 18. `benchmarks/wide_sweep.py` now imports the constant instead of
 keeping a private copy that could silently drift from it. `CaseCard.validate()`
 checks a stated hardware value against `HARDWARE_BOUNDS` with the same 100×
 orders-of-magnitude slack it already applies to the 7 swept parameters —
 closing the divide-by-zero risk this entry named.
 
-**Units and synonyms.** `casecard.py` gained `HARDWARE_UNITS` (18 entries,
-read off `model.py`'s own inline unit comments) and `ALL_UNITS`, the merged
-view code that doesn't care which group a field is from needs. `ingest.py`'s
+**Units and synonyms.** `dejasolve/casecard.py` gained `HARDWARE_UNITS` (18 entries,
+read off `dejasolve/model.py`'s own inline unit comments) and `ALL_UNITS`, the merged
+view code that doesn't care which group a field is from needs. `dejasolve/ingest.py`'s
 `SYNONYMS` gained English phrasings for all 18 (no Romanian — unlike the seven
 required fields, no fixture demonstrates a concrete need for it, so nothing
 was guessed).
@@ -749,7 +749,7 @@ be silently thrown away. A second loop now merges any of the 18 the model
 found, at no extra cost since the call already happened, with `card.params`
 checked first so rules keeps precedence where both found the same field.
 
-**A real bug this exposed and fixed alongside it.** `dejasolve.py`'s ingest
+**A real bug this exposed and fixed alongside it.** `dejasolve/pipeline.py`'s ingest
 stage counted `found = len(card.params)` for its "N of 7 parameters read"
 headline. Once `card.params` could hold more than 7 keys, a stated hardware
 constant would have inflated that count past the fixed "of 7" denominator —
@@ -797,14 +797,14 @@ hardware constant filled through the new one, in the same call.
 retrieval are completely untouched — `Archive.nearest()` still normalises only
 on `model.PARAM_NAMES`, and the Case Card table's first (required) section is
 identical to before. Checked directly: no reference to any of the 18 constant
-names exists anywhere in `static/index.html`'s 3D drawing code (`machineParts`,
+names exists anywhere in `dejasolve/static/index.html`'s 3D drawing code (`machineParts`,
 `schematic`, `renderMachine`) — bore sizes come from `A_valve_a`/`A_valve_b`
 (already one of the 7), pipe colours and shaft speeds come from the *solved
 state*, never from a hardware constant directly. The geometry the page draws
 is identical whichever way a case's hardware resolves; only the solved numbers
 can move, and only for an artifact that explicitly states one of these 18
-fields — none of the shipped sample fixtures do. `python selftest.py` (5/5,
-byte-identical) and `python dejasolve.py --all` (byte-identical) confirm the
+fields — none of the shipped sample fixtures do. `python -m benchmarks.selftest` (5/5,
+byte-identical) and `python -m dejasolve --all` (byte-identical) confirm the
 seven fixtures and the archive are unaffected.
 
 ### N4 — "Show the retrieved pair" leaves the hand-picked tile selected
@@ -813,7 +813,7 @@ seven fixtures and the archive are unaffected.
 > `MACH.right`, and re-renders the cloud. Resolution note at the end of this
 > entry.
 
-**Verified.** `static/index.html:1728`
+**Verified.** `dejasolve/static/index.html:1728`
 
 `$('#machpair').onclick = () => { MACH.right = null; renderMachPanel(); }` clears
 the machine panel's right subject but never clears `GEO.sel` or the tile's `.on`
@@ -847,7 +847,7 @@ now revert together.
 > layout box on screen, and the per-pipe checkbox lookup is cached. Resolution
 > note at the end of this entry.
 
-**Verified.** `geoTick`, `machTick`, `flowTick` (`static/index.html:974`, `1553`, `1214`)
+**Verified.** `geoTick`, `machTick`, `flowTick` (`dejasolve/static/index.html:974`, `1553`, `1214`)
 
 All three run for the life of the page. None is paused when its section is
 scrolled out of view, and none of the stored handles (`GEO.raf`, `MACH.raf`,
@@ -906,7 +906,7 @@ attribute) and updates on `change`.
 > gained ARIA state. Resolution note — including a real bug this work turned
 > up — at the end of this entry.
 
-**By inspection.** `static/index.html:33`, `:57`
+**By inspection.** `dejasolve/static/index.html:33`, `:57`
 
 The reduced-motion rules disable `.gradtext`, `.run`, `header::after` and the
 body background drift. The three rAF loops — the spinning 3D assembly, the
@@ -997,7 +997,7 @@ the previous fix-by-coincidence could have.
 > so `refreshHealth()`'s poll — which only ever touched `#hint` — has nothing
 > in that element to overwrite. Resolution note at the end of this entry.
 
-**Verified.** `static/index.html:494` (`explain`), `:510` (`refreshHealth`)
+**Verified.** `dejasolve/static/index.html:494` (`explain`), `:510` (`refreshHealth`)
 
 `loadFile()` writes `loaded <name> (n kB)` into `#hint`. `refreshHealth()` runs on
 a 15 s interval and on window focus, and calls `explain()`, which unconditionally
@@ -1031,7 +1031,7 @@ sample chip afterward — `#loadhint` clears.
 > process lifetime. Verified against a fake DB layer (no live Aurora in this
 > environment) — resolution note at the end of this entry.
 
-**By inspection.** `archive_aurora.py:98-121`
+**By inspection.** `dejasolve/cloud/archive_aurora.py:98-121`
 
 `self.records` is snapshotted at construction; `nearest()` queries the live table
 and then does `next(i for i, r in enumerate(self.records) if r["case_id"] == case_id)`.
@@ -1086,16 +1086,16 @@ lru_cache`'s own well-established contract already guarantees.
 
 **By inspection.**
 
-* `static/index.html:667` — `VW` and `VH` are declared and never read (`screen()`
+* `dejasolve/static/index.html:667` — `VW` and `VH` are declared and never read (`screen()`
   uses `VCX` / `VCY`).
-* `static/index.html:1111` — `const L = []` in `flowLeg` is pushed to and never read.
-* `static/index.html:820` — `schematic()`'s inner `branch(Y, p2, p3, w_, area)`
+* `dejasolve/static/index.html:1111` — `const L = []` in `flowLeg` is pushed to and never read.
+* `dejasolve/static/index.html:820` — `schematic()`'s inner `branch(Y, p2, p3, w_, area)`
   takes `area` and ignores it; `p.A_valve_a` / `p.A_valve_b` are passed in at
   lines 846-847 and dropped. The section copy says "bore is the valve's real flow
   area", which is true of the 3D view (`machineParts` does use `bore(area)`) but
   not of the contact-sheet tiles.
-* `static/index.html:74` — `h1 span{}`, an empty rule.
-* `static/index.html:1918-1940` — `draw()` escapes most interpolated values but
+* `dejasolve/static/index.html:74` — `h1 span{}`, an empty rule.
+* `dejasolve/static/index.html:1918-1940` — `draw()` escapes most interpolated values but
   not `sug.on_fields`, not the parameter names in `Object.entries(sug.values)`,
   and not `st.detail.indexed_on`. All are server-generated today, so this is a
   consistency/robustness nit rather than a live XSS, but it is the one place in
@@ -1129,7 +1129,7 @@ true of the 3D view and false of the tiles beside it. Verified: a tile with
 > Verified with a case constructed specifically to exceed the fixture's
 > ceiling — resolution note at the end of this entry.
 
-**By inspection.** `static/index.html:941` (`renderTiles`)
+**By inspection.** `dejasolve/static/index.html:941` (`renderTiles`)
 
 `PSCALE` is computed once from the contact-sheet tiles plus the fixture pair
 (measured: 258.3 bar) and is never recomputed in `adoptTrace`. `ramp()` clamps
@@ -1168,7 +1168,7 @@ confirming the fix does not just always grow the number.
 > below (`#flow` was never actually affected). Resolution notes inline with
 > each item.
 
-* `casecard.py:117` — `"bara"` and `"barg"` both map to a factor of 1.0. The
+* `dejasolve/casecard.py:117` — `"bara"` and `"barg"` both map to a factor of 1.0. The
   model works in gauge pressure (`P_TANK`), so an artifact stating `bara` is
   read one bar high with no complaint.
 
@@ -1181,7 +1181,7 @@ confirming the fix does not just always grow the number.
   Verified: `187.0 bara -> 185.98675 bar`; `187.0 bar` (unaffected) stays
   `187.0`.
 
-* `casecard.py:125` — `normalise_unit` silently returns the value unconverted
+* `dejasolve/casecard.py:125` — `normalise_unit` silently returns the value unconverted
   for any unit it does not recognise (`kg/dm^3` is absent while `kg/dm3` is
   present, for instance). A misread unit becomes a plausible-looking number,
   which is the exact failure mode the Units gate exists to catch — and the Units
@@ -1198,7 +1198,7 @@ confirming the fix does not just always grow the number.
   both now convert to `850.0` from `0.85`; before this fix only the second
   form did.
 
-* `ingest.py:89` — `if canon is None or canon in params: continue` means the
+* `dejasolve/ingest.py:89` — `if canon is None or canon in params: continue` means the
   *first* occurrence of a key wins. A log that states a value and then corrects
   it later keeps the superseded one.
 
@@ -1207,7 +1207,7 @@ confirming the fix does not just always grow the number.
   Verified: an artifact stating `Q_nom = 62.4` then `Q_nom = 65.0` now reads
   `65.0`, with provenance correctly citing the second line.
 
-* `ingest.py:513` — `ingest_hybrid` copies `model_side.notes` onto the card even
+* `dejasolve/ingest.py:513` — `ingest_hybrid` copies `model_side.notes` onto the card even
   when the model contributed nothing, including the "[dropped …]" note
   `verify_provenance` appends about fields that were never used.
 
@@ -1229,7 +1229,7 @@ confirming the fix does not just always grow the number.
   **Fixed.** A module-level `logger = logging.getLogger("dejasolve")`,
   `logger.warning(...)` in place of `print(...)`.
 
-* `static/index.html:1749` — `geoBoot().catch()` removes `#mach` when
+* `dejasolve/static/index.html:1749` — `geoBoot().catch()` removes `#mach` when
   `/api/viz` is unavailable, but `#stepper` and `#flow` are left in the DOM. Since
   `stepperBoot()` is only reached from the tail of `machBoot()` (itself the tail
   of `geoBoot()`), the "Newton Convergence & Fluid Dynamics Studio" renders in

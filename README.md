@@ -1,13 +1,43 @@
 # Déjà Solve
 
 Warm-start a solver's initialisation from the physically-nearest case it has
-already solved, instead of starting from zero every time.
+already solved, instead of starting from zero every time — and check, before and
+after the solve, that reusing that case was legitimate.
 
-Siemens Summer School 2026 · domain: *Digital Twins & Platforms*
+Siemens Summer School 2026 · domain: *Digital Twins & Platforms* · **finished and presented**
+
+Four layers: **ingest** (a messy run artifact becomes a structured Case Card),
+**retrieve** (the best of the nearest solved cases, walked toward the new setup
+along the solution manifold), **verify** (physics-based gates that warn or block
+with a reason, before *and* after the solve), and **runtime** (Docker, with an
+AWS build behind switches that default to off).
+
+## At a glance
+
+Everything below is reproducible from the repo — see [Reproduce every number](#reproduce-every-number).
+
+| | |
+|---|---|
+| **Newton iterations** (200 fresh cases, 395-case archive) | 8.3 cold → 7.1 nominal → **3.0 warm** |
+| **vs a competent nominal guess** | **57% fewer** (63% fewer than a flat start, on total iterations) |
+| **Runs that never converged** | 4 / 200 cold → **0 / 200** warm |
+| **Answer** | identical to 4e-08 bar / 4e-08 rev/min — the warm start changes the guess, never the physics |
+| **The app as shipped** (shortlist → gate → rank → second-order) | 3.04 mean iterations, 57.3%, 0 failures |
+| **Fold circuit: silently wrong answers** | 4 → **0**, for +1% solver work |
+| **Ingest** (5 artifacts, 35 fields) | **35 / 35**, 0 invented values |
+| **Archive** | 395 solved + 5 failed runs — the failures are kept on purpose |
+
+**The claim this project tested hardest is its own speed number.** A hand-derived
+per-branch initialiser (no archive, no solve) reaches 2.70 iterations on the base
+circuit and beats retrieval there; retrieval's case is that it needs no
+derivation and applies to a circuit it has never seen. See
+[The baseline that beats the archive](#the-baseline-that-beats-the-archive).
 
 - [DEJA_SOLVE_PLAN.md](DEJA_SOLVE_PLAN.md) — the plan, the pitch and the presentation notes
 - [phases/](phases/) — what was actually built in each phase, and what was rejected
 - [docs/architecture.md](docs/architecture.md) — the two services that exist, what each layer becomes at scale, and what is not built
+- [docs/aws-deployment-plan.md](docs/aws-deployment-plan.md) — the CloudFormation build of the "at scale" row
+- [docs/known-bugs.md](docs/known-bugs.md) — the bug sweep of the app, with what was fixed and what was declined
 
 ## Reproduce every number
 
@@ -29,6 +59,12 @@ changed with it. Ingest is scored on the parser alone by default; add
 `--score-models` to score the local model too (minutes per prose artifact).
 
 Requires Python 3.11+, numpy and matplotlib (`pip install -r requirements.txt`).
+`python selftest.py` runs alone in seconds — the analytic Jacobian and `∂F/∂p`
+against central differences (worst relative error 3e-08), the solution Hessian's
+symmetry, and a check that hardware defaults change nothing. 5 / 5 pass.
+
+Not in `run_all.py`, so not covered by the hash: `bench_app_path.py`, `geometry.py`,
+`manifold.py`, `coupled.py` and `python agent_select.py --model ...`.
 
 ## What is here
 
@@ -36,19 +72,24 @@ Requires Python 3.11+, numpy and matplotlib (`pip install -r requirements.txt`).
 |---|---|
 | `model.py` | The physics: a hydraulic manifold driving two motors against Stribeck friction. 7 nonlinear equations, analytic Jacobian, damped Newton, dynamic stability |
 | `sweep.py` | Runs a 400-case parameter sweep. What converged becomes the archive; what failed is kept too, in `archive/failures.jsonl` |
-| `bench.py` | On 200 *fresh* cases: solve from a flat start, a nominal guess, the nearest archived case verbatim, and the same case transferred first-order (`model.solution_sensitivity`, `model.transfer_start`). Writes `results.json` |
+| `bench.py` | On 200 *fresh* cases: solve from a flat start, a nominal guess, the nearest archived case verbatim, and the same case transferred first-order, ranked, second-order (`model.solution_hessian`, `model.transfer_start_second_order`) and by simplex. Writes `results.json` |
+| `bench_app_path.py` | The number as the *app* produces it — `Archive.select` then `Archive.warm_start`, gate and fallback included — over `bench.py`'s own 200 queries. Writes `bench_app_path_results.json`. Not in `run_all.py` |
 | `surrogate.py` | The *other* source of a warm start: a quadratic response surface fitted to the archive, predicting a state instead of recalling one. The PhysicsAI arrow, at laptop scale |
 | `dimensionality.py` | What happens to retrieval when the Case Card carries hundreds of parameters instead of 7 — and which gate stops working |
 | `failure_zone.py` | Are the failed runs worth keeping? Tests whether proximity to a failure predicts anything — with the controls that decide whether it is real |
 | `selftest.py` | The invariants everything rests on: the analytic Jacobian against central differences, and hardware defaults that must change nothing |
 | `wide_sweep.py` | The same measurement on 25 real parameters and six machine variants — where the hardware rule finally becomes reachable |
+| `topk.py`, `agent_select.py` | Two claims measured and declined: walking deeper into the archive by distance, and letting a model (or a physics heuristic) choose among the candidates. See *Claims tested and declined* |
+| `geometry.py`, `manifold.py`, `coupled.py` | Harder circuits, none of them shipped: pipe geometry (12 unknowns), an N-branch manifold (up to 32 unknowns), and a shared-return circuit with a bistable band. Where the scaling claim and the decomposed baseline were tested. Not in `run_all.py` |
+| `viz.py` | Projection data for the 3D views — the archive, a matched pair, and the Newton race. Cross-checks its iteration counts against `results.json` and refuses to write if they disagree |
 | `verifier.py` | Layer 3: decides whether reusing a case is legitimate, and whether the answer is an operating point at all. Verdicts carry a severity — a *risk* the engineer may override, or a *fact* they may not |
 | `fold.py` | The circuit variant where a warm start *can* be silently wrong, and the naive-vs-verified experiment |
 | `casecard.py` | Layer 1's output record: canonical units, quoted provenance, explicit absence |
 | `ingest.py` | Turns a run artifact into a Case Card — deterministic parser, a local model via Ollama, or Claude, all behind one interface |
 | `make_logs.py` | Seven messy artifacts — five with exact ground truth, plus two built to trip the verifier |
-| `dejasolve.py` | The pipeline: `analyse()` returns a structured trace; the CLI and the service both render it |
+| `dejasolve.py` | The pipeline: `analyse()` returns a structured trace; the CLI and the service both render it. Retrieval is `Archive.select` — shortlist the 5 nearest, filter by the verifier, rank the survivors by predicted start error — and the start is transferred second-order |
 | `app.py` + `static/` | **The demo UI** — FastAPI service and the page: `index.html` (markup), `app.css`, `app.js`, and a vendored three.js for the WebGL machine view. Nothing is fetched from a CDN, so it runs offline |
+| `archive_aurora.py`, `sync_archive_to_aurora.py`, `ingest_worker.py`, `infra/cloudformation/` | The "at scale" build: Aurora + pgvector retrieval, an SQS ingest worker, and the CloudFormation templates. Every one is gated behind an environment variable that defaults to off — see [Runtime](#runtime-docker-and-the-aws-build) |
 | `plot_convergence.py` | Draws the Phase 1 figure from `results.json` |
 | `run_all.py` | All of it, in order |
 
@@ -64,11 +105,20 @@ ingest, units, retrieve, verify, solve, admissible — each with its own verdict
 A stage that warns is amber and a stage that blocks is red, because those are
 different statements. The header badge reads **395 solved · 5 failed**, because
 the archive is two things now, and Retrieve names the nearest *failed* run
-alongside the nearest solved one — as two distances, never as a verdict. Under the headline sits the **report**: what happened, what
-it means, and — when the verdict is a warning — a name field, a reason field and
-**Warm-start anyway**. Accepting a warning appends to the audit trail shown at the
-bottom of the page.
-The headline is the number, against both baselines: **8 cold / 7 nominal → 3 warm Newton iterations, same answer to 2.3e-13** — the warm start now transfers first-order (§ Result), not verbatim.
+alongside the chosen solved one — as two distances, never as a verdict. Retrieve
+also says how the pick was made: the best of the 5 nearest that passed the gate,
+and which case it beat if that was not the nearest. Under the headline sits the
+**report**: what happened, what it means, and — when the verdict is a warning — a
+name field, a reason field and **Warm-start anyway**. Accepting a warning appends
+to the audit trail shown at the bottom of the page.
+The headline is the number, against both baselines: **8 cold / 7 nominal → 3 warm Newton iterations, same answer to 2.3e-13** — the warm start is transferred second-order (§ Result), not verbatim, and the report names which transfer order it used.
+
+Alongside the pipeline there is a **3D view**, three.js and vendored: the archive's
+solved states projected to three dimensions, the query beside the case retrieval
+chose, and a race between the three starts — plus a **Newton convergence studio**
+that steps the real solver iterates across the 3D machine model. Every iterate it
+draws is the solver's own (an earlier version interpolated the path; that was bug
+C1 in [docs/known-bugs.md](docs/known-bugs.md) and is fixed).
 
 An **Evidence** panel used to sit below the pipeline — the measured results,
 the three arms, the surrogate arms, the fold circuit's 4-vs-40, the
@@ -96,15 +146,19 @@ ingest falls back to the parser and the demo still runs.
 python dejasolve.py --all
 ```
 
-Five artifacts — a tidy solver log, an older banner log in SI units, a truncated
-log, an English email, a Romanian note — go through ingest, retrieval, the
-verifier, a warm solve, and an admissibility check:
+Seven artifacts — a tidy solver log, an older banner log in SI units, an oversized
+pump, a truncated log, a structural NX Nastran log, an English email, a Romanian
+note — go through ingest, retrieval, the verifier, a warm solve, and an
+admissibility check. With `--backend rules` (parser only, no model needed):
 
 ```
-run-tidy.log      warm_started         8 cold / 7 nominal -> 4 warm iterations
-run-legacy.log    warm_started         8 cold / 7 nominal -> 4 warm iterations
+run-tidy.log      warm_started         8 cold / 7 nominal -> 2 warm iterations
+run-legacy.log    warm_started         8 cold / 7 nominal -> 3 warm iterations
 run-bigpump.log   warned_not_used      nominal guess, 7 iterations (archive not used)
 run-truncated.log refused_incomplete   missing p_crack
+part-bracket.log  foreign_domain       3D structural FE; nothing in this archive applies
+note-email.txt    refused_incomplete   (parser alone cannot read prose — the hybrid backend can)
+note-ro.txt       refused_incomplete   (as above)
 ```
 
 The half that does not warm-start is the interesting half — and it stops in two
@@ -120,7 +174,7 @@ back to the nominal guess so the warning costs nothing, and offers an override:
 python dejasolve.py logs/run-bigpump.log --override --operator you --basis "why"
 ```
 
-`10 cold / 7 nominal -> 5 warm iterations, same answer to 2.4e-09` — and the
+`10 cold / 7 nominal -> 3 warm iterations, same answer to 3.2e-09` — and the
 acceptance is recorded, with a name, a reason and a timestamp, in the trace's
 audit trail. Here the warning was conservative and the override paid off. That is
 the argument *for* warning rather than refusing; what makes it safe is that the
@@ -301,30 +355,69 @@ compute once per card and stored on it (`model.solution_sensitivity`). The
 start becomes `x0 = x_j + S_j (p - p_j)` — the neighbour's answer, walked
 toward the query — instead of the neighbour's answer standing in for it.
 
-| | warm (verbatim) | + sensitivity | + ranked by predicted error, k=5 |
-|---|---|---|---|
-| mean Newton iterations | 4.9 | 3.8 | 3.4 |
-| **vs nominal** | **31.1%** | **47.1%** | **51.5%** |
-| vs the verbatim warm start | — | 23.3% | 29.7% |
+| | warm (verbatim) | + sensitivity | + ranked by predicted error, k=5 | **+ second-order** |
+|---|---|---|---|---|
+| mean Newton iterations | 4.9 | 3.8 | 3.4 | **3.0** |
+| **vs nominal** | **31.1%** | **47.1%** | **51.5%** | **57.2%** |
+| vs the verbatim warm start | — | 23.3% | 29.7% | 37.9% |
+| vs the flat start (total iterations, 1631) | 41.6% | 54.0% | 57.8% | **62.7%** |
 
-Same candidate as `warm` in the middle column — only the transfer changes, so
-it isolates what the tangent alone is worth. The right column also lets the
+Same candidate as `warm` in the second column — only the transfer changes, so
+it isolates what the tangent alone is worth. The third column also lets the
 tangent choose *which* card to transfer from, ranked by predicted start error
 (`‖S_j Δp‖`, scaled) instead of by parameter distance — which is the actual
-question retrieval was a proxy for. **0 answers differ** from the verbatim
-column across all three; same tolerance, same agreement to 3e-08 bar.
+question retrieval was a proxy for. The fourth adds the curvature of the
+solution manifold, `d²x*/dp²` (`model.solution_hessian`, recorded per card by
+`sweep.py`): the archived answer is walked toward the query *along the curve*
+rather than shooting straight off the tangent, which matters wherever the relief
+valve cracks or a shaft crosses the Stribeck peak. **0 answers differ** from the
+verbatim column across all four; same tolerance, same agreement to 4e-08 bar. A
+simplex arm (interpolating between several candidates) was measured as well and
+lands at 4.2 iterations / 40.9% — worse than ranking, so it is not shipped.
 
-It costs 392 bytes and 277 µs per card, computed once when the case enters the
-archive, and a 7×7 matrix–vector product per query — about 15% of one residual
-evaluation. `python selftest.py` checks the analytic `∂F/∂p` against central
-differences (worst relative error 3e-08) the same way it checks the Jacobian.
+The tangent costs one 7×7 matrix–vector product per query — about 15% of one
+residual evaluation — and is computed once when the case enters the archive. The
+Hessian adds ~50 ms per card, offline. A card without a Hessian degrades to
+first-order, and one without a tangent to verbatim, so an old archive keeps
+working at the accuracy it can support; the report names which order it used.
+`python selftest.py` checks the analytic `∂F/∂p` against central differences
+(worst relative error 3e-08) the same way it checks the Jacobian.
 
-**The 31% still ships as the conservative number** — it is what a verbatim
-transfer gets, and every other result in this file (the surrogate comparison,
-the dimensionality table, the wide-parameter sweep) is measured against it, so
-changing the baseline there would mean re-measuring all of them. The 47%/51.5%
-is the newer result, on the base circuit, reported alongside it rather than in
-place of it.
+### The number as the app produces it
+
+`bench.py` scores each construction on its own, with no verifier and no fallback.
+The app does not run one construction — `dejasolve.analyse` shortlists the 5
+nearest, lets the verifier **filter** them, ranks the survivors by predicted start
+error and transfers second-order. `bench_app_path.py` runs exactly that path over
+the same 200 queries:
+
+| | nominal | **app path** |
+|---|---|---|
+| mean Newton iterations | 7.10 | **3.035** |
+| **vs nominal** | — | **57.3%** |
+| runs that never converged | 0 / 200 | 0 / 200 |
+| picked a case other than the nearest | — | 131 / 200 |
+| fell back to the nominal guess (gate admitted nobody) | — | 2 / 200 |
+| transfer order used | — | second-order on 198 |
+
+The order of the three steps is the design: **filter, then rank.** Ranking first
+and gating the winner afterwards is the obvious implementation and it is worse —
+the ranked pick is often further away than the nearest, so the coverage rule
+refuses it and the archive is abandoned for a case two rows down that the gate
+would have admitted. Measured on the same 200 queries: rank-then-gate falls back
+to the nominal guess on 21, gate-then-rank on 2. And when the gate refuses all 5,
+ranking is abandoned and the plain nearest case is returned with its refusal:
+predicted start error is read off a tangent recorded at the candidate's own
+operating point, and that stops describing anything outside the region the gate
+vouches for. On `run-bigpump.log` ranking the refused shortlist puts the *worst*
+of the five first.
+
+**The 31% remains the conservative number for everything else in this file.** It is
+what a verbatim transfer gets, and the surrogate comparison, the dimensionality
+table and the wide-parameter sweep below are all measured against that arm, so
+changing the baseline there would mean re-measuring all of them. The 57% is the
+shipped result, on the base circuit, reported alongside it rather than in place of
+it.
 
 ### Why there is a third column
 
@@ -577,11 +670,140 @@ base circuit: a start that lands closer to the true operating point is a start
 less likely to overshoot into an unstable one, so cost and correctness improve
 together instead of trading off.
 
-## Not done yet
+## The baseline that beats the archive
 
-Phase 4 is Docker and the AWS architecture slide. The container needs no
-secrets — the full demo runs on the deterministic ingest backend.
+[WARP](https://arxiv.org/abs/2605.05728) says to test against the baseline a sceptic
+would pick, and `nominal_start` is still three rules of thumb. A competent engineer
+*decomposes*: each branch sees the rest of the machine through one scalar, the
+manifold pressure. Fix it, close the branch in closed form, bisect until supply meets
+demand. No archive, no solve, no residual evaluation. `coupled.py` builds it.
 
-The UI shipped in Phase 3 — a FastAPI service with a single-page client, both
-clients of `dejasolve.analyse()`, which returns a structured trace. (An earlier
-draft of this file said it was deferred; it was not.)
+| circuit | shipped `nominal_start` | archive (ranked + 1st order) | decomposed guess |
+|---|---|---|---|
+| base, mean iterations | 7.10 | 3.44 | **2.70** |
+| fold, mean iterations | — | 7.40 | **4.52** |
+| fold, failures / inadmissible roots | — | 49 / 4 | **0 / 0** |
+
+It beats retrieval outright — the second-order transfer (3.04) narrows the base-circuit
+gap without closing it. Three attempts to build a circuit that does *not* decompose
+all failed: a wider manifold (more branches is *more* decomposable), a load-sensing
+pump, and a shared return manifold with a bistable band. A hydraulic network is a
+handful of shared pressures joining locally-closed-form branches, and that is the
+definition of decomposable.
+
+What survives, and it is measurable: **a decomposed initialiser is bound to its
+topology.** It cannot even be called on the 12-unknown geometry circuit, the
+22-unknown manifold or the 14-unknown coupled circuit — wrong state dimension — and
+each needed about forty lines of algebra specific to that circuit. Retrieval needed
+nothing: the same code, on any circuit whose Case Card you can build, from run number
+two. The claim is therefore not *"fewer iterations than a competent tool"*. It is:
+
+> A hand-derived initialiser beats retrieval on the circuit it was written for.
+> Nobody writes one per model. Retrieval is within ~30% of it, needs no derivation,
+> and transfers to a circuit it has never seen.
+
+That is why the layers a formula cannot replace — **ingest** and the **verifier** —
+carry the project as much as the speed number does. Full record:
+[phases/phase-1g-decomposition.md](phases/phase-1g-decomposition.md). These numbers
+come from `coupled.py` and are not in `run_all.py`.
+
+## Beyond the base circuit
+
+Real models are not 7 parameters. Two extensions were built and measured; neither
+is shipped, and neither confirmed the tempting story.
+
+**Scaling** (`manifold.py`, [phase 1f](phases/phase-1f-scaling.md)). The pitch "cold
+starts on bigger models take 30–50 iterations, so the saving grows to 80–90%" inflates
+the baseline — the error above, again. Measured on a manifold of 2–6 branches
+(36–88 parameters), on a uniform archive, **the first-order transfer degrades faster
+than the verbatim one** — a tangent has a validity radius — and at four branches it is
+worse than doing nothing. The ranked arm survives because it declines to
+extrapolate far. Rebuilt the way real archives look — a handful of machine designs,
+many operating points each — the ranked arm returns **40.8–48.5%** at 62–88 parameters.
+The saving tracks archive density in the *effective* dimension, not the width of the
+Case Card: it degrades gently with complexity rather than growing with it. The
+n = 6 row carries a caveat: the nominal guess itself stops working there.
+
+**Geometry** (`geometry.py`, [phase 1e](phases/phase-1e-geometry.md)). Give the circuit
+five pipe runs with a length and a bore (Darcy–Weisbach; 12 unknowns, 18 parameters)
+and the "layout is illustrative" disclaimer becomes false. Retrieval returns **14.3%**
+against nominal, against 31% on the lumped circuit — and a random archived state is
+now *worse* than the nominal guess (−2.8%), so the index is doing all the work.
+Retrieving on the 7 lumped parameters alone gets 7.9%: geometry has to be on the Case
+Card. The oracle sits at 40.2%, which is headroom left unclaimed.
+
+## Claims tested and declined
+
+The pattern of declining its own claims is deliberate, and each is a file you can run:
+
+| claim | verdict |
+|---|---|
+| The archive rescues runs that fail cold | **No** — the nominal guess rescues all 4 too |
+| A worse Jacobian makes the archive worth more | **No** — it makes the *flat start* worth less |
+| Pre-filtering a predicted start is a safety mechanism | **No** — a cost mechanism; safety comes from the gate on the *answer* |
+| Proximity to a failed run should be a gate rule | **No** — advisory only (AUC 0.77 for "will this die?", 0.63 for "will reuse go wrong?") |
+| Walking deeper into the archive by distance (`topk.py`) | **No** — k = 1 is the optimum by distance |
+| A model or heuristic can rank the candidates better (`agent_select.py`) | **No** — four rankers at or below the random floor; the models parse cleanly and choose badly |
+| The saving grows with model complexity | **No** — it degrades gently ([above](#beyond-the-base-circuit)) |
+| Retrieval beats a competent baseline on iteration count | **No** — not against a hand-derived one ([above](#the-baseline-that-beats-the-archive)) |
+
+The selection-agent result and the shipped ranking do not contradict each other: what
+lost was ordering candidates by distance, by physics heuristics or by a model; what
+won is ranking the gate's survivors by the tangent-predicted start error, which is the
+question distance was a proxy for. The verifier holds the veto throughout — the agent
+proposes, the verifier disposes.
+
+## Runtime: Docker and the AWS build
+
+```bash
+docker compose up                        # the demo at http://localhost:8000
+docker compose --profile reproduce up    # regenerate every number, then exit
+```
+
+One image, two services — `ui` (FastAPI + the page) and `runner` (`python run_all.py`,
+profile-gated) — non-root, with a `HEALTHCHECK` on `/api/health`. It needs no secrets:
+the full demo runs on the deterministic ingest backend, and the Phase 1 summary hash
+is identical from the host and from the container.
+
+The "at scale" row of [docs/architecture.md](docs/architecture.md) is written as real
+code and CloudFormation, not a diagram: Aurora Serverless v2 with pgvector for
+retrieval (`RETRIEVAL_BACKEND=aurora`), an SQS queue and ECS Fargate worker for ingest,
+a DynamoDB mirror of the audit trail (`AUDIT_TABLE`), S3 for raw artifacts, and a CPU
+Ollama instance for the model backend — four templates in
+[`infra/cloudformation/`](infra/cloudformation/), deployed in order and torn down
+independently ([docs/aws-deployment-plan.md](docs/aws-deployment-plan.md)).
+
+**It was deployed and it worked** — all four stacks (network, data, ollama, compute)
+were built in `eu-west-2`, with the same container running on ECS Fargate behind an
+ALB against Aurora, SQS and DynamoDB. **It is not running now:** all of it was deleted after the presentation so the account carries no cost, so
+there is no live URL. The templates are unchanged and redeploy in the order the plan
+gives. Every backend is gated behind an environment variable that defaults to off, so
+the benchmarked pipeline and a plain `docker compose up` never touch AWS, and none of
+the reported numbers depend on it.
+
+## Status and limits
+
+The project is finished and presented. What it does not do, stated plainly:
+
+- **No live cloud deployment.** The AWS stack was built and verified, then torn down
+  (see [Runtime](#runtime-docker-and-the-aws-build)); what remains is the templates.
+- **State vectors only.** No mesh handling, no field transfer, no structural solving.
+  `part-bracket.log` (NX Nastran) is refused at the domain gate, on purpose, and the
+  mapped-field adapter needed for 3D is the next piece of real engineering. Amesim
+  (a state vector) is what the demo covers; STAR-CCM+ and Simcenter 3D are a mapping,
+  with FMI/FMU as the standard warm-start interface.
+- **One circuit family.** Every headline number is on a hydraulic manifold with two
+  motors. The scaling and geometry work says how it degrades; it does not say it
+  generalises.
+- **The speed number is against a rule-of-thumb baseline.** A hand-derived
+  initialiser beats it on the circuit it was written for (see above).
+- **No tenancy, authentication or retention policy.** One archive, one domain, no
+  notion of who may reuse whose results.
+- **The hosted-model (Claude) ingest backend is written and has never executed here.**
+  The local model (`qwen2.5:7b` via Ollama) is what was measured.
+- **The archive is a file.** `cases.jsonl` is read into memory — right for 395 cases,
+  wrong for the first customer. Phase 1c also shows the *metric* degrades long before
+  the *scan* does, so an ANN index would make a failing search faster, not better.
+
+The bug sweep in [docs/known-bugs.md](docs/known-bugs.md) records every finding against
+the app and how each was resolved.
